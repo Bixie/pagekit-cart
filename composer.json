@@ -1,0 +1,20 @@
+{
+  "name": "bixie/cart",
+  "module": "bixie/cart",
+  "type": "pagekit-extension",
+  "version": "0.5.0",
+  "title": "Shopping cart handler",
+  "description": "Enables you to sell items to your visitors.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Bixie",
+      "email": "info@bixie.org",
+      "homepage": "http://cart.bixie.org"
+    }
+  ],
+  "extra": {
+    "icon": "icon.svg",
+    "scripts": "scripts.php"
+  }
+}
