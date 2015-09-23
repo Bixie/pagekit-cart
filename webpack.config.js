@@ -2,7 +2,10 @@ module.exports = [
 
     {
         entry: {
-            /*pagekit addons*/
+            /*sections*/
+            "download-section-cart": "./app/components/download-section-cart.vue",
+            "bixie-addtocart": "./app/addtocart.js",
+            "bixie-cart": "./app/cart.js",
             /*frontpage views*/
             "cart": "./app/views/cart.js",
             /*admin views*/

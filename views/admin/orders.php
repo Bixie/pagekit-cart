@@ -1,5 +1,28 @@
 <?php $view->script('admin-orders', 'bixie/cart:app/bundle/admin-orders.js', ['vue']) ?>
+<?php
+$util = $app['db']->getUtility();
 
+if ($util->tableExists('@cart_product')) {
+	$util->dropTable('@cart_product');
+}
+
+$util->createTable('@cart_product', function ($table) {
+	$table->addColumn('id', 'integer', ['unsigned' => true, 'length' => 10, 'autoincrement' => true]);
+	$table->addColumn('active', 'smallint');
+	$table->addColumn('item_model', 'string', ['length' => 128]);
+	$table->addColumn('item_id', 'smallint');
+	$table->addColumn('price', 'decimal', ['precision' => 9, 'scale' => 2]);
+	$table->addColumn('vat', 'string', ['length' => 64]);
+
+	$table->addColumn('data', 'json_array', ['notnull' => false]);
+	$table->setPrimaryKey(['id']);
+	$table->addIndex(['active'], 'CART_PRODUCT_ACTIVE');
+	$table->addIndex(['item_id'], 'CART_PRODUCT_ITEM_ID');
+	$table->addIndex(['price'], 'CART_PRODUCT_PRICE');
+});
+
+
+?>
 <div id="cart-orders" class="uk-form uk-form-horizontal" v-cloak>
 
 	<div class="uk-margin uk-flex uk-flex-space-between uk-flex-wrap" data-uk-margin>

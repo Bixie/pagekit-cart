@@ -66,28 +66,6 @@
 							</div>
 						</div>
 
-						<div class="uk-form-row">
-							<label for="form-mainpage_image_align" class="uk-form-label">{{ 'Image align' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<select name="mainpage_image_align" id="form-mainpage_image_align" class="uk-form-width-small"
-										v-model="config.mainpage_image_align">
-									<option value="left">{{ 'Left' | trans }}</option>
-									<option value="right">{{ 'Right' | trans }}</option>
-									<option value="center">{{ 'Center' | trans }}</option>
-								</select>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Grid filter' | trans }}</span>
-
-							<div class="uk-form-controls uk-form-controls-text">
-								<p class="uk-form-controls-condensed">
-									<label><input type="checkbox" v-model="config.filter_tags"> {{ 'Filter by tags' | trans }}</label>
-								</p>
-							</div>
-						</div>
 
 					</div>
 				</li>
@@ -108,11 +86,11 @@
 
 					<div class="uk-form-horizontal">
 						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Files per page' | trans }}</label>
+							<label class="uk-form-label">{{ 'Orders per page' | trans }}</label>
 
 							<div class="uk-form-controls uk-form-controls-text">
 								<p class="uk-form-controls-condensed">
-									<input type="number" v-model="config.files_per_page" class="uk-form-width-small">
+									<input type="number" v-model="config.orders_per_page" class="uk-form-width-small">
 								</p>
 							</div>
 						</div>
@@ -138,17 +116,6 @@
 									<option value="asc">{{ 'Ascending' | trans }}</option>
 									<option value="desc">{{ 'Descending' | trans }}</option>
 								</select>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Markdown' | trans }}</span>
-
-							<div class="uk-form-controls uk-form-controls-text">
-								<p class="uk-form-controls-condensed">
-									<label><input type="checkbox" v-model="config.markdown_enabled"> {{ 'Enable
-										Markdown' | trans }}</label>
-								</p>
 							</div>
 						</div>
 

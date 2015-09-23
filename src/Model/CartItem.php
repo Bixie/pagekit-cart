@@ -49,18 +49,6 @@ class CartItem implements \JsonSerializable
 	/** @Column(type="json_array") */
 	public $image;
 
-	public static function allTags () {
-		//todo cache this
-		$tags = App::module('bixie/download')->config('tags');
-		foreach (self::findAll() as $file) {
-			if (is_array($file->tags)) {
-				$tags = array_merge($tags, $file->tags);
-			}
-		}
-		$tags = array_unique($tags);
-		natsort($tags);
-		return $tags;
-	}
 
 	public function getDownloadLink () {
 		if (!$this->id) {
