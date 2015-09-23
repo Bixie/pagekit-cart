@@ -108,12 +108,20 @@
 	        return date ? this.$date(date, 'mediumDate') + ', ' + this.$date(date, 'HH:mm:ss') : '';
 	    });
 
-	    Vue.filter('currency', function (price, currency) {
-	        var icon = '<i class="' + (icons[(currency || window.$cart.config.currency)] || icons.EUR) + ' uk-margin-small-right"></i>', numberString;
+	    Vue.filter('currency', function (price, product) {
+
+	        var siteCurrency = window.$bixieCart.currency || 'EUR',
+	            icon = '<i class="' + icons[siteCurrency] + ' uk-margin-small-right"></i>',
+	            numberString;
+
+	        if (product && product.currency !== siteCurrency) {
+	            price = window.$bixieCart.convertPrice(price, product);
+	        }
+
 	        try {
 	            numberString = Number(price).toLocaleString(window.$locale.locale.replace('_', '-'), {minimumFractionDigits: 2});
 	        } catch (ignore) {
-	            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, $locale.NUMBER_FORMATS.GROUP_SEP);
+	            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
 	        }
 	        return icon + numberString;
 	    });
@@ -139,12 +147,14 @@
 
 	        data: function () {
 	            return {
+	                'currency': window.$cart.config.currency,
 	                'config': window.$cart.config,
-	                'cartItems': []
+	                'cartItems': _.merge([], window.$cartItems)
 	            };
 	        },
 
 	        created: function () {
+	            this.resource = this.$resource('api/cart/cart/:id');
 	            this.$on('add.bixie.cart', function (product) {
 	                this.addToCart(product);
 	            });
@@ -157,21 +167,62 @@
 	            totalNetto: function () {
 	                var total = 0;
 	                this.cartItems.forEach(function (cartItem) {
-	                    total += parseFloat(cartItem.price);
-	                });
+	                    total += this.convertPrice(cartItem.price, cartItem);
+	                }.bind(this));
 	                return total;
+	            },
+	            totalBruto: function () {
+	                var total = 0;
+	                this.cartItems.forEach(function (cartItem) {
+	                    var vat = this.calcVat(cartItem);
+	                    total += vat.bruto;
+	                }.bind(this));
+	                return total;
+	            },
+	            totalTaxes: function () {
+	                return this.totalBruto - this.totalNetto
 	            }
+
 	        },
 
 	        methods: {
 	            addToCart: function (product) {
 	                var cartItem = _.merge({
 	                    item_title: product.item.title,
-	                    item_url: product.item.url
+	                    item_url: product.item.url,
+	                    product_id: product.id
 	                }, product);
 	                delete cartItem['item'];
+	                delete cartItem['id'];
 	                this.cartItems.push(cartItem);
+	                this.saveCart();
 	                this.$.cartmodal.open();
+	            },
+
+	            saveCart: function () {
+	                this.resource.save({}, { cartItems: this.cartItems }, function (data) {
+	                    console.log(data);
+	                    this.$notify('Cart updated.');
+	                });
+	            },
+
+	            calcVat: function (product) {
+	                var netto = this.convertPrice(product.price, product),
+	                    vatclass = this.config.vatclasses[product.vat];
+	                return {
+	                    netto: netto,
+	                    bruto: (Math.round((netto * 100) * ((vatclass.rate / 100) + 1))) / 100,
+	                    vatclass: vatclass
+	                }
+	            },
+
+	            convertPrice: function (price, product) {
+	                var siteCurrency = this.currency || 'EUR';
+	                price = Number(price);
+	                if (product && product.currency !== siteCurrency) {
+	                    price = (Math.round((price * 100) * (window.$cart.config[product.currency + 'to' + siteCurrency] || 1))) / 100;
+	                }
+	                return price;
 	            }
 	        }
 
@@ -181,7 +232,7 @@
 /* 10 */
 /***/ function(module, exports) {
 
-	module.exports = "<v-modal v-ref=\"cartmodal\" large>\r\n        <div class=\"uk-modal-header\">\r\n            <h3>{{ 'Items in cart' | trans }}</h3>\r\n        </div>\r\n        <div class=\"uk-margin\">\r\n            <div v-show=\"!cartItems.length\" class=\"uk-alert\">{{ 'No items in cart yet' | trans }}</div>\r\n            <ul v-show=\"cartItems.length\" class=\"uk-list uk-list-line\">\r\n                <li v-repeat=\"cartItem: cartItems\">\r\n                    <div class=\"uk-grid uk-grid-small\">\r\n                        <div class=\"uk-width-medium-3-4\">\r\n                            <a href=\"{{ cartItem.item_url}}\">{{ cartItem.item_title  }}</a>\r\n                        </div>\r\n                        <div class=\"uk-width-medium-1-4 uk-text-right\">\r\n                            {{{ cartItem.price | currency }}}\r\n                        </div>\r\n                    </div>\r\n                </li>\r\n                <li>\r\n                    <div class=\"uk-grid uk-grid-small\">\r\n                        <div class=\"uk-width-medium-3-4\">\r\n                        </div>\r\n                        <div class=\"uk-width-medium-1-4 uk-text-right\">\r\n                            {{{ totalNetto | currency }}}\r\n                        </div>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"uk-modal-footer uk-text-right\">\r\n            <button type=\"button\" class=\"uk-button uk-modal-close\">{{ 'Close' | trans }}</button>\r\n            <button type=\"button\" class=\"uk-button uk-button-success uk-margin-left\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'To checkout' | trans }}</button>\r\n        </div>\r\n\r\n    </v-modal>\r\n<pre>{{$data.cartItems|json}}</pre>";
+	module.exports = "<v-modal v-ref=\"cartmodal\" large>\r\n        <div class=\"uk-modal-header\">\r\n            <h3>{{ 'Items in cart' | trans }}</h3>\r\n        </div>\r\n        <div class=\"uk-margin\">\r\n            <div v-show=\"!cartItems.length\" class=\"uk-alert\">{{ 'No items in cart yet' | trans }}</div>\r\n            <ul v-show=\"cartItems.length\" class=\"uk-list uk-list-line\">\r\n                <li v-repeat=\"cartItem: cartItems\">\r\n                    <div class=\"uk-grid uk-grid-small\">\r\n                        <div class=\"uk-width-medium-3-4\">\r\n                            <a href=\"{{ cartItem.item_url}}\">{{ cartItem.item_title  }}</a>\r\n                        </div>\r\n                        <div class=\"uk-width-medium-1-4 uk-text-right\">\r\n                            {{{ cartItem.price | currency cartItem}}}\r\n                        </div>\r\n                    </div>\r\n                </li>\r\n                <li>\r\n                    <div class=\"uk-grid uk-grid-small\">\r\n                        <div class=\"uk-width-medium-3-4 uk-text-right uk-text-small\">\r\n                            <div><span>{{ 'Total taxes' | trans }}</span> {{{ totalTaxes | currency }}}</div>\r\n                            <div><span>{{ 'Total including taxes' | trans }}</span> {{{ totalBruto | currency }}}</div>\r\n                        </div>\r\n                        <div class=\"uk-width-medium-1-4 uk-text-right\">\r\n                            <h3>{{{ totalNetto | currency }}}</h3>\r\n                        </div>\r\n                    </div>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"uk-modal-footer uk-text-right\">\r\n            <button type=\"button\" class=\"uk-button uk-modal-close\">{{ 'Close' | trans }}</button>\r\n            <button type=\"button\" class=\"uk-button uk-button-success uk-margin-left\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'To checkout' | trans }}</button>\r\n        </div>\r\n\r\n    </v-modal>\r\n    <pre>{{ totalNetto | json}}</pre>\r\n    <pre>{{$data.cartItems | json}}</pre>";
 
 /***/ }
 /******/ ]);

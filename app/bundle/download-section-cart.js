@@ -65,7 +65,7 @@
 	        data: function () {
 	            return _.merge({
 	                product: {
-	                    active: false,
+	                    active: this.file.data.cart_active,
 	                    id: 0,
 	                    item_model: 'Bixie\\Download\\Model\\File',
 	                    item_id: this.file.id,

@@ -2,81 +2,39 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Cart\CartFactory;
 use Pagekit\Application as App;
-use Bixie\Cart\Model\CartItem;
+use Bixie\Cart\Cart\CartItem;
 
 /**
  * @Route("cart", name="cart")
  */
 class CartApiController
 {
-    /**
-     * @Route("/", methods="GET")
-     * @Request({"filter": "array", "page":"int"})
-     */
-    public function indexAction($filter = [], $page = 0)
-    {
-        $query  = CartItem::query();
-        $filter = array_merge(array_fill_keys(['status', 'search', 'order', 'limit'], ''), $filter);
-
-        extract($filter, EXTR_SKIP);
-
-        if ($search) {
-            $query->where(function ($query) use ($search) {
-                $query->orWhere(['title LIKE :search'], ['search' => "%{$search}%"]);
-            });
-        }
-
-		if (is_numeric($status)) {
-			$query->where(['status' => (int) $status]);
-		}
-
-		if (!preg_match('/^(date|title)\s(asc|desc)$/i', $order, $order)) {
-            $order = [1 => 'date', 2 => 'desc'];
-        }
-
-        $limit = (int) $limit ?: App::module('bixie/download')->config('files_per_page');
-        $count = $query->count();
-        $pages = ceil($count / $limit);
-        $page  = max(0, min($pages - 1, $page));
-
-        $files = array_values($query->offset($page * $limit)->limit($limit)->orderBy($order[1], $order[2])->get());
-
-        return compact('files', 'pages', 'count');
-    }
-
-    /**
-     * @Route("/{id}", methods="GET", requirements={"id"="\d+"})
-     */
-    public function getAction($id)
-    {
-        return CartItem::where(compact('id'))->first();
-    }
 
     /**
      * @Route("/", methods="POST")
-     * @Route("/{id}", methods="POST", requirements={"id"="\d+"})
-     * @Request({"file": "array", "id": "int"}, csrf=true)
+     * @Request({"cartItems": "array"}, csrf=true)
      */
-    public function saveAction($data, $id = 0)
+    public function saveAction($data)
     {
-        if (!$id || !$file = File::find($id)) {
+		/** @var CartFactory $bixieCart */
+		/** @var CartItem $cartItem */
+		$bixieCart = App::bixieCart()->loadFromSession();
+		$ids = [];
+		foreach ($data as $cartData) {
+			if ($cartItem = $bixieCart->load($cartData)) {
+				$ids[] = $cartItem->getId();
+				$bixieCart[$cartItem->getId()] = $cartItem;
+			}
+		}
+		foreach(array_diff($bixieCart->ids(), $ids) as $id) {
+			unset($bixieCart[$id]);
+		}
 
-            if ($id) {
-                App::abort(404, __('Post not found.'));
-            }
+		$bixieCart->saveCartItems();
 
-			$file = File::create();
-        }
-
-        if (!$data['slug'] = App::filter($data['slug'] ?: $data['title'], 'slugify')) {
-            App::abort(400, __('Invalid slug.'));
-        }
-
-
-		$file->save($data);
-
-        return ['message' => 'success', 'file' => $file];
+		return array_values($bixieCart->all());
     }
 
     /**

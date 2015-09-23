@@ -1,4 +1,5 @@
 <?php
+use Pagekit\Application as App;
 
 return [
 
@@ -107,8 +108,8 @@ return [
 		'products_per_page' => 20,
 		'currency' => 'EUR',
 		'vat' => 'high',
-		'USD-EUR' => 1.25415,
-		'EUR-USD' => 0.82481,
+		'USDtoEUR' => 1.25415,
+		'EURtoUSD' => 0.82481,
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
@@ -120,6 +121,13 @@ return [
 
 		'boot' => function ($event, $app) {
 			$app->subscribe(new Bixie\Cart\Event\FileListener());
+		},
+
+		'view.data' => function ($event, $view) use ($app) {
+			$cartItems = $app['bixieCart']->all();
+			if (count($cartItems)) {
+				$view->add('$cartItems', array_values($cartItems));
+			}
 		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {

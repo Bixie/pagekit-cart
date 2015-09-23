@@ -109,7 +109,7 @@
 
 	        methods: {
 	            addToCart: function (product) {
-	                window.$bixieCart.$emit('add.bixie.cart', product);
+	                window.$bixieCart.addToCart(product);
 	            }
 	        }
 
@@ -118,8 +118,8 @@
 	    Vue.component('addtocart', function (resolve, reject) {
 	        Vue.asset({
 	            js: [
-	                'app/assets/uikit/js/components/upload.min.js',
-	                'app/system/modules/finder/app/bundle/panel-finder.js'
+	//                'app/assets/uikit/js/components/upload.min.js',
+	//                'app/system/modules/finder/app/bundle/panel-finder.js'
 	            ]
 	        }, function () {
 	            resolve(module.exports);
@@ -130,7 +130,7 @@
 /* 6 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"uk-grid uk-grid-small uk-flex-middle uk-margin\" data-uk-margin=\"\">\r\n        <div class=\"uk-width-medium-1-3 uk-text-right\">{{{ product.price | currency }}}</div>\r\n        <div class=\"uk-width-medium-2-3\">\r\n            <button class=\"uk-button uk-button-success\" v-on=\"click: addToCart(product)\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'Add to cart' | trans }}\r\n            </button>\r\n        </div>\r\n\r\n\r\n    </div>";
+	module.exports = "<div class=\"uk-grid uk-grid-small uk-flex-middle uk-margin\" data-uk-margin=\"\">\r\n        <div class=\"uk-width-medium-1-3 uk-text-right\">{{{ product.price | currency product}}}</div>\r\n        <div class=\"uk-width-medium-2-3\">\r\n            <button class=\"uk-button uk-button-success\" v-on=\"click: addToCart(product)\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'Add to cart' | trans }}\r\n            </button>\r\n        </div>\r\n\r\n\r\n    </div>";
 
 /***/ },
 /* 7 */
@@ -178,12 +178,20 @@
 	        return date ? this.$date(date, 'mediumDate') + ', ' + this.$date(date, 'HH:mm:ss') : '';
 	    });
 
-	    Vue.filter('currency', function (price, currency) {
-	        var icon = '<i class="' + (icons[(currency || window.$cart.config.currency)] || icons.EUR) + ' uk-margin-small-right"></i>', numberString;
+	    Vue.filter('currency', function (price, product) {
+
+	        var siteCurrency = window.$bixieCart.currency || 'EUR',
+	            icon = '<i class="' + icons[siteCurrency] + ' uk-margin-small-right"></i>',
+	            numberString;
+
+	        if (product && product.currency !== siteCurrency) {
+	            price = window.$bixieCart.convertPrice(price, product);
+	        }
+
 	        try {
 	            numberString = Number(price).toLocaleString(window.$locale.locale.replace('_', '-'), {minimumFractionDigits: 2});
 	        } catch (ignore) {
-	            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, $locale.NUMBER_FORMATS.GROUP_SEP);
+	            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
 	        }
 	        return icon + numberString;
 	    });

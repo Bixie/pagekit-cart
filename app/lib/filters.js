@@ -40,12 +40,20 @@ module.exports = function (Vue) {
         return date ? this.$date(date, 'mediumDate') + ', ' + this.$date(date, 'HH:mm:ss') : '';
     });
 
-    Vue.filter('currency', function (price, currency) {
-        var icon = '<i class="' + (icons[(currency || window.$cart.config.currency)] || icons.EUR) + ' uk-margin-small-right"></i>', numberString;
+    Vue.filter('currency', function (price, product) {
+
+        var siteCurrency = window.$bixieCart.currency || 'EUR',
+            icon = '<i class="' + icons[siteCurrency] + ' uk-margin-small-right"></i>',
+            numberString;
+
+        if (product && product.currency !== siteCurrency) {
+            price = window.$bixieCart.convertPrice(price, product);
+        }
+
         try {
             numberString = Number(price).toLocaleString(window.$locale.locale.replace('_', '-'), {minimumFractionDigits: 2});
         } catch (ignore) {
-            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, $locale.NUMBER_FORMATS.GROUP_SEP);
+            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
         }
         return icon + numberString;
     });
