@@ -73,7 +73,7 @@ class CartApiController
 
 		return [
 			'cartItems' => array_values($cartItems),
-			'succesurl' => App::url('@cart/paymentreturn', ['id' => $order->transaction_id]),
+			'succesurl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
 			'checkout' => $checkout,
 			'order' => $order
 		];

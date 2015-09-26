@@ -108,15 +108,14 @@ return [
 	'settings' => '@cart/settings',
 
 	'config' => [
-		'ordering' => 'title',
-		'ordering_dir' => 'asc',
-		'orders_per_page' => 20,
-		'products_per_page' => 20,
 		'currency' => 'EUR',
 		'vat' => 'high',
 		'vat_view' => 'incl',
-		'USDtoEUR' => 0.82481,
-		'EURtoUSD' => 1.25415,
+		'date_format' => 'M d Y, H:i:s',
+		'addtocart' => [
+			'show_vat' => true
+		],
+		'gateways' => [],
 		'required_checkout' => [
 			'billing_address.firstName',
 			'billing_address.lastName',
@@ -127,15 +126,22 @@ return [
 			'payment.method',
 			'agreed'
 		],
-		'addtocart' => [
-			'show_vat' => true
-		],
-		'gateways' => [],
+		'USDtoEUR' => 0.82481,
+		'EURtoUSD' => 1.25415,
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
 			'high' => ['rate' => 21, 'name' => 'High taxclass']
-		]
+		],
+		'thankyou' => [
+			'title' => 'Thank you for your order',
+			'content' => '<p>Below are the details of your order.</p>'
+		],
+		'markdown_enabled' => false,
+		'ordering' => 'title',
+		'ordering_dir' => 'asc',
+		'orders_per_page' => 20,
+		'products_per_page' => 20
 	],
 
 	'events' => [
@@ -146,6 +152,7 @@ return [
 
 		'after@cart/checkout' => function ($event, $request) use ($app) {
 			App::view()->data('$cart', [
+				'countries' => App::module('system/intl')->getCountries(),
 				'gateways' => App::bixiePayment()->activeGatewaysData(),
 				'config' => App::module('bixie/cart')->publicConfig()
 			]);

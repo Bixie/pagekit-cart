@@ -38,7 +38,7 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-building"></i>
+                            <i class="uk-icon-building-o"></i>
                             <input v-model="checkout.billing_address.address1" name="address1" type="text"
                                    v-on="blur: validateField('billing_address.address1')"
                                    class="uk-width-1-1" placeholder="{{ 'Address' | trans }}">
@@ -52,7 +52,7 @@
                 <div v-show="show_address2" class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-building"></i>
+                            <i class="uk-icon-building-o"></i>
                             <input v-model="checkout.billing_address.address2" name="address2" type="text"
                                    class="uk-width-1-1" placeholder="{{ 'Address line 2' | trans }}">
                         </div>
@@ -109,7 +109,7 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <select v-model="checkout.billing_address.country" name="country" options="countryList"
-                                v-on="blur: validateField('billing_address.country')"
+                                v-on="change: validateField('billing_address.country')"
                                 class="uk-width-1-1"></select>
                     </div>
                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.country">
@@ -212,7 +212,6 @@
 
     </v-modal>
 
-    <pre>{{gateways|json}}</pre>
 </template>
 
 <script>
@@ -328,7 +327,9 @@ module.exports = {
     computed: {
         countryList: function () {
             var options = [{value: '', text: this.$trans('Country')}];
-            options.push({value: 'NL', text: this.$trans('Netherlands')});
+            _.forIn(this.countries, function (text, value) {
+                options.push({value: value, text: text});
+            });
             return options;
         },
         months: function () {

@@ -101,7 +101,7 @@ class PaymentHelper {
 			throw new PaymentException("Payment method $type not found in configuration");
 		}
 		$gateway->initialize($this->config[$type]);
-		$order->transaction_id = md5(serialize($cardData) . serialize($order->toArray()));
+		$order->transaction_id = md5(time() . serialize($cardData) . serialize($order->toArray()));
 
 		$card = new CreditCard(array_merge($cardData, $order->get('billing_address')));
 
@@ -116,7 +116,7 @@ class PaymentHelper {
 					'transactionId' => $order->transaction_id,
 //					'transactionReference' => $order->transaction_id,
 //					'cardReference' => $order->transaction_id,
-					'returnUrl' => App::url('@cart/paymentreturn', ['id' => $order->transaction_id]),
+					'returnUrl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
 					'cancelUrl' => App::url('@cart/checkout'),
 					'notifyUrl' => '',
 					'issuer' => '',
@@ -128,6 +128,7 @@ class PaymentHelper {
 			if ($response->isSuccessful()) {
 
 				// Payment was successful
+				$this->app['session']->set('_bixiePayment.transaction_id', $order->transaction_id);
 				return $response;
 
 			} elseif ($response->isRedirect()) {

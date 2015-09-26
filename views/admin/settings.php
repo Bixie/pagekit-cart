@@ -8,9 +8,10 @@
 			<div class="uk-panel">
 
 				<ul class="uk-nav uk-nav-side pk-nav-large" data-uk-tab="{ connect: '#tab-content' }">
-					<li><a><i class="pk-icon-large-brush uk-margin-right"></i> {{ 'Main page content' | trans }}</a></li>
+					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'Cart settings' | trans }}</a></li>
+					<li><a><i class="pk-icon-large-code uk-margin-right"></i> {{ 'Thank you content' | trans }}</a></li>
 					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'Payment settings' | trans }}</a></li>
-					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'Download settings' | trans }}</a></li>
+					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'General settings' | trans }}</a></li>
 				</ul>
 
 			</div>
@@ -24,7 +25,7 @@
 					<div class="uk-margin uk-flex uk-flex-space-between uk-flex-wrap" data-uk-margin>
 						<div data-uk-margin>
 
-							<h2 class="uk-margin-remove">{{ 'Main page content' | trans }}</h2>
+							<h2 class="uk-margin-remove">{{ 'Cart settings' | trans }}</h2>
 
 						</div>
 						<div data-uk-margin>
@@ -34,41 +35,9 @@
 						</div>
 					</div>
 
-					<div class="uk-form-horizontal">
-
-						<div class="uk-form-row">
-							<label for="form-mainpagetitle" class="uk-form-label">{{ 'Main page title' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input id="form-mainpagetitle" class="uk-width-1-1" type="text" name="mainpage_title"
-									   v-model="config.mainpage_title">
-							</div>
-						</div>
-					</div>
-
-
-					<div class="uk-form-stacked uk-margin">
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Main page text' | trans }}</span>
-
-							<div class="uk-form-controls">
-								<v-editor id="form-intro" value="{{@ config.mainpage_text }}"
-										  options="{{ {markdown : config.markdown_enabled, height: 250} }}"></v-editor>
-							</div>
-						</div>
-					</div>
-
-					<div class="uk-form-horizontal">
-
-						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Image' | trans }}</label>
-							<div class="uk-form-controls">
-								<input-image source="{{@ config.mainpage_image }}" class="pk-image-max-height"></input-image>
-							</div>
-						</div>
-
-
-					</div>
+				</li>
+				<li>
+					<?= $view->render('bixie/cart/admin/settings_thankyou.php') ?>
 				</li>
 				<li>
 					<div class="uk-margin">
@@ -190,19 +159,13 @@
 						</div>
 
 						<div class="uk-form-row">
-							<label for="form-date_format" class="uk-form-label">{{ 'Date format' | trans }}</label>
+							<span class="uk-form-label">{{ 'Markdown' | trans }}</span>
 
-							<div class="uk-form-controls">
-								<select name="date_format" id="form-date_format" class="uk-form-width-small"
-										v-model="config.date_format">
-									<option value="F Y">{{ 'January 2015' | trans }}</option>
-									<option value="F d Y">{{ 'January 15 2015' | trans }}</option>
-									<option value="d F Y">{{ '15 January 2015' | trans }}</option>
-									<option value="M Y">{{ 'Jan 2015' | trans }}</option>
-									<option value="m Y">{{ '1 2015' | trans }}</option>
-									<option value="m-d-Y">{{ '1-15-2015' | trans }}</option>
-									<option value="d-m-Y">{{ '15-1-2015' | trans }}</option>
-								</select>
+							<div class="uk-form-controls uk-form-controls-text">
+								<p class="uk-form-controls-condensed">
+									<label><input type="checkbox" v-model="config.markdown_enabled"> {{ 'Enable
+										Markdown' | trans }}</label>
+								</p>
 							</div>
 						</div>
 

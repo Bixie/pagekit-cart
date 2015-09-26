@@ -2,14 +2,14 @@
 
 namespace Bixie\Cart\Model;
 
+use Bixie\Cart\Cart\CartItem;
 use Pagekit\Application as App;
 use Pagekit\System\Model\DataModelTrait;
 
 /**
  * @Entity(tableClass="@cart_order")
  */
-class Order implements \JsonSerializable
-{
+class Order implements \JsonSerializable {
 	use DataModelTrait, OrderModelTrait;
 
 	/* Order not yet payed. */
@@ -28,7 +28,7 @@ class Order implements \JsonSerializable
 	public $created;
 
 	/** @Column(type="json_array") */
-	public $cartItems;
+	public $cartItemsData;
 
 	/** @Column(type="json_array") */
 	public $payment;
@@ -45,6 +45,12 @@ class Order implements \JsonSerializable
 	/** @Column(type="string") */
 	public $transaction_id;
 
+	/** @var array */
+	protected static $properties = [
+		'valid' => 'isValid',
+		'cartItems' => 'getCartItems'
+	];
+
 	/**
 	 * Creates a new instance of this model.
 	 * @param  array $cartItems
@@ -57,19 +63,44 @@ class Order implements \JsonSerializable
 			'created' => new \DateTime(),
 			'currency' => $checkout['currency'],
 			'data' => $checkout,
-			'cartItems' => $cartItems
+			'cartItemsData' => $cartItems
 		]);
+	}
+
+	public function isValid () {
+		return $this->status == self::STATUS_CONFIRMED;
+	}
+
+	public function getCartItems () {
+		$cartItems = [];
+		$bixieCart = App::bixieCart();
+		foreach ($this->cartItemsData as $cartItemData) {
+			$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->load($cartItemData);
+		}
+		return $cartItems;
 	}
 
 	public function calculateOrder () {
 		$this->total_netto = 0;
 		$this->total_bruto = 0;
-		foreach ($this->cartItems as $cartItem) {
-			$vat = $this->calcVat($cartItem);
-			$this->total_netto += $vat['netto'];
-			$this->total_bruto += $vat['bruto'];
+		foreach ($this->getCartItems() as $cartItem) {
+			$prices = $cartItem->calcPrices($this);
+			$this->total_netto += $prices['netto'];
+			$this->total_bruto += $prices['bruto'];
 		}
 		return $this;
+	}
+
+	public static function getStatuses () {
+		return [
+			self::STATUS_PENDING => __('Order pending'),
+			self::STATUS_CONFIRMED => __('Order confirmed')
+		];
+	}
+
+	public function getStatusText () {
+		$statuses = self::getStatuses();
+		return isset($statuses[$this->status]) ? $statuses[$this->status] : __('Unknown');
 	}
 
 	/**
