@@ -50,7 +50,7 @@
 
 	    data: function () {
 	        return {
-	            invoice_address: {
+	            billing_address: {
 	                name: '',
 	                address: '',
 	                address_2: '',
@@ -62,7 +62,7 @@
 	    },
 
 	    created: function () {
-	        this.invoice_address.name = 'asdff';
+	        this.billing_address.name = 'asdff';
 	    }
 
 	});

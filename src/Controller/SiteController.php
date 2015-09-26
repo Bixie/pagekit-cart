@@ -30,11 +30,26 @@ class SiteController
 		return [
 			'$view' => [
 				'title' => __('Checkout'),
-				'name' => 'bixie/cart/checkout.php',
-				'link:feed' => [
-					'rel' => 'alternate',
-				]
+				'name' => 'bixie/cart/checkout.php'
 			],
+			'cart' => $this->cart
+		];
+	}
+
+	/**
+	 * @Route("/paymentreturn")
+	 * @Request({"id": "string"})
+	 */
+	public function paymentreturnAction($id = '')
+	{
+		$transaction_id = $id;
+
+		return [
+			'$view' => [
+				'title' => __('Thank you'),
+				'name' => 'bixie/cart/paymentreturn.php'
+			],
+			'transaction_id' => $transaction_id,
 			'cart' => $this->cart
 		];
 	}

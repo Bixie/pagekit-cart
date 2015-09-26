@@ -9,6 +9,7 @@ var Cart = Vue.extend({
             'checkout': {},
             'config': {},
             'products': {},
+            'gateways': [],
             'cartItems': window.$cartItems || []
         }, window.$cart);
     },

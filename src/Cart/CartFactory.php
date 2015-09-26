@@ -85,6 +85,14 @@ class CartFactory implements \ArrayAccess, \IteratorAggregate
 	/**
 	 * Stores cart to session
 	 */
+	public function reset () {
+		$this->cartItems = [];
+		$this->saveCartItems();
+    }
+
+	/**
+	 * Stores cart to session
+	 */
 	public function saveCartItems () {
 		$this->session->set($this->getKey(), $this->cartItems);
 	}

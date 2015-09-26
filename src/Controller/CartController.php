@@ -3,7 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Pagekit\Application as App;
-use Bixie\Cart\Model\CartItem;
+use Bixie\Cart\Cart\CartItem;
 use Pagekit\User\Model\Role;
 
 /**
@@ -102,14 +102,17 @@ class CartController
      */
     public function settingsAction()
     {
+		$config = $this->cart->config();
+		$config['gateways'] = App::bixiePayment()->getSettings();
         return [
             '$view' => [
                 'title' => __('Cart Settings'),
                 'name'  => 'bixie/cart/admin/settings.php'
             ],
             '$data' => [
-                'config' => App::module('bixie/cart')->config()
-           ]
-        ];
+                'config' => $config
+            ],
+			'gateways' => App::bixiePayment()->getGateways()
+		];
     }
 }

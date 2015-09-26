@@ -55,6 +55,7 @@
 	            'checkout': {},
 	            'config': {},
 	            'products': {},
+	            'gateways': [],
 	            'cartItems': window.$cartItems || []
 	        }, window.$cart);
 	    },
@@ -115,18 +116,18 @@
 	        }
 	    },
 	    components: {
-	        cartmodal: __webpack_require__(6),
-	        checkout: __webpack_require__(25),
-	        addtocart: __webpack_require__(10)
+	        cartmodal: __webpack_require__(7),
+	        checkout: __webpack_require__(10),
+	        addtocart: __webpack_require__(13)
 	    },
 
 	    mixins: [
-	        __webpack_require__(13),
-	        __webpack_require__(14)
+	        __webpack_require__(16),
+	        __webpack_require__(17)
 	    ]
 	});
 
-	Vue.use(__webpack_require__(19));
+	Vue.use(__webpack_require__(22));
 
 	$(function () {
 
@@ -144,15 +145,16 @@
 /* 3 */,
 /* 4 */,
 /* 5 */,
-/* 6 */
+/* 6 */,
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(7)
-	module.exports.template = __webpack_require__(8)
+	module.exports = __webpack_require__(8)
+	module.exports.template = __webpack_require__(9)
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -169,13 +171,12 @@
 	    };
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	module.exports = "<v-modal v-ref=\"cartmodal\" large>\r\n        <div class=\"uk-modal-header\">\r\n            <h3>{{ 'Items in cart' | trans }}</h3>\r\n        </div>\r\n        <div class=\"uk-margin\">\r\n            <cartlist></cartlist>\r\n        </div>\r\n        <div class=\"uk-modal-footer uk-text-right\">\r\n            <button type=\"button\" class=\"uk-button uk-modal-close\">{{ 'Close' | trans }}</button>\r\n            <a v-attr=\"href: checkout_url\" class=\"uk-button uk-button-success uk-margin-left\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'To checkout' | trans }}</a>\r\n        </div>\r\n\r\n    </v-modal>\r\n    <pre>{{ filters.currency | json}}</pre>\r\n    <pre>{{ totalNetto | json}}</pre>";
 
 /***/ },
-/* 9 */,
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -185,6 +186,157 @@
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	module.exports = {
+
+	    data: function () {
+	        return {
+	            spin: false,
+	            paymenterror: '',
+	            show_address2: false,
+	            checkout: {
+	                agreed: false,
+	                billing_address: {
+	                    firstName: 'Piet',
+	                    lastName: 'Jansen',
+	                    address1: 'Straat 34',
+	                    address2: '',
+	                    postcode: '3456 BE',
+	                    city: 'Ede',
+	                    state: '',
+	                    country: 'NL'
+	                },
+	                payment: {
+	                    method: '',
+	                    price: 0
+	                }
+	            },
+	            card: {
+	                number: '4242424242424242',
+	                expiryMonth: '6',
+	                expiryYear: '2016',
+	                cvv: '123'
+	            },
+	            invalid: {}
+	        };
+	    },
+
+	    inherit: true,
+
+	    created: function () {
+	        this.config.required_checkout.forEach(function (name) {
+	            this.$set('invalid.' + name, false);
+	        }.bind(this));
+	        this.$set('invalid.payment.method', false);
+	        if (this.gateways.length === 1) {
+	            this.$set('checkout.payment.method', this.gateways[0].shortName);
+	        }
+	    },
+
+	    methods: {
+	        doCheckout: function () {
+	            if (this.spin) {
+	                return;
+	            }
+	            var vm = this;
+
+	            if(this.validateCheckout()) {
+
+	                this.spin = true;
+	                this.$set('paymenterror', '');
+
+	                this.resource.save({id: 'checkout'}, {
+	                    cartItems: this.cartItems,
+	                    cardData: this.card,
+	                    checkout: _.merge({currency: this.filters.currency}, this.checkout)
+	                }, function (data) {
+
+	                    if (data.error) {
+	                        vm.$set('paymenterror', data.error);
+	                    } else {
+	                        console.log(data);
+	                        //reset cart oon orig vm
+	                        this.$set('cartItems', data.cartItems);
+	                        vm.$.redirectmodal.open();
+	                        setTimeout(function () {
+	                            window.location.href = data.succesurl;
+	                        }, 500)
+
+	                    }
+	                    vm.$set('spin', false);
+
+	                });
+	            }
+	        },
+
+	        validateCheckout: function () {
+	            var invalid = false;
+
+	            this.config.required_checkout.forEach(function (name) {
+	                invalid = !this.validateField(name, 'checkout') || invalid;
+	            }.bind(this));
+
+	            ['number', 'expiryMonth', 'expiryYear', 'cvv'].forEach(function (name) {
+	                invalid = !this.validateField(name, 'card') || invalid;
+	            }.bind(this));
+
+	            if (!this.checkout.payment.method) {
+	                invalid = true;
+	            }
+	            this.$set('invalid.payment.method', !this.checkout.payment.method);
+
+	            return !invalid;
+	        },
+
+	        validateField: function (name, type) {
+	            var valid = !!this.$get(type + '.' + name);
+	            this.$set('invalid.' + name, !valid);
+	            return valid;
+	        }
+	    },
+
+	    computed: {
+	        countryList: function () {
+	            var options = [{value: '', text: this.$trans('Country')}];
+	            options.push({value: 'NL', text: this.$trans('Netherlands')});
+	            return options;
+	        },
+	        months: function () {
+	            var options = [{value: '', text: this.$trans('Month')}];
+	            for (var m = 1; m <= 12; m++) {
+	                options.push({value: m.toString(), text: m.toString()});
+	            }
+	            return options;
+	        },
+	        years: function () {
+	            var nowYear = (new Date()).getFullYear(),
+	               options = [{value: '', text: this.$trans('Year')}];
+	            for (var y = nowYear; y < (nowYear + 10); y++) {
+	                options.push({value: y.toString(), text: y.toString()});
+	            }
+	            return options;
+	        }
+	    }
+
+	};
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"uk-grid uk-grid-width-medium-1-2\">\r\n        <div>\r\n\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'Billing Address' | trans }}</h3>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-user\"></i>\r\n                            <input v-model=\"checkout.billing_address.firstName\" name=\"firstName\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.firstName')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'First name' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.firstName\">\r\n                            {{ 'Please enter your first name' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-user\"></i>\r\n                            <input v-model=\"checkout.billing_address.lastName\" name=\"lastName\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.lastName')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Last name' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.lastName\">\r\n                            {{ 'Please enter your last name' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-building\"></i>\r\n                            <input v-model=\"checkout.billing_address.address1\" name=\"address1\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.address1')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Address' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.address1\">\r\n                            {{ 'Please enter an address' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div v-show=\"show_address2\" class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-building\"></i>\r\n                            <input v-model=\"checkout.billing_address.address2\" name=\"address2\" type=\"text\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Address line 2' | trans }}\">\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"checkbox\" value=\"hide-show_address2\"\r\n                                      v-model=\"show_address2\"> {{ 'Show address line 2' | trans }}</label>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-map-pin\"></i>\r\n                            <input v-model=\"checkout.billing_address.postcode\" name=\"postcode\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.postcode')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Zipcode' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.postcode\">\r\n                            {{ 'Please enter a zipcode' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-map-o\"></i>\r\n                            <input v-model=\"checkout.billing_address.city\" name=\"city\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.city')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'City' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.city\">\r\n                            {{ 'Please enter a city' | trans }}</p>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-map-o\"></i>\r\n                            <input v-model=\"checkout.billing_address.state\" name=\"state\" type=\"text\"\r\n                                   v-on=\"blur: validateField('billing_address.state')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'State' | trans }}\">\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <select v-model=\"checkout.billing_address.country\" name=\"country\" options=\"countryList\"\r\n                                v-on=\"blur: validateField('billing_address.country')\"\r\n                                class=\"uk-width-1-1\"></select>\r\n                    </div>\r\n                    <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.billing_address.country\">\r\n                        {{ 'Please select a country' | trans }}</p>\r\n                </div>\r\n            </div>\r\n\r\n\r\n        </div>\r\n        <div>\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'Payment method' | trans }}</h3>\r\n\r\n                <div v-repeat=\"gateway: gateways\" class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"radio\" value=\"{{ gateway.shortName | trans }}\"\r\n                                      v-model=\"checkout.payment.method\"> {{ gateway.name | trans }}</label>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-credit-card\"></i>\r\n                            <input v-model=\"card.number\" name=\"number\" type=\"text\"\r\n                                   v-on=\"blur: validateField('card.number')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Credit card number' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.number\">\r\n                            {{ 'Please enter card number' | trans }}</p>\r\n                    </div>\r\n                </div>\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <div class=\"uk-grid uk-grid-small\">\r\n                            <div class=\"uk-width-1-3\">\r\n                                <select v-model=\"card.expiryMonth\" name=\"expiryMonth\" options=\"months\"\r\n                                        v-on=\"blur: validateField('card.expiryMonth')\"\r\n                                        class=\"uk-width-1-1\"></select>\r\n                                <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.expiryMonth\">\r\n                                    {{ 'Please enter expiry month' | trans }}</p>\r\n                            </div>\r\n                            <div class=\"uk-width-1-3\">\r\n                                <select v-model=\"card.expiryYear\" name=\"expiryYear\" options=\"years\"\r\n                                        v-on=\"blur: validateField('card.expiryYear')\"\r\n                                        class=\"uk-width-1-1\"></select>\r\n                                <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.expiryYear\">\r\n                                    {{ 'Please enter expiry year' | trans }}</p>\r\n                            </div>\r\n                            <div class=\"uk-width-1-3\">\r\n                                <input v-model=\"card.cvv\" name=\"vvc\" type=\"text\"\r\n                                       v-on=\"blur: validateField('card.cvv')\"\r\n                                       class=\"uk-width-1-1\" placeholder=\"{{ 'CVV' | trans }}\">\r\n                                <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.cvv\">\r\n                                    {{ 'Please enter card number' | trans }}</p>\r\n                            </div>\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.payment.method\">\r\n                    {{ 'Please select a payment method' | trans }}</p>\r\n            </div>\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'To payment' | trans }}</h3>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"checkbox\" name=\"agreed\" value=\"agreed\"\r\n                                      v-model=\"checkout.agreed\"> {{ 'I agree with the terms and conditions' | trans }}</label>\r\n                    </div>\r\n                    <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.agreed\">\r\n                        {{ 'Please agree with the terms and conditions' | trans }}</p>\r\n                </div>\r\n\r\n                <div class=\"uk-margin uk-text-right\">\r\n                    <button class=\"uk-button uk-button-large uk-button-success\">\r\n                        <i v-show=\"!spin\" class=\"uk-icon-check uk-margin-small-right\"></i>\r\n                        <i v-show=\"spin\" class=\"uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right\"></i>\r\n                        {{ 'To payment' | trans }}\r\n                    </button>\r\n                </div>\r\n\r\n                <div v-if=\"paymenterror\" class=\"uk-alert uk-alert-danger\">{{ paymenterror | trans }}</div>\r\n\r\n              </div>\r\n        </div>\r\n    </div>\r\n\r\n    <v-modal v-ref=\"redirectmodal\" lightbox options=\"{{ {center: true} }}\">\r\n        <div class=\"uk-panel uk-panel-space uk-text-center\">\r\n            <h1 class=\"uk-heading-large\"><i class=\"uk-icon-check uk-text-success uk-margin-small-right\"></i>\r\n                {{ 'Payment successful' | trans }}</h1>\r\n            <p>{{ 'You are redirected....' | trans }}</p>\r\n            <p><i class=\"uk-icon-refresh uk-icon-spin\"></i></p>\r\n        </div>\r\n\r\n    </v-modal>\r\n\r\n    <pre>{{gateways|json}}</pre>";
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(14)
+	module.exports.template = __webpack_require__(15)
+
+
+/***/ },
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -204,13 +356,13 @@
 	    };
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"uk-flex uk-flex-middle uk-flex-center uk-flex-space-around uk-flex-wrap uk-margin\" data-uk-margin=\"\">\r\n        <div class=\"uk-text-right\">\r\n            <strong>{{{ product | productprice }}}</strong>\r\n            <div v-if=\"config.addtocart.show_vat\"><small>{{{ includingVat }}}</small></div>\r\n        </div>\r\n        <div class=\"\">\r\n            <button type=\"button\" class=\"uk-button uk-button-success\" v-on=\"click: addToCart(product)\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'Add to cart' | trans }}\r\n            </button>\r\n        </div>\r\n\r\n    </div>";
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports) {
 
 	
@@ -240,14 +392,14 @@
 	};
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
 	var icons = {
 	    'EUR': 'uk-icon-euro',
 	    'USD': 'uk-icon-dollar'
-	}, number_format = __webpack_require__(15);
+	}, number_format = __webpack_require__(18);
 
 	module.exports = {
 
@@ -331,13 +483,13 @@
 	    },
 
 	    components: {
-	        cartlist: __webpack_require__(16)
+	        cartlist: __webpack_require__(19)
 	    }
 
 	};
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports) {
 
 	
@@ -371,15 +523,15 @@
 	};
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(17)
-	module.exports.template = __webpack_require__(18)
+	module.exports = __webpack_require__(20)
+	module.exports.template = __webpack_require__(21)
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -396,13 +548,13 @@
 	    };
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = "<div v-show=\"!cartItems.length\" class=\"uk-alert\">{{ 'No items in cart yet' | trans }}</div>\r\n\r\n    <ul v-show=\"cartItems.length\" class=\"uk-list uk-list-line\">\r\n        <li v-repeat=\"cartItem: cartItems\">\r\n            <div class=\"uk-grid uk-grid-small\">\r\n                <div class=\"uk-width-medium-1-2\">\r\n                    <a href=\"{{ cartItem.item_url}}\">{{ cartItem.item_title  }}</a>\r\n                </div>\r\n                <div class=\"uk-width-medium-1-2 uk-text-right\">\r\n                    <div class=\"uk-grid uk-grid-small\">\r\n                        <div class=\"uk-width-1-2\">\r\n                            <a v-on=\"click: removeFromCart($index)\" class=\"uk-icon-trash-o uk-icon-justify uk-icon-hover\"></a>\r\n                        </div>\r\n                        <div class=\"uk-width-1-2\">\r\n                            {{{ cartItem | productprice }}}\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </li>\r\n        <li>\r\n            <div class=\"uk-grid uk-grid-small\">\r\n                <div class=\"uk-width-medium-3-4 uk-text-right uk-text-small\">\r\n                    <div v-if=\"config.vat_view == 'incl'\"><span>{{ 'Total excluding taxes' | trans }}</span> {{{ totalNetto | formatprice }}}</div>\r\n                    <div><span>{{ 'Total taxes' | trans }}</span> {{{ totalTaxes | formatprice }}}</div>\r\n                    <div v-if=\"config.vat_view == 'excl'\"><span>{{ 'Total including taxes' | trans }}</span> {{{ totalBruto | formatprice }}}</div>\r\n                </div>\r\n                <div class=\"uk-width-medium-1-4 uk-text-right\">\r\n                    <h3 v-if=\"config.vat_view == 'incl'\">{{{ totalBruto | formatprice }}}</h3>\r\n                    <h3 v-if=\"config.vat_view == 'excl'\">{{{ totalNetto | formatprice }}}</h3>\r\n                </div>\r\n            </div>\r\n        </li>\r\n    </ul>";
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports) {
 
 	/**
@@ -466,107 +618,6 @@
 	    Vue.prototype.$localstorage.io = io;
 	};
 
-
-/***/ },
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(26)
-	module.exports.template = __webpack_require__(27)
-
-
-/***/ },
-/* 26 */
-/***/ function(module, exports) {
-
-	module.exports = {
-
-	    data: function () {
-	        return {
-	            spin: false,
-	            show_address_2: false,
-	            checkout: {
-	                agreed: false,
-	                invoice_address: {
-	                    name: 'name',
-	                    address: 'address',
-	                    address_2: '',
-	                    zipcode: '3456',
-	                    city: 'City',
-	                    country: 'NL'
-	                },
-	                payment: {
-	                    method: window.$cart.config.default_payment,
-	                    price: 0
-	                }
-	            },
-	            invalid: {}
-	        };
-	    },
-
-	    inherit: true,
-
-	    created: function () {
-	        this.config.required_checkout.forEach(function (name) {
-	            this.$set('invalid.' + name, false);
-	        }.bind(this));
-	    },
-
-	    methods: {
-	        doCheckout: function () {
-	            if (this.spin) {
-	                return;
-	            }
-	            console.log('checkout');
-	            var vm = this;
-	            if(this.validateCheckout()) {
-	                console.log(this.checkout.payment.method);
-	                this.spin = true;
-	                this.resource.save({id: 'checkout'}, { cartItems: this.cartItems, checkout: this.checkout }, function (data) {
-
-	                    console.log(data);
-	                    vm.$set('spin', false);
-
-	                });
-	            }
-	        },
-
-	        validateCheckout: function () {
-	            var invalid = false;
-	            this.config.required_checkout.forEach(function (name) {
-	                invalid = !this.validateField(name) || invalid;
-	            }.bind(this));
-
-	            return !invalid;
-	        },
-
-	        validateField: function (name) {
-	            var valid = !!this.$get('checkout.' + name);
-	            this.$set('invalid.' + name, !valid);
-	            return valid;
-	        }
-	    },
-
-	    computed: {
-	        countryList: function () {
-	            var options = [{value: '', text: this.$trans('Country')}];
-	            options.push({value: 'NL', text: this.$trans('Netherlands')});
-	            return options;
-	        }
-	    }
-
-	};
-
-/***/ },
-/* 27 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"uk-grid uk-grid-width-medium-1-2\">\r\n        <div>\r\n\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'Invoice Address' | trans }}</h3>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-user\"></i>\r\n                            <input v-model=\"checkout.invoice_address.name\" name=\"name\" type=\"text\"\r\n                                   v-on=\"blur: validateField('invoice_address.name')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Name' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.invoice_address.name\">\r\n                            {{ 'Please enter your name' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-building\"></i>\r\n                            <input v-model=\"checkout.invoice_address.address\" name=\"address\" type=\"text\"\r\n                                   v-on=\"blur: validateField('invoice_address.address')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Address' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.invoice_address.address\">\r\n                            {{ 'Please enter an address' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div v-show=\"show_address_2\" class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-building\"></i>\r\n                            <input v-model=\"checkout.invoice_address.address_2\" name=\"address_2\" type=\"text\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Address line 2' | trans }}\">\r\n                        </div>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"checkbox\" value=\"hide-show_address_2\"\r\n                                      v-model=\"show_address_2\"> {{ 'Show address line 2' | trans }}</label>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-map-pin\"></i>\r\n                            <input v-model=\"checkout.invoice_address.zipcode\" name=\"name\" type=\"text\"\r\n                                   v-on=\"blur: validateField('invoice_address.zipcode')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'Zipcode' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.invoice_address.zipcode\">\r\n                            {{ 'Please enter a zipcode' | trans }}</p>\r\n\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <div class=\"uk-form-icon uk-width-1-1\">\r\n                            <i class=\"uk-icon-map-o\"></i>\r\n                            <input v-model=\"checkout.invoice_address.city\" name=\"name\" type=\"text\"\r\n                                   v-on=\"blur: validateField('invoice_address.city')\"\r\n                                   class=\"uk-width-1-1\" placeholder=\"{{ 'City' | trans }}\">\r\n                        </div>\r\n                        <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.invoice_address.city\">\r\n                            {{ 'Please enter a city' | trans }}</p>\r\n                    </div>\r\n                </div>\r\n\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls\">\r\n                        <select v-model=\"checkout.invoice_address.country\" name=\"country\" options=\"countryList\"\r\n                                v-on=\"blur: validateField('invoice_address.country')\"\r\n                                class=\"uk-width-1-1\"></select>\r\n                    </div>\r\n                    <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.invoice_address.country\">\r\n                        {{ 'Please select a country' | trans }}</p>\r\n                </div>\r\n            </div>\r\n\r\n\r\n        </div>\r\n        <div>\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'Payment method' | trans }}</h3>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"radio\" value=\"PAYPAL\"\r\n                                      v-model=\"checkout.payment.method\"> {{ 'Paypal' | trans }}</label>\r\n                    </div>\r\n                </div>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"radio\" value=\"STRIPE\"\r\n                                      v-model=\"checkout.payment.method\"> {{ 'Stripe' | trans }}</label>\r\n                    </div>\r\n                </div>\r\n\r\n            </div>\r\n            <div class=\"uk-panel uk-panel-box uk-form\">\r\n\r\n                <h3 class=\"uk-panel-title\">{{ 'To payment' | trans }}</h3>\r\n\r\n                <div class=\"uk-form-row\">\r\n                    <div class=\"uk-form-controls uk-form-controls-text\">\r\n                        <label><input type=\"checkbox\" name=\"agreed\" value=\"agreed\"\r\n                                      v-model=\"checkout.agreed\"> {{ 'I agree with the terms and conditions' | trans }}</label>\r\n                    </div>\r\n                    <p class=\"uk-form-help-block uk-text-danger\" v-show=\"invalid.agreed\">\r\n                        {{ 'Please agree with the terms and conditions' | trans }}</p>\r\n                </div>\r\n\r\n                <div class=\"uk-margin uk-text-right\">\r\n                    <button class=\"uk-button uk-button-large uk-button-success\">\r\n                        <i v-show=\"!spin\" class=\"uk-icon-check uk-margin-small-right\"></i>\r\n                        <i v-show=\"spin\" class=\"uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right\"></i>\r\n                        {{ 'To payment' | trans }}\r\n                    </button>\r\n                </div>\r\n\r\n              </div>\r\n        </div>\r\n    </div>\r\n<pre>{{checkout|json}}</pre>";
 
 /***/ }
 /******/ ]);

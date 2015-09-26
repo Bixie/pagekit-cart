@@ -115,13 +115,22 @@ return [
 		'currency' => 'EUR',
 		'vat' => 'high',
 		'vat_view' => 'incl',
-		'USDtoEUR' => 1.25415,
-		'EURtoUSD' => 0.82481,
-		'default_payment' => 'PAYPAL',
-		'required_checkout' => ['invoice_address.name', 'invoice_address.address', 'invoice_address.zipcode', 'invoice_address.city', 'invoice_address.country', 'agreed'],
+		'USDtoEUR' => 0.82481,
+		'EURtoUSD' => 1.25415,
+		'required_checkout' => [
+			'billing_address.firstName',
+			'billing_address.lastName',
+			'billing_address.address1',
+			'billing_address.postcode',
+			'billing_address.city',
+			'billing_address.country',
+			'payment.method',
+			'agreed'
+		],
 		'addtocart' => [
 			'show_vat' => true
 		],
+		'gateways' => [],
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
@@ -137,7 +146,8 @@ return [
 
 		'after@cart/checkout' => function ($event, $request) use ($app) {
 			App::view()->data('$cart', [
-				'config' => App::module('bixie/cart')->config()
+				'gateways' => App::bixiePayment()->activeGatewaysData(),
+				'config' => App::module('bixie/cart')->publicConfig()
 			]);
 		},
 
@@ -154,6 +164,7 @@ return [
 			//sections
 			$scripts->register('download-section-cart', 'bixie/cart:app/bundle/download-section-cart.js', ['~bixie-downloads']);
 
+			$scripts->register('uikit-accordion', 'app/assets/uikit/js/components/accordion.min.js', 'uikit');
 			$scripts->register('uikit-lightbox', 'app/assets/uikit/js/components/lightbox.min.js', 'uikit');
 		},
 

@@ -3,6 +3,8 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Cart\CartFactory;
+use Bixie\Cart\Model\Order;
+use Bixie\Cart\Payment\PaymentException;
 use Pagekit\Application as App;
 use Bixie\Cart\Cart\CartItem;
 
@@ -40,13 +42,41 @@ class CartApiController
 
     /**
      * @Route("/checkout", methods="POST")
-     * @Request({"cartItems": "array", "checkout": "array"}, csrf=true)
+     * @Request({"cartItems": "array", "cardData": "array", "checkout": "array"}, csrf=true)
      */
-    public function checkoutAction($cartItemsData, $checkout)
+    public function checkoutAction($cartItemsData, $cardData, $checkout)
     {
 		$cartItems = $this->saveAction($cartItemsData);
 
-		return ['cartItems' => array_values($cartItems), 'checkout' => $checkout];
+		$order = Order::createNew($cartItems, $checkout)->calculateOrder();
+
+		$payment_method = $checkout['payment']['method'];
+
+		try {
+
+			$payment = App::bixiePayment()->getPayment($payment_method, $cardData, $order);
+
+			$order->status = Order::STATUS_CONFIRMED;
+			$order->payment = $payment->getData();
+
+			$order->save();
+
+			//reset cart
+			App::bixieCart()->reset();
+			$cartItems = [];
+
+			//send mail
+
+		} catch (PaymentException $e) {
+			return ['error' => $e->getMessage()];
+		}
+
+		return [
+			'cartItems' => array_values($cartItems),
+			'succesurl' => App::url('@cart/paymentreturn', ['id' => $order->transaction_id]),
+			'checkout' => $checkout,
+			'order' => $order
+		];
     }
 
 }

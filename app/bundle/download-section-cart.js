@@ -45,13 +45,13 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(20)
-	module.exports.template = __webpack_require__(21)
+	module.exports = __webpack_require__(23)
+	module.exports.template = __webpack_require__(24)
 
 
 /***/ },
 
-/***/ 20:
+/***/ 23:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -122,7 +122,7 @@
 
 /***/ },
 
-/***/ 21:
+/***/ 24:
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"uk-form-horizontal\">\r\n\r\n        <div class=\"uk-form-row\">\r\n            <span class=\"uk-form-label\">{{ 'Shopping cart' | trans }}</span>\r\n\r\n            <div class=\"uk-form-controls uk-form-controls-text\">\r\n                <p v-show=\"file.id\" class=\"uk-form-controls-condensed\">\r\n                    <label><input type=\"checkbox\" v-model=\"file.data.cart_active\"> {{ 'Enable cart' | trans }}</label>\r\n                </p>\r\n                <p v-show=\"!file.id\" class=\"uk-form-help-block uk-text-warning\">\r\n                    {{ 'Save item to enable cart' | trans }}\r\n                </p>\r\n            </div>\r\n        </div>\r\n\r\n        <div v-show=\"file.id && product.active\" class=\"uk-margin\">\r\n            <div class=\"uk-form-row\">\r\n                <label for=\"form-cart-price\" class=\"uk-form-label\">{{ 'Price' | trans }}</label>\r\n\r\n                <div class=\"uk-form-controls\">\r\n                    <div class=\"uk-form-icon\">\r\n                        <i class=\"{{ currencyIcon }}\"></i>\r\n                        <input type=\"number\" step=\"0.01\" v-model=\"product.price\"\r\n                               id=\"form-cart-price\" class=\"uk-form-width-medium uk-text-right\" number>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n\r\n            <div class=\"uk-form-row\">\r\n                <label class=\"uk-form-label\">{{ 'Price config' | trans }}</label>\r\n\r\n                <div class=\"uk-form-controls uk-form-controls-text\">\r\n                    <select name=\"file_cart_currency\" class=\"uk-form-width-small\"\r\n                            v-model=\"product.currency\">\r\n                        <option value=\"EUR\">{{ 'Euro' | trans }}</option>\r\n                        <option value=\"USD\">{{ 'Dollar' | trans }}</option>\r\n                    </select>\r\n                    <select name=\"file_cart_vat\" class=\"uk-margin-small-left uk-form-width-small\"\r\n                            v-model=\"product.vat\" options=\"vatOptions\">\r\n                    </select>\r\n                </div>\r\n            </div>\r\n\r\n        </div>\r\n    </div>";

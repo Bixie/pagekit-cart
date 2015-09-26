@@ -2,7 +2,7 @@
   "name": "bixie/cart",
   "module": "bixie/cart",
   "type": "pagekit-extension",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "title": "Shopping cart handler",
   "description": "Enables you to sell items to your visitors.",
   "license": "MIT",
@@ -18,6 +18,7 @@
     "scripts": "scripts.php"
   },
   "require": {
-    "omnipay/omnipay": "~2.0"
+    "omnipay/paypal": "~2.0",
+    "omnipay/stripe": "~2.0"
   }
 }

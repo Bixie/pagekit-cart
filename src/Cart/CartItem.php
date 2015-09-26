@@ -40,6 +40,10 @@ class CartItem implements \JsonSerializable
 	/**
 	 * @var string
 	 */
+	public $currency;
+	/**
+	 * @var string
+	 */
 	public $vat;
 	/**
 	 * @var array

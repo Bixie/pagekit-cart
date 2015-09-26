@@ -29,7 +29,7 @@ class FileListener implements EventSubscriberInterface {
 		$view->data('$cart', [
 			'product' => $product,
 			'checkout_url' => App::url('@cart/checkout'),
-			'config' => App::module('bixie/cart')->config()
+			'config' => App::module('bixie/cart')->publicConfig()
 		]);
 	}
 
@@ -54,7 +54,7 @@ class FileListener implements EventSubscriberInterface {
 			$view->data('$cart', [
 				'products' => $products,
 				'checkout_url' => App::url('@cart/checkout'),
-				'config' => App::module('bixie/cart')->config()
+				'config' => App::module('bixie/cart')->publicConfig()
 			]);
 		}
 	}

@@ -1,4 +1,4 @@
-<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['vue', 'editor']) ?>
+<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['vue', 'editor', 'uikit-accordion']) ?>
 
 <div id="cart-settings" class="uk-form">
 
@@ -9,6 +9,7 @@
 
 				<ul class="uk-nav uk-nav-side pk-nav-large" data-uk-tab="{ connect: '#tab-content' }">
 					<li><a><i class="pk-icon-large-brush uk-margin-right"></i> {{ 'Main page content' | trans }}</a></li>
+					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'Payment settings' | trans }}</a></li>
 					<li><a><i class="pk-icon-large-settings uk-margin-right"></i> {{ 'Download settings' | trans }}</a></li>
 				</ul>
 
@@ -66,6 +67,75 @@
 							</div>
 						</div>
 
+
+					</div>
+				</li>
+				<li>
+					<div class="uk-margin">
+
+						<div class="uk-margin uk-flex uk-flex-space-between uk-flex-wrap" data-uk-margin>
+							<div data-uk-margin>
+
+								<h2 class="uk-margin-remove">{{ 'Payment gateways settings' | trans }}</h2>
+
+							</div>
+							<div data-uk-margin>
+
+								<button class="uk-button uk-button-primary" v-on="click: save">{{ 'Save' | trans }}</button>
+
+							</div>
+						</div>
+
+						<div class="uk-accordion uk-form-horizontal" data-uk-accordion="{showfirst: false}">
+
+							<?php foreach ($gateways as $gateway) :
+								$shortName = $gateway->getShortName()
+								?>
+
+								<h3 class="uk-accordion-title">
+									<i v-attr="class: config.gateways['<?= $shortName ?>'].active ?
+									'uk-icon-circle uk-text-success uk-margin-small-right' :
+									'uk-icon-circle uk-text-danger uk-margin-small-right'"></i>
+									<?= $gateway->getName() ?></h3>
+
+								<div class="uk-accordion-content">
+									<div class="uk-form-row">
+										<span class="uk-form-label">{{ 'Active' | trans }}</span>
+
+										<div class="uk-form-controls uk-form-controls-text">
+											<label><input type="checkbox" value="hide-title"
+														  v-model="config.gateways['<?= $shortName ?>'].active"> {{ 'Payment method active' |
+												trans }}</label>
+										</div>
+									</div>
+
+									<?php foreach ($gateway->getParameters() as $key => $default) : ?>
+
+										<div class="uk-form-row">
+											<label for="form-gateways-<?= $shortName ?>-<?= $key ?>"
+												   class="uk-form-label">{{ '<?= $key ?>' | trans }}</label>
+
+											<?php if (is_bool($default)): ?>
+												<div class="uk-form-controls uk-form-controls-text">
+													<input type="checkbox" value="hide-title"
+														   v-model="config.gateways['<?= $shortName ?>']['<?= $key ?>']">
+												</div>
+											<?php else: ?>
+												<div class="uk-form-controls">
+													<input class="uk-form-width-large" type="text"
+														   name="form-gateways-<?= $shortName ?>-<?= $key ?>"
+														   id="form-gateways-<?= $shortName ?>-<?= $key ?>"
+														   v-model="config.gateways['<?= $shortName ?>']['<?= $key ?>']">
+												</div>
+											<?php endif; ?>
+										</div>
+
+									<?php endforeach; ?>
+								</div>
+
+							<?php endforeach; ?>
+
+						</div>
 
 					</div>
 				</li>

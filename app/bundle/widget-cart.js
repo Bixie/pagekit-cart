@@ -45,13 +45,13 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(22)
-	module.exports.template = __webpack_require__(23)
+	module.exports = __webpack_require__(25)
+	module.exports.template = __webpack_require__(26)
 
 
 /***/ },
 
-/***/ 22:
+/***/ 25:
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -73,7 +73,7 @@
 
 /***/ },
 
-/***/ 23:
+/***/ 26:
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"uk-grid pk-grid-large\" data-uk-grid-margin>\r\n        <div class=\"uk-flex-item-1 uk-form-horizontal\">\r\n\r\n            <div class=\"uk-form-row\">\r\n                <label for=\"form-title\" class=\"uk-form-label\">{{ 'Title' | trans }}</label>\r\n                <div class=\"uk-form-controls\">\r\n                    <input id=\"form-title\" class=\"uk-form-width-large\" type=\"text\" name=\"title\" v-model=\"widget.title\" v-valid=\"required\">\r\n                    <p class=\"uk-form-help-block uk-text-danger\" v-show=\"form.title.invalid\">{{ 'Title cannot be blank.' | trans }}</p>\r\n                </div>\r\n            </div>\r\n\r\n           <div class=\"uk-form-row\">\r\n                <span class=\"uk-form-label\">{{ 'Currency' | trans }}</span>\r\n\r\n                <div class=\"uk-form-controls uk-form-controls-text\">\r\n                    <label><input type=\"checkbox\" value=\"hide-title\" v-model=\"widget.data.show_currency\"> {{ 'Show currency selector' |\r\n                        trans }}</label>\r\n                </div>\r\n            </div>\r\n\r\n\r\n        </div>\r\n        <div class=\"pk-width-sidebar pk-width-sidebar-large\">\r\n\r\n            <partial name=\"settings\"></partial>\r\n\r\n        </div>\r\n    </div>";

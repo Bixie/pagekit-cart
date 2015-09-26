@@ -1,7 +1,6 @@
 <?php
 /**
  * @var $view
- * @var array $config
  * @var Bixie\Cart\CartModule $cart
  */
 $view->script('bixie-cart');
