@@ -16,5 +16,8 @@
   "extra": {
     "icon": "icon.svg",
     "scripts": "scripts.php"
+  },
+  "require": {
+    "omnipay/omnipay": "~2.0"
   }
 }

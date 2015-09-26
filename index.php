@@ -17,9 +17,9 @@ return [
 
 	'nodes' => [
 
-		'cart' => [
+		'checkout' => [
 			'name' => '@cart',
-			'label' => 'Cart',
+			'label' => 'Checkout',
 			'controller' => 'Bixie\\Cart\\Controller\\SiteController',
 			'protected' => true,
 			'frontpage' => false
@@ -42,6 +42,12 @@ return [
 				'Bixie\\Cart\\Controller\\ProductApiController'
 			]
 		]
+
+	],
+
+	'widgets' => [
+
+		'widgets/cart.php'
 
 	],
 
@@ -108,8 +114,14 @@ return [
 		'products_per_page' => 20,
 		'currency' => 'EUR',
 		'vat' => 'high',
+		'vat_view' => 'incl',
 		'USDtoEUR' => 1.25415,
 		'EURtoUSD' => 0.82481,
+		'default_payment' => 'PAYPAL',
+		'required_checkout' => ['invoice_address.name', 'invoice_address.address', 'invoice_address.zipcode', 'invoice_address.city', 'invoice_address.country', 'agreed'],
+		'addtocart' => [
+			'show_vat' => true
+		],
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
@@ -123,11 +135,18 @@ return [
 			$app->subscribe(new Bixie\Cart\Event\FileListener());
 		},
 
-		'view.data' => function ($event, $view) use ($app) {
+		'after@cart/checkout' => function ($event, $request) use ($app) {
+			App::view()->data('$cart', [
+				'config' => App::module('bixie/cart')->config()
+			]);
+		},
+
+		'view.data' => function ($event, $data) use ($app) {
 			$cartItems = $app['bixieCart']->all();
 			if (count($cartItems)) {
-				$view->add('$cartItems', array_values($cartItems));
+				$data->add('$cartItems', array_values($cartItems));
 			}
+
 		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {

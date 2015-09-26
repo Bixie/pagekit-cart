@@ -2,12 +2,12 @@ module.exports = [
 
     {
         entry: {
-            /*sections*/
             "download-section-cart": "./app/components/download-section-cart.vue",
-            "bixie-addtocart": "./app/addtocart.js",
+
+            "widget-cart": "./app/components/widget-cart.vue",
             "bixie-cart": "./app/cart.js",
             /*frontpage views*/
-            "cart": "./app/views/cart.js",
+    /*        "checkout": "./app/views/checkout.js",*/
             /*admin views*/
             "cart-settings": "./app/views/admin/settings.js",
             "admin-order": "./app/views/admin/order.js",

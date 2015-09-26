@@ -12,7 +12,7 @@ class CartItem implements \JsonSerializable
 	/**
 	 * @var string
 	 */
-	protected $id;
+	public $id;
 	/**
 	 * @var integer
 	 */

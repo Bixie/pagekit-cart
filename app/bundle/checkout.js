@@ -46,21 +46,32 @@
 
 	module.exports = Vue.extend({
 
+	    el: '#bixie-checkout',
+
 	    data: function () {
-	        return window.$data;
+	        return {
+	            invoice_address: {
+	                name: '',
+	                address: '',
+	                address_2: '',
+	                zipcode: '',
+	                city: '',
+	                country: ''
+	            }
+	        };
 	    },
 
-	    methods: {
-
+	    created: function () {
+	        this.invoice_address.name = 'asdff';
 	    }
 
 	});
 
-	$(function () {
-
-	    (new module.exports()).$mount('#cart');
-
-	});
+	//$(function () {
+	//
+	//    (new module.exports()).$mount('#checkout');
+	//
+	//});
 
 
 /***/ }

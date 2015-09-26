@@ -1,12 +1,14 @@
 <template>
-    <div class="uk-grid uk-grid-small uk-flex-middle uk-margin" data-uk-margin="">
-        <div class="uk-width-medium-1-3 uk-text-right">{{{ product.price | currency product}}}</div>
-        <div class="uk-width-medium-2-3">
-            <button class="uk-button uk-button-success" v-on="click: addToCart(product)">
+    <div class="uk-flex uk-flex-middle uk-flex-center uk-flex-space-around uk-flex-wrap uk-margin" data-uk-margin="">
+        <div class="uk-text-right">
+            <strong>{{{ product | productprice }}}</strong>
+            <div v-if="config.addtocart.show_vat"><small>{{{ includingVat }}}</small></div>
+        </div>
+        <div class="">
+            <button type="button" class="uk-button uk-button-success" v-on="click: addToCart(product)">
                 <i class="uk-icon-shopping-cart uk-margin-small-right"></i>{{ 'Add to cart' | trans }}
             </button>
         </div>
-
 
     </div>
 
@@ -18,38 +20,16 @@
 
         props: ['product', 'item_id'],
 
-        data: function () {
-            return {
-                config: window.$cart.config
-            }
-        },
-
-        created: function () {
-        },
+        inherit: true,
 
         computed: {
-            fileName: function () {
-                return this.file.split('/').pop();
-            }
-        },
-
-        methods: {
-            addToCart: function (product) {
-                window.$bixieCart.addToCart(product);
+            includingVat: function () {
+                var vatString = this.formatprice(this.getVat(this.product)),
+                        text = this.config.vat_view == 'excl' ? '+ %vat% VAT' : 'incl. %vat% VAT';
+                return this.$trans(text, {vat: vatString});
             }
         }
 
     };
-
-    Vue.component('addtocart', function (resolve, reject) {
-        Vue.asset({
-            js: [
-//                'app/assets/uikit/js/components/upload.min.js',
-//                'app/system/modules/finder/app/bundle/panel-finder.js'
-            ]
-        }, function () {
-            resolve(module.exports);
-        })
-    });
 
 </script>

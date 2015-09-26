@@ -28,6 +28,7 @@ class FileListener implements EventSubscriberInterface {
 
 		$view->data('$cart', [
 			'product' => $product,
+			'checkout_url' => App::url('@cart/checkout'),
 			'config' => App::module('bixie/cart')->config()
 		]);
 	}
@@ -49,9 +50,10 @@ class FileListener implements EventSubscriberInterface {
 			}
 			$file->product = $product;
 			$products[$file->id] = $product;
-			$view->script('bixie-addtocart', 'bixie/cart:app/bundle/bixie-addtocart.js', ['vue', 'bixie-cart']);
+			$view->script('bixie-cart');
 			$view->data('$cart', [
 				'products' => $products,
+				'checkout_url' => App::url('@cart/checkout'),
 				'config' => App::module('bixie/cart')->config()
 			]);
 		}

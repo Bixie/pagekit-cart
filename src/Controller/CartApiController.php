@@ -15,7 +15,8 @@ class CartApiController
     /**
      * @Route("/", methods="POST")
      * @Request({"cartItems": "array"}, csrf=true)
-     */
+	 * @return CartItem[]
+	 */
     public function saveAction($data)
     {
 		/** @var CartFactory $bixieCart */
@@ -38,46 +39,14 @@ class CartApiController
     }
 
     /**
-     * @Route("/{id}", methods="DELETE", requirements={"id"="\d+"})
-     * @Request({"id": "int"}, csrf=true)
+     * @Route("/checkout", methods="POST")
+     * @Request({"cartItems": "array", "checkout": "array"}, csrf=true)
      */
-    public function deleteAction($id)
+    public function checkoutAction($cartItemsData, $checkout)
     {
-        if ($project = File::find($id)) {
+		$cartItems = $this->saveAction($cartItemsData);
 
-            if(!App::user()->hasAccess('download: manage downloads')) {
-                return ['error' => __('Access denied.')];
-            }
-
-			$project->delete();
-        }
-
-        return ['message' => 'success'];
+		return ['cartItems' => array_values($cartItems), 'checkout' => $checkout];
     }
 
-    /**
-     * @Route("/bulk", methods="POST")
-     * @Request({"files": "array"}, csrf=true)
-     */
-    public function bulkSaveAction($files = [])
-    {
-        foreach ($files as $data) {
-            $this->saveAction($data, isset($data['id']) ? $data['id'] : 0);
-        }
-
-        return ['message' => 'success'];
-    }
-
-    /**
-     * @Route("/bulk", methods="DELETE")
-     * @Request({"ids": "array"}, csrf=true)
-     */
-    public function bulkDeleteAction($ids = [])
-    {
-        foreach (array_filter($ids) as $id) {
-            $this->deleteAction($id);
-        }
-
-        return ['message' => 'success'];
-    }
 }
