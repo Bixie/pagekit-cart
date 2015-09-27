@@ -8,14 +8,16 @@
 
 ?>
 <div class="uk-panel uk-panel-box">
-	<?php if (!empty($order->payment['paid'])) : ?>
-		<div class="uk-panel-badge uk-badge uk-badge-success"><?= __('Order paid') ?></div>
-	<?php endif; ?>
-
 
 	<h3 class="uk-panel-title"><?= __('Payment details') ?></h3>
 
 	<dl class="uk-description-list">
+		<dt><?= __('Payment status') ?></dt>
+		<?php if (!empty($order->payment['paid'])) : ?>
+			<dd class="uk-text-success"><?= __('Order paid') ?></dd>
+		<?php else: ?>
+			<dd class="uk-text-danger"><?= __('Order not paid') ?></dd>
+		<?php endif; ?>
 		<dt><?= __('Payment method') ?></dt>
 		<dd><?= $order->get('payment.method') ?></dd>
 		<dt><?= __('Payment ID') ?></dt>

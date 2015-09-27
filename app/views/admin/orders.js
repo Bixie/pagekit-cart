@@ -14,8 +14,8 @@ module.exports = {
         this.config.filter = _.extend({
             status: '',
             search: '',
-            order: this.config.ordering + ' ' + this.config.ordering_dir,
-            limit: this.config.files_per_page
+            order: 'created desc',
+            limit: this.config.orders_per_page
         }, this.config.filter);
     },
 
@@ -32,6 +32,13 @@ module.exports = {
     },
 
     methods: {
+
+        cartItems: function (order) {
+            var cartItems = order.cartItems.map(function (cartItem) {
+                return cartItem.item_title;
+            });
+            return cartItems.join(', ');
+        },
 
         active: function (portfolio) {
             return this.selected.indexOf(portfolio.id) != -1;
@@ -50,10 +57,10 @@ module.exports = {
             });
         },
 
-        save: function (file) {
-            this.resource.save({ id: file.id }, { file: file }, function (data) {
+        save: function (order) {
+            this.resource.save({ id: order.id }, { order: order }, function (data) {
                 this.load();
-                this.$notify('File saved.');
+                this.$notify('Cart order saved.');
             });
         },
 
@@ -71,14 +78,14 @@ module.exports = {
             });
         },
 
-        toggleStatus: function (file) {
-            file.status = file.status === 0 ? 1 : 0;
-            this.save(file);
+        toggleStatus: function (order) {
+            order.status = order.status === 0 ? 1 : 0;
+            this.save(order);
         },
 
         getSelected: function () {
-            return this.orders.filter(function (file) {
-                return this.selected.indexOf(file.id) !== -1;
+            return this.orders.filter(function (order) {
+                return this.selected.indexOf(order.id) !== -1;
             }, this);
         },
 
@@ -110,7 +117,7 @@ module.exports = {
 
 $(function () {
 
-    new Vue(module.exports).$mount('#download-orders');
+    new Vue(module.exports).$mount('#cart-orders');
 
 });
 

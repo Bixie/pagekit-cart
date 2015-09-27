@@ -8,12 +8,13 @@ use Pagekit\Module\Module;
 use Bixie\Cart\Cart\CartFactory;
 
 class CartModule extends Module {
-	const CURRENCY_ICONS = [
+
+	protected $currency_icons = [
 		'EUR' => 'uk-icon-euro',
 		'USD' => 'uk-icon-dollar'
 	];
 
-	const DATETIME_FORMATS = [
+	protected $datetime_formats = [
 		'full' => 'l, F j, Y h:i:s a',
 		'fullDate' => 'l, F j, Y',
 		'longDate' => 'F j, Y',
@@ -65,9 +66,8 @@ class CartModule extends Module {
 				$date = new \DateTime($date);
 			}
 
-			$formats = self::DATETIME_FORMATS;
 //			$formats = App::module('system/intl')->getFormats(); //todo get form core
-			return $date->format(isset($formats[$format]) ? $formats[$format] : $formats['medium']);
+			return $date->format(isset($this->datetime_formats[$format]) ? $this->datetime_formats[$format] : $this->datetime_formats['medium']);
 
 		} catch (\Exception $e) {
 		    return 'Invalid date';
@@ -75,8 +75,7 @@ class CartModule extends Module {
 	}
 
 	public function formatMoney ($amount, $currency = 'EUR') {
-		$icons = self::CURRENCY_ICONS;
-		$icon = '<i class="' . $icons[$currency] . ' uk-margin-small-right"></i>';
+		$icon = '<i class="' . $this->currency_icons[$currency] . ' uk-margin-small-right"></i>';
 
 		$formats = App::module('system/intl')->getFormats();
 		$numberString = number_format($amount, 2, $formats['NUMBER_FORMATS']['DECIMAL_SEP'], $formats['NUMBER_FORMATS']['GROUP_SEP']);

@@ -3,7 +3,6 @@
  * @var $view
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
-<pre><?php print_r($order->payment); ?></pre>
  */
 
 ?>

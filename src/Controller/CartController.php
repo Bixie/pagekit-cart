@@ -2,8 +2,8 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
-use Bixie\Cart\Cart\CartItem;
 use Pagekit\User\Model\Role;
 
 /**
@@ -27,7 +27,7 @@ class CartController
 	/**
      * @Request({"filter": "array", "page":"int"})
      */
-    public function ordersAction($filter = null, $page = 1)
+    public function ordersAction($filter = null, $page = 0)
     {
         return [
             '$view' => [
@@ -35,7 +35,7 @@ class CartController
                 'name'  => 'bixie/cart/admin/orders.php'
             ],
             '$data' => [
-				'statuses' => CartItem::getStatuses(),
+				'statuses' => Order::getStatuses(),
 				'config'   => [
                     'ordering' => $this->cart->config('ordering'),
                     'ordering_dir' => $this->cart->config('ordering_dir'),
@@ -53,48 +53,32 @@ class CartController
      */
     public function editAction($id = 0)
     {
-        try {
 
-            if (!$cartItem = CartItem::where(compact('id'))->first()) {
+		if (!$order = Order::where(compact('id'))->first()) {
 
-                if ($id) {
-                    App::abort(404, __('Invalid file id.'));
-                }
-
-
-				$cartItem = CartItem::create([
-					'status' => 1,
-					'slug' => '',
-					'data' => [],
-					'tags' => [],
-					'date' => new \DateTime()
-				]);
-
-				$cartItem->set('markdown', $this->cart->config('markdown'));
-
+			if ($id) {
+				App::abort(404, __('Invalid file id.'));
 			}
 
+			App::abort(401, __('Orders cannot be created.'));
 
-            return [
-                '$view' => [
-                    'title' => $id ? __('Edit download') : __('Add download'),
-                    'name'  => 'bixie/cart/admin/file.php'
-                ],
-                '$data' => [
-					'statuses' => CartItem::getStatuses(),
-					'roles'    => array_values(Role::findAll()),
-					'config' => $this->cart->config(),
-                	'cartItem'  => $cartItem
-                ],
-                'file' => $cartItem
-            ];
+		}
 
-        } catch (\Exception $e) {
 
-            App::message()->error($e->getMessage());
+		return [
+			'$view' => [
+				'title' => __('Edit order'),
+				'name'  => 'bixie/cart/admin/order.php'
+			],
+			'$data' => [
+				'statuses' => Order::getStatuses(),
+				'config' => $this->cart->config(),
+				'order'  => $order
+			],
+			'cart' => $this->cart,
+			'order' => $order
+		];
 
-            return App::redirect('@cart/cart');
-        }
     }
 
     /**

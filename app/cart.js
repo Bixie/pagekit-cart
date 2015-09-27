@@ -1,7 +1,8 @@
 var Cart = Vue.extend({
 
     data: function () {
-         return _.merge({
+        return _.merge({
+            'cart_loading': false,
             'filters': {
                 currency: window.$cart.config.currency || 'EUR'
             },
@@ -46,14 +47,18 @@ var Cart = Vue.extend({
 
         saveCart: _.debounce(function () {
             console.log('save' + this.cartItems.length);
-            this.resource.save({}, { cartItems: this.cartItems }, function (data) {
+            this.cart_loading = true;
+            this.resource.save({}, {cartItems: this.cartItems}, function (data) {
                 console.log(data, this.cartItems.length);
-                if (data.length == this.cartItems.length) { //todo this is bodgy
+                if (data.length == this.cartItems.length) { //todo this is bodgy (but works fine)
                     this.$set('cartItems', data);
                 }
-                //this.$notify('Cart updated.');
+                this.cart_loading = false;
             });
-        }, 700),
+        }, 700, {
+            'leading': true,
+            'trailing': true
+        }),
 
         checkoutSubmit: function (e) {
             e.preventDefault();

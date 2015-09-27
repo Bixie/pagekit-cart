@@ -2,6 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Cart\MailHelper;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\CartItem;
@@ -52,7 +53,8 @@ class SiteController
 
 		$content = '';
 		if ($this->cart->config('thankyou.content')) {
-			$content = App::content()->applyPlugins($this->cart->config('thankyou.content'), ['markdown' => $this->cart->config('markdown_enabled')]);;
+			$content = App::content()->applyPlugins($this->cart->config('thankyou.content'), ['markdown' => $this->cart->config('markdown_enabled')]);
+			$content = (new MailHelper($order))->replaceString($content);
 		}
 
 		return [

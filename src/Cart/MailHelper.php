@@ -3,8 +3,8 @@
 namespace Bixie\Cart\Cart;
 
 use Bixie\Cart\CartModule;
+use Bixie\Cart\Payment\PaymentException;
 use Pagekit\Application as App;
-use Pagekit\Application\Exception;
 use Bixie\Cart\Model\Order;
 
 class MailHelper {
@@ -30,6 +30,7 @@ class MailHelper {
 
 	/**
 	 * @return string
+	 * @throws PaymentException
 	 */
 	public function sendMail () {
 
@@ -37,35 +38,38 @@ class MailHelper {
 		$mailBody = $this->replaceString($this->cart->config('email.body'));
 		$mailBody = App::content()->applyPlugins($mailBody, ['order' => $this->order, 'markdown' => $this->cart->config('markdown_enabled')]);
 		$mailBody .= App::view('bixie/cart/mails/order_confirmation.php', ['cart' => $this->cart, 'order' => $this->order]);
-		$mailTemplate = App::view('bixie/cart/mails/template.php', compact('mailBody'), 'text/html');
+		$mailTemplate = App::view('bixie/cart/mails/template.php', compact('mailBody'));
 		try {
 
 			if ($adminMail = $this->cart->config('email.admin_email')) {
 				$mail = App::mailer()->create();
-				$mail->setTo($adminMail)->setSubject($mailSubject)->setBody($mailTemplate)->send();
+				$mail->setTo($adminMail)->setSubject($mailSubject)->setBody($mailTemplate, 'text/html')->send();
 			}
 
 			if ($this->order->email) {
 
 				$mail = App::mailer()->create();
-				$mail->setTo($this->order->email)->setSubject($mailSubject)->setBody($mailTemplate)->send();
+				$mail->setTo($this->order->email)->setSubject($mailSubject)->setBody($mailTemplate, 'text/html')->send();
 			}
 
 		} catch (\Exception $e) {
-			throw new Exception(__('Unable to send confirmation mail.'));
+			throw new PaymentException(__('Unable to send confirmation mail.'));
 		}
 
 	}
 
 	public function replaceString ($string) {
-		$billing_flieds = $this->order->get('billing_address');
-		$string = preg_replace_callback('/\$\$(.+?)\$\$/is', function($matches) use ($billing_flieds) {
+		$billing_fields = $this->order->get('billing_address');
+		$string = preg_replace_callback('/\$\$(.+?)\$\$/is', function($matches) use ($billing_fields) {
 			$placeholder = $matches[1];
 			if (property_exists($this->order, $placeholder)) {
 				return $this->order->$placeholder;
 			}
-			if (isset($billing_flieds[$placeholder])) {
-				return $billing_flieds[$placeholder];
+			if ($this->order->get($placeholder) !== null) {
+				return $this->order->get($placeholder);
+			}
+			if (isset($billing_fields[$placeholder])) {
+				return $billing_fields[$placeholder];
 			}
 			return '';
 		}, $string);

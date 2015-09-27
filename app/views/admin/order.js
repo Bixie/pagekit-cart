@@ -47,6 +47,10 @@ module.exports = Vue.extend({
             }, function (data) {
                 this.$notify(data, 'danger');
             });
+        },
+
+        getStatusText: function(order) {
+            return this.statuses[order.status];
         }
 
     }

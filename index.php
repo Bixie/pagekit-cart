@@ -39,6 +39,7 @@ return [
 			'name' => '@cart/api',
 			'controller' => [
 				'Bixie\\Cart\\Controller\\CartApiController',
+				'Bixie\\Cart\\Controller\\OrderApiController',
 				'Bixie\\Cart\\Controller\\ProductApiController'
 			]
 		]
@@ -64,7 +65,7 @@ return [
 			'icon' => 'bixie/cart:icon.svg',
 			'url' => '@cart/orders',
 			'access' => 'bixie/cart: manage cart',
-			'active' => '@cart/orders*'
+			'active' => '@cart/*'
 		],
 
 		'cart: orders' => [
@@ -72,7 +73,7 @@ return [
 			'parent' => 'cart',
 			'url' => '@cart/orders',
 			'access' => 'bixie/cart: manage orders',
-			'active' => '@cart/orders*'
+			'active' => '@cart/order*'
 		],
 
 		'cart: settings' => [

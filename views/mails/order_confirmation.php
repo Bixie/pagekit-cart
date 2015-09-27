@@ -8,7 +8,7 @@
 
 ?>
 
-<p style="margin: 20px 0">
+<div style="margin: 20px 0">
 
 	<h3><?= __('Order details') ?></h3>
 
@@ -35,10 +35,10 @@
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
 	<tr>
-		<td width="50%">
+		<td width="50%" style="font-size: 16px; line-height: 24px; font-family: Helvetica, Arial, sans-serif; color: #666;">
 			<?= $view->render('bixie/cart/templates/billing_address.php', compact('cart', 'order')) ?>
 		</td>
-		<td width="50%">
+		<td width="50%" style="font-size: 16px; line-height: 24px; font-family: Helvetica, Arial, sans-serif; color: #666;">
 			<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
 		</td>
 	</tr>

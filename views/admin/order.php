@@ -1,4 +1,10 @@
-<?php  $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/admin-order.js', ['vue', 'editor']); ?>
+<?php
+/**
+* @var $view
+* @var Bixie\Cart\Model\Order $order
+* @var Bixie\Cart\CartModule $cart
+*/
+$view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/admin-order.js', ['vue', 'editor']); ?>
 
 <form id="order-edit" class="uk-form" name="form" v-on="submit: save | valid" v-cloak>
 
@@ -27,119 +33,50 @@
 	<div class="uk-switcher uk-margin" v-el="content">
 		<div>
 			<div class="uk-margin">
-				<div class="uk-grid pk-grid-large" data-uk-grid-margin>
-					<div class="uk-flex-item-1">
-						<div class="uk-form-horizontal uk-margin">
-							<div class="uk-form-row">
-								<label for="form-title" class="uk-form-label">{{ 'Title' | trans }}</label>
-
-								<div class="uk-form-controls">
-									<input id="form-title" class="uk-width-1-1 uk-form-large" type="text" name="title"
-										   v-model="order.title" v-valid="required">
-								</div>
-								<p class="uk-form-help-block uk-text-danger" v-show="form.title.invalid">
-									{{ 'Please enter a title' | trans }}</p>
-							</div>
-
-							<div class="uk-form-row">
-								<label for="form-subtitle" class="uk-form-label">{{ 'Subitle' | trans }}</label>
-
-								<div class="uk-form-controls">
-									<input id="form-subtitle" class="uk-width-1-1" type="text" name="subtitle"
-										   v-model="order.subtitle">
-								</div>
-							</div>
-
-						</div>
-
-
-						<div class="uk-form-stacked uk-margin">
-							<div class="uk-form-row">
-								<span class="uk-form-label">{{ 'Content' | trans }}</span>
-
-								<div class="uk-form-controls">
-									<v-editor id="form-content" value="{{@ order.content }}"
-											  options="{{ {markdown : order.data.markdown} }}"></v-editor>
-								</div>
-							</div>
-						</div>
-
-					</div>
-					<div class="pk-width-sidebar pk-width-sidebar-large uk-form-stacked">
-
-						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Order' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input-order order="{{@ order.path }}" ext="{{ ['zip', 'rar', 'tar.gz'] }}"></input-order>
-								<input type="hidden" name="path" v-model="order.path" v-valid="required">
-							</div>
-							<p class="uk-form-help-block uk-text-danger" v-show="form.path.invalid">
-								{{ 'Please select a order' | trans }}</p>
-						</div>
-
-						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Image' | trans }}</label>
-							<div class="uk-form-controls">
-								<input-image-meta image="{{@ order.image.main }}" class="pk-image-max-height"></input-image-meta>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Icon' | trans }}</label>
-							<div class="uk-form-controls">
-								<input-image-meta image="{{@ order.image.icon }}" class="pk-image-max-height"></input-image-meta>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-slug" class="uk-form-label">{{ 'Slug' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input id="form-slug" class="uk-width-1-1" type="text" v-model="order.slug">
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-status" class="uk-form-label">{{ 'Status' | trans }}</label>
-							<div class="uk-form-controls">
-								<select id="form-status" class="uk-width-1-1" v-model="order.status" options="statusOptions"></select>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Date' | trans }}</span>
-							<div class="uk-form-controls">
-								<input-date datetime="{{@ order.date}}"></input-date>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Tags' | trans }}</span>
-							<div class="uk-form-controls">
-								<input-tags tags="{{@ order.tags}}" existing="{{ tags }}"></input-tags>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Restrict Access' | trans }}</span>
-							<div class="uk-form-controls uk-form-controls-text">
-								<p v-repeat="role: roles" class="uk-form-controls-condensed">
-									<label><input type="checkbox" value="{{ role.id }}" v-checkbox="order.roles" number> {{ role.name }}</label>
-								</p>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'Options' | trans }}</span>
-							<div class="uk-form-controls uk-form-controls-text">
-								<label>
-									<input type="checkbox" value="markdown" v-model="order.data.markdown"> {{ 'Enable Markdown' |
-									trans }}</label>
-							</div>
+				<div class="uk-form-horizontal">
+					<div class="uk-form-row">
+						<label for="form-status" class="uk-form-label">{{ 'Order status' | trans }}</label>
+						<div class="uk-form-controls">
+							<select id="form-status" class="uk-form-width-medium" v-model="order.status" options="statusOptions"></select>
 						</div>
 					</div>
 				</div>
+
+				<div class="uk-panel uk-panel-box uk-margin">
+
+					<div class="uk-panel-badge uk-badge {{ order.status == 1 ? 'uk-badge-success' : 'uk-badge-warning' }}">
+						{{ getStatusText(order) }}
+					</div>
+
+					<h3 class="uk-panel-title"><?= __('Order details') ?></h3>
+
+					<dl class="uk-description-list uk-description-list-horizontal">
+						<dt><?= __('Tansaction ID') ?></dt>
+						<dd><?= $order->transaction_id ?></dd>
+						<dt><?= __('Order date') ?></dt>
+						<dd><?= $cart->formatDate($order->created) ?></dd>
+						<dt><?= __('Amount excl. VAT') ?></dt>
+						<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
+						<dt><?= __('VAT amount') ?></dt>
+						<dd class="uk-text-right"><?= $cart->formatMoney($order->total_bruto - $order->total_netto, $order->currency) ?></dd>
+						<dt><?= __('Amount incl. VAT') ?></dt>
+						<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
+					</dl>
+				</div>
+
+				<div class="uk-margin">
+					<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order')) ?>
+				</div>
+
+				<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">
+					<div class="uk-width-medium-1-2">
+						<?= $view->render('bixie/cart/templates/billing_address.php', compact('cart', 'order')) ?>
+					</div>
+					<div class="uk-width-medium-1-2">
+						<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
+					</div>
+				</div>
+
 
 			</div>
 		</div>
