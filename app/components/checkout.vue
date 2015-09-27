@@ -38,6 +38,31 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
+                            <i class="uk-icon-envelope-o"></i>
+                            <input v-model="checkout.billing_address.email" name="email" type="email"
+                                   v-on="blur: validateField('billing_address.email')"
+                                   class="uk-width-1-1" placeholder="{{ 'Email address' | trans }}">
+                        </div>
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.email">
+                            {{ 'Please enter your email address' | trans }}</p>
+
+                    </div>
+                </div>
+
+                <div class="uk-form-row">
+                    <div class="uk-form-controls">
+                        <div class="uk-form-icon uk-width-1-1">
+                            <i class="uk-icon-phone"></i>
+                            <input v-model="checkout.billing_address.phone" name="phone" type="text"
+                                   class="uk-width-1-1" placeholder="{{ 'Phone number' | trans }}">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="uk-form-row">
+                    <div class="uk-form-controls">
+                        <div class="uk-form-icon uk-width-1-1">
                             <i class="uk-icon-building-o"></i>
                             <input v-model="checkout.billing_address.address1" name="address1" type="text"
                                    v-on="blur: validateField('billing_address.address1')"
@@ -228,6 +253,8 @@ module.exports = {
                 billing_address: {
                     firstName: 'Piet',
                     lastName: 'Jansen',
+                    email: 'info@bixie.nl',
+                    phone: '467748',
                     address1: 'Straat 34',
                     address2: '',
                     postcode: '3456 BE',
@@ -280,19 +307,21 @@ module.exports = {
                     checkout: _.merge({currency: this.filters.currency}, this.checkout)
                 }, function (data) {
 
+                    vm.$set('spin', false);
                     if (data.error) {
                         vm.$set('paymenterror', data.error);
                     } else {
                         console.log(data);
-                        //reset cart oon orig vm
-                        this.$set('cartItems', data.cartItems);
-                        vm.$.redirectmodal.open();
-                        setTimeout(function () {
-                            window.location.href = data.succesurl;
-                        }, 500)
+                        if (data.succesurl) {
+                            //reset cart oon orig vm
+                            this.$set('cartItems', data.cartItems);
+                            vm.$.redirectmodal.open();
+                            setTimeout(function () {
+                                window.location.href = data.succesurl;
+                            }, 500)
+                        }
 
                     }
-                    vm.$set('spin', false);
 
                 });
             }

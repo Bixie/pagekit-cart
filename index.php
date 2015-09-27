@@ -119,6 +119,7 @@ return [
 		'required_checkout' => [
 			'billing_address.firstName',
 			'billing_address.lastName',
+			'billing_address.email',
 			'billing_address.address1',
 			'billing_address.postcode',
 			'billing_address.city',
@@ -136,6 +137,11 @@ return [
 		'thankyou' => [
 			'title' => 'Thank you for your order',
 			'content' => '<p>Below are the details of your order.</p>'
+		],
+		'email' => [
+			'admin_email' => 'admin@bixie.nl',
+			'subject' => 'Order confirmation #$$transaction_id$$',
+			'body' => '<p>Below are the details of your order.</p>'
 		],
 		'markdown_enabled' => false,
 		'ordering' => 'title',

@@ -27,6 +27,9 @@ class Order implements \JsonSerializable {
 	/** @Column(type="datetime") */
 	public $created;
 
+	/** @Column(type="string") */
+	public $email;
+
 	/** @Column(type="json_array") */
 	public $cartItemsData;
 
@@ -61,6 +64,7 @@ class Order implements \JsonSerializable {
 		return static::create([
 			'status' => self::STATUS_PENDING,
 			'created' => new \DateTime(),
+			'email' => $checkout['billing_address']['email'],
 			'currency' => $checkout['currency'],
 			'data' => $checkout,
 			'cartItemsData' => $cartItems

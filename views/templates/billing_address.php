@@ -16,6 +16,12 @@
 		<dd><?= $order->get('billing_address.firstName') ?></dd>
 		<dt><i class="uk-icon-user uk-icon-justify uk-margin-small-right"></i><?= __('Last name') ?></dt>
 		<dd><?= $order->get('billing_address.lastName') ?></dd>
+		<dt><i class="uk-icon-envelope-o uk-icon-justify uk-margin-small-right"></i><?= __('Email address') ?></dt>
+		<dd><?= $order->get('billing_address.email') ?></dd>
+		<?php if ($order->get('billing_address.phone')) : ?>
+			<dt><i class="uk-icon-phone uk-icon-justify uk-margin-small-right"></i><?= __('Phone number') ?></dt>
+			<dd><?= $order->get('billing_address.phone') ?></dd>
+		<?php endif; ?>
 		<dt><i class="uk-icon-building-o uk-icon-justify uk-margin-small-right"></i><?= __('Address') ?></dt>
 		<dd><?= $order->get('billing_address.address1') ?></dd>
 		<?php if ($order->get('billing_address.address2')) : ?>

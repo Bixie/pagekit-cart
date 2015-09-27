@@ -88,7 +88,7 @@ class CartItem implements \JsonSerializable
 	}
 
 	public function purchaseKey (Order $order) {
-		if (!$order->isValid()) {
+		if ($order->isValid()) {
 			return sha1($order->status . $order->transaction_id . serialize($order->payment) . serialize($this));
 		}
 		return '';

@@ -11,6 +11,7 @@ return [
 				$table->addColumn('id', 'integer', ['unsigned' => true, 'length' => 10, 'autoincrement' => true]);
 				$table->addColumn('status', 'smallint');
 				$table->addColumn('created', 'datetime');
+				$table->addColumn('email', 'string', ['length' => 255]);
 				$table->addColumn('cartItemsData', 'json_array');
 				$table->addColumn('payment', 'json_array', ['notnull' => false]);
 				$table->addColumn('total_netto', 'decimal', ['precision' => 9, 'scale' => 2]);
@@ -20,6 +21,7 @@ return [
 				$table->addColumn('data', 'json_array', ['notnull' => false]);
 				$table->setPrimaryKey(['id']);
 				$table->addIndex(['status'], 'CART_ORDER_STATUS');
+				$table->addIndex(['email'], 'CART_ORDER_EMAIL');
 				$table->addIndex(['total_netto'], 'CART_ORDER_TOTAL_NETTO');
 				$table->addIndex(['total_bruto'], 'CART_ORDER_TOTAL_BRUTO');
 				$table->addIndex(['transaction_id'], 'CART_ORDER_TRANSACTION_ID');

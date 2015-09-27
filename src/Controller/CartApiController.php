@@ -3,6 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Cart\CartFactory;
+use Bixie\Cart\Cart\MailHelper;
 use Bixie\Cart\Model\Order;
 use Bixie\Cart\Payment\PaymentException;
 use Pagekit\Application as App;
@@ -66,6 +67,7 @@ class CartApiController
 			$cartItems = [];
 
 			//send mail
+			(new MailHelper($order))->sendMail();
 
 		} catch (PaymentException $e) {
 			return ['error' => $e->getMessage()];
