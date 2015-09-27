@@ -5,7 +5,7 @@ namespace Bixie\Cart\Controller;
 use Bixie\Cart\Cart\MailHelper;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
-use Bixie\Cart\Model\CartItem;
+use Pagekit\Event\Event;
 
 class SiteController
 {
@@ -47,6 +47,7 @@ class SiteController
 			App::abort(401, __('Invalid request.'));
 		}
 
+		/** @var Order $order */
 		if (!$order = Order::findByTransaction_id($transaction_id)) {
 			App::abort(404, __('Order not found.'));
 		}
@@ -55,6 +56,12 @@ class SiteController
 		if ($this->cart->config('thankyou.content')) {
 			$content = App::content()->applyPlugins($this->cart->config('thankyou.content'), ['markdown' => $this->cart->config('markdown_enabled')]);
 			$content = (new MailHelper($order))->replaceString($content);
+		}
+
+		foreach ($order->getCartItems() as $cartItem) {
+			$event = new Event('bixie.cart.orderitem');
+			App::trigger($event, [$order, $cartItem]);
+			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}
 
 		return [

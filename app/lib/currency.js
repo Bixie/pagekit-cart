@@ -53,8 +53,8 @@ module.exports = {
             return vat.vat;
         },
 
-        formatprice: function (price) {
-            var icon = '<i class="' + icons[this.filters.currency || 'EUR'] + ' uk-margin-small-right"></i>',
+        formatprice: function (price, currency) {
+            var icon = '<i class="' + icons[currency || this.filters.currency || 'EUR'] + ' uk-margin-small-right"></i>',
                 numberString;
             try {
                 numberString = price.toLocaleString(window.$trans.locale, {minimumFractionDigits: 2});

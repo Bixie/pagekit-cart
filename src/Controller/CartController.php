@@ -4,7 +4,7 @@ namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
-use Pagekit\User\Model\Role;
+use Pagekit\Event\Event;
 
 /**
  * @Access(admin=true)
@@ -53,7 +53,7 @@ class CartController
      */
     public function editAction($id = 0)
     {
-
+		/** @var Order $order */
 		if (!$order = Order::where(compact('id'))->first()) {
 
 			if ($id) {
@@ -63,7 +63,12 @@ class CartController
 			App::abort(401, __('Orders cannot be created.'));
 
 		}
-
+		foreach ($order->getCartItems() as $cartItem) {
+			$event = new Event('bixie.admin.orderitem');
+			App::trigger($event, [$order, $cartItem]);
+			$cartItem->setTemplate('bixie.admin.order', $event['bixie.admin.order'] ? : '');
+			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
+		}
 
 		return [
 			'$view' => [

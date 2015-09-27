@@ -1,8 +1,9 @@
 <?php
 /**
-* @var $view
+* @var \Pagekit\View\View $view
 * @var Bixie\Cart\Model\Order $order
 * @var Bixie\Cart\CartModule $cart
+* @var Bixie\Cart\Cart\CartItem $cartItem
 */
 $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/admin-order.js', ['vue', 'editor']); ?>
 
@@ -27,12 +28,14 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 	</div>
 
 	<ul class="uk-tab" v-el="tab">
-		<li><a>{{ 'General' | trans }}</a></li>
+		<li><a>{{ 'Overview' | trans }}</a></li>
+		<li><a>{{ 'Items' | trans }}</a></li>
 	</ul>
 
 	<div class="uk-switcher uk-margin" v-el="content">
 		<div>
 			<div class="uk-margin">
+
 				<div class="uk-form-horizontal">
 					<div class="uk-form-row">
 						<label for="form-status" class="uk-form-label">{{ 'Order status' | trans }}</label>
@@ -54,7 +57,7 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 						<dt><?= __('Tansaction ID') ?></dt>
 						<dd><?= $order->transaction_id ?></dd>
 						<dt><?= __('Order date') ?></dt>
-						<dd><?= $cart->formatDate($order->created) ?></dd>
+						<dd>{{ order.created | date 'medium' }}</dd>
 						<dt><?= __('Amount excl. VAT') ?></dt>
 						<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
 						<dt><?= __('VAT amount') ?></dt>
@@ -80,7 +83,46 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 
 			</div>
 		</div>
-	</div>
+		<div>
+			<div class="uk-margin">
+				<ul class="uk-list uk-list-line">
+					<?php foreach ($order->cartItems as $cartItem) :
+						$prices = $cartItem->calcPrices($order);
 
+						?>
+
+						<li>
+							<div class="uk-grid uk-grid-small" data-uk-grid-margin="">
+								<div class="uk-width-medium-3-4">
+									<h3><a class="uk-icon-external-link uk-icon-hover uk-margin-small-right"
+										   href="<?= $cartItem->item_url ?>" target="_blank"></a>
+										<?= $cartItem->item_title ?></h3>
+
+									<dl class="uk-description-list uk-description-list-horizontal">
+										<dt><?= __('Purchase key') ?></dt>
+										<dd><em><?= $cartItem->purchaseKey($order) ?></em></dd>
+									</dl>
+									<?= $cartItem->getTemplate('bixie.admin.order') ?>
+								</div>
+								<div class="uk-width-medium-1-4">
+									<dl class="uk-description-list uk-description-list-horizontal">
+										<dt><?= __('Price excl. VAT') ?></dt>
+										<dd class="uk-text-right"><?= $cart->formatMoney($prices['netto'], $order->currency) ?></dd>
+										<dt><?= __('VAT') ?></dt>
+										<dd class="uk-text-right"><?= $cart->formatMoney($prices['vat'], $order->currency) ?></dd>
+										<dt><?= __('Price incl. VAT') ?></dt>
+										<dd class="uk-text-right"><?= $cart->formatMoney($prices['bruto'], $order->currency) ?></dd>
+									</dl>
+								</div>
+							</div>
+						</li>
+
+					<?php endforeach; ?>
+				</ul>
+
+			</div>
+		</div>
+	</div>
+	<pre>{{$data.order.cartItems|json}}</pre>
 </form>
 

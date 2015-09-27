@@ -35,8 +35,8 @@
 					<input-filter title="{{ 'Status' | trans }}" value="{{@ config.filter.status}}" options="{{ statusOptions }}"></input-filter>
 				</th>
 				<th class="pk-table-width-100" v-order="created: config.filter.order">{{ 'Date' | trans }}</th>
-				<th class="pk-table-width-200">{{ 'Email' | trans }}</th>
-				<th class="pk-table-width-100" v-order="total_bruto: config.filter.order">{{ 'Total' | trans }}</th>
+				<th class="pk-table-width-200" v-order="email: config.filter.order">{{ 'User / Email' | trans }}</th>
+				<th class="pk-table-width-100 uk-text-right" v-order="total_bruto: config.filter.order">{{ 'Total' | trans }}</th>
 				<th class="pk-table-min-width-100">{{ 'Items' | trans }}</th>
 			</tr>
 			</thead>
@@ -53,13 +53,15 @@
                             " v-on="click: toggleStatus(order)"></a>
 				</td>
 				<td>
-					{{ order.created | date }}
+					{{ order.created | date 'mediumDate' }}<br/>
+					<small>{{ order.created | date 'mediumTime' }}</small>
 				</td>
 				<td class="pk-table-text-truncate">
+					{{ getName(order) }}<br/>
 					{{ order.email }}
 				</td>
 				<td class="uk-text-right">
-					{{ order.total_bruto | currency order.currency }}
+					{{{ order.total_bruto | formatprice order.currency }}}
 				</td>
 				<td class="pk-table-text-break">
 					{{ cartItems(order) }}

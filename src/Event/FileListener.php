@@ -2,15 +2,33 @@
 
 namespace Bixie\Cart\Event;
 
+use Bixie\Cart\Cart\CartItem;
+use Bixie\Cart\Model\Order;
 use Bixie\Cart\Model\Product;
 use Pagekit\Application as App;
+use Pagekit\Event\Event;
 use Pagekit\Event\EventSubscriberInterface;
 use Bixie\Download\Model\File;
 use Pagekit\View\View;
 
 class FileListener implements EventSubscriberInterface {
 
-	protected $request;
+	static $periods = [
+		'PT3H' => '3 hours',
+		'P1D' => '1 days',
+		'P2D' => '2 days',
+		'P3D' => '3 days',
+		'P1W' => '1 week',
+		'P2W' => '2 weeks',
+		'P1M' => '1 month',
+		'P2M' => '2 months',
+		'P3M' => '3 months',
+		'P6M' => '6 months',
+		'P1Y' => '1 year',
+		'P2Y' => '2 years',
+		'P3Y' => '3 years',
+		'P5Y' => '5 years'
+	];
 
 	public function onProductView ($event, View $view) {
 		$product = new \stdClass();
@@ -28,11 +46,65 @@ class FileListener implements EventSubscriberInterface {
 
 		$view->data('$cart', [
 			'product' => $product,
+			'periods' => self::$periods,
 			'checkout_url' => App::url('@cart/checkout'),
 			'config' => App::module('bixie/cart')->publicConfig()
 		]);
 	}
 
+	/**
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onCartPurchaseKey (Event $event, Order $order, CartItem $cartItem) {
+		/** @var File $file */
+		$file = $cartItem->loadItemModel();
+		$orderValid = $this->validateOrder($order, $cartItem, $file);
+		$event->addParameters([
+			'invalidPurchaseKey' => !empty($event['allowPurchaseKey']) ? $event['allowPurchaseKey'] : !$orderValid
+		], true);
+	}
+
+	/**
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onCalculateOrder (Event $event, Order $order, CartItem $cartItem) {
+		if ($validity_period = $cartItem->get('validity_period')) {
+			$date = (new \DateTime($order->created->format(\DateTime::ISO8601)))->add(new \DateInterval($validity_period));
+			$cartItem->set('valid_until', $date->format(\DateTime::ISO8601));
+			$cartItem->set('validity_text', self::$periods[$validity_period]);
+		} else {
+			$cartItem->set('validity_text', 'No end date');
+		}
+	}
+
+	/**
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onOrderitem (Event $event, Order $order, CartItem $cartItem) {
+		if ($cartItem->item_model == 'Bixie\Download\Model\File') {
+			/** @var File $file */
+			$file = $cartItem->loadItemModel();
+			$orderValid = $this->validateOrder($order, $cartItem, $file);
+
+			$event->addParameters([
+				'bixie.admin.order' => App::view('bixie/cart/templates/file_admin.php', compact('order', 'cartItem', 'file', 'orderValid')),
+				'bixie.cart.order_item' => App::view('bixie/cart/templates/file_cart_order_item.php', compact('order', 'cartItem', 'file', 'orderValid'))
+			]);
+
+		}
+	}
+
+	/**
+	 * @param Event $event
+	 * @param File $file
+	 * @param View $view
+	 */
 	public function onProductPrepare ($event, File $file, View $view) {
 		static $products;
 		if (!$products) {
@@ -53,12 +125,17 @@ class FileListener implements EventSubscriberInterface {
 			$view->script('bixie-cart');
 			$view->data('$cart', [
 				'products' => $products,
+				'periods' => self::$periods,
 				'checkout_url' => App::url('@cart/checkout'),
 				'config' => App::module('bixie/cart')->publicConfig()
 			]);
 		}
 	}
 
+	/**
+	 * @param Event $event
+	 * @param File $file
+	 */
 	public function onProductChange ($event, File $file) {
 		$data = App::request()->request->get('product', []);
 
@@ -79,12 +156,44 @@ class FileListener implements EventSubscriberInterface {
 		}
 	}
 
+	/**
+	 * @param Event $event
+	 * @param File $file
+	 */
 	public function onProductDeleted ($event, File $file) {
 		foreach (Product::where(['item_id = :id', 'item_model = :item_model'], [':id' => $file->id, ':item_model' => 'Bixie\Download\Model\File'])->get() as $product) {
 			$product->delete();
 		}
 	}
 
+	/**
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 * @param File     $file
+	 * @return bool
+	 */
+	protected function validateOrder (Order $order, CartItem $cartItem, File $file) {
+		if ($order->isValid()
+			and $file->status == File::STATUS_PUBLISHED
+			and $file->get('cart_active')) {
+
+			if (!$cartItem->get('validity_period')) {
+				return true;
+			}
+
+			try {
+				$now = new \DateTime();
+				$expiry_date = new \DateTime($cartItem->get('valid_until'));
+				if ($now < $expiry_date) {
+					return true;
+				}
+
+			} catch (\Exception $ignore) {
+			}
+
+		}
+		return false;
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -93,6 +202,10 @@ class FileListener implements EventSubscriberInterface {
 		return [
 			'view.bixie/download/admin/file' => 'onProductView',
 			'bixie.prepare.file' => 'onProductPrepare',
+			'bixie.calculate.order' => 'onCalculateOrder',
+			'bixie.cart.purchaseKey' => 'onCartPurchaseKey',
+			'bixie.admin.orderitem' => 'onOrderitem',
+			'bixie.cart.orderitem' => 'onOrderitem',
 			'model.file.saved' => 'onProductChange',
 			'model.file.deleted' => 'onProductDeleted'
 		];

@@ -31,7 +31,7 @@ class OrderApiController {
 	public function indexAction ($filter = [], $page = 0) {
 
 		$query  = Order::query();
-		$filter = array_merge(array_fill_keys(['status', 'order', 'limit'], ''), $filter);
+		$filter = array_merge(array_fill_keys(['search', 'status', 'order', 'limit'], ''), $filter);
 
 		extract($filter, EXTR_SKIP);
 
@@ -39,7 +39,13 @@ class OrderApiController {
 			$query->where(['status' => (int) $status]);
 		}
 
-		if (!preg_match('/^(transaction_id|created|total_bruto)\s(asc|desc)$/i', $order, $order)) {
+		if ($search) {
+			$query->where(function ($query) use ($search) {
+				$query->orWhere(['transaction_id LIKE :search', 'email LIKE :search'], ['search' => "%{$search}%"]);
+			});
+		}
+
+		if (!preg_match('/^(transaction_id|created|email|total_bruto)\s(asc|desc)$/i', $order, $order)) {
 			$order = [1 => 'created', 2 => 'desc'];
 		}
 

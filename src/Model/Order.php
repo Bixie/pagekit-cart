@@ -4,6 +4,7 @@ namespace Bixie\Cart\Model;
 
 use Bixie\Cart\Cart\CartItem;
 use Pagekit\Application as App;
+use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
 
 /**
@@ -75,11 +76,17 @@ class Order implements \JsonSerializable {
 		return $this->status == self::STATUS_CONFIRMED;
 	}
 
+	/**
+	 * @return CartItem[]
+	 */
 	public function getCartItems () {
-		$cartItems = [];
-		$bixieCart = App::bixieCart();
-		foreach ($this->cartItemsData as $cartItemData) {
-			$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->load($cartItemData);
+		static $cartItems;
+		if (!$cartItems) {
+			$cartItems = [];
+			$bixieCart = App::bixieCart();
+			foreach ($this->cartItemsData as $cartItemData) {
+				$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->load($cartItemData);
+			}
 		}
 		return $cartItems;
 	}
@@ -88,7 +95,12 @@ class Order implements \JsonSerializable {
 		$this->total_netto = 0;
 		$this->total_bruto = 0;
 		foreach ($this->getCartItems() as $cartItem) {
+
+			$event = new Event('bixie.calculate.order');
+			App::trigger($event, [$this, $cartItem]);
+
 			$prices = $cartItem->calcPrices($this);
+
 			$this->total_netto += $prices['netto'];
 			$this->total_bruto += $prices['bruto'];
 		}
@@ -117,6 +129,6 @@ class Order implements \JsonSerializable {
 //			'url' => App::url('@download/id', ['id' => $this->id ?: 0], 'base')
 		];
 
-		return $this->toArray($data);
+		return $this->toArray($data, ['cartItemsData']);
 	}
 }

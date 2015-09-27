@@ -5,7 +5,10 @@ module.exports = {
             orders: false,
             pages: 0,
             count: '',
-            selected: []
+            selected: [],
+            filters: {
+                currency: window.$data.config.currency || 'EUR'
+            }
         }, window.$data);
     },
 
@@ -97,8 +100,12 @@ module.exports = {
             });
         },
 
-        getStatusText: function(order) {
+        getStatusText: function (order) {
             return this.statuses[order.status];
+        },
+
+        getName: function (order) {
+            return order.data.billing_address.firstName + ' ' + order.data.billing_address.lastName;
         }
 
     },
@@ -110,7 +117,9 @@ module.exports = {
             handler: function () { this.load(0); },
             deep: true
         }
-    }
+    },
+
+    mixins: [require('../../lib/currency')]
 
 
 };

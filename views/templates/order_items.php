@@ -3,6 +3,7 @@
  * @var $view
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
+ * @var Bixie\Cart\Cart\CartItem $cartItem
  */
 
 ?>
@@ -19,7 +20,7 @@
 					<div class="uk-width-medium-2-3">
 						<h3><a href="<?= $cartItem->item_url ?>"><?= $cartItem->item_title ?></a></h3>
 						<dl class="uk-description-list uk-description-list-horizontal">
-							<dt><?= __('Puchase key') ?></dt>
+							<dt><?= __('Purchase key') ?></dt>
 							<dd><em><?= $cartItem->purchaseKey($order) ?></em></dd>
 						</dl>
 					</div>
@@ -30,6 +31,7 @@
 						</dl>
 					</div>
 				</div>
+				<?= $cartItem->getTemplate('bixie.cart.order_item') ?>
 			</li>
 
 		<?php endforeach; ?>

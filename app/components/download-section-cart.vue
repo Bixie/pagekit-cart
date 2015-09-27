@@ -43,6 +43,19 @@
                 </div>
             </div>
 
+            <div class="uk-form-row">
+                <label for="file_cart_validity_period" class="uk-form-label">{{ 'Validity period' | trans }}</label>
+
+                <div class="uk-form-controls uk-form-controls-text">
+                    <select id="file_cart_validity_period" name="file_cart_validity_period" class="uk-form-width-small"
+                            v-model="product.data.validity_period">
+                        <option value="">{{ 'Infinite' | trans }}</option>
+                        <option v-repeat="periods" value="{{ $key }}">{{ $value | trans }}</option>
+                    </select>
+                </div>
+            </div>
+
+
         </div>
     </div>
 
@@ -67,7 +80,10 @@
                     item_id: this.file.id,
                     price: 0,
                     currency: window.$cart.config.currency,
-                    vat: window.$cart.config.vat
+                    vat: window.$cart.config.vat,
+                    data: {
+                        validity_period: ''
+                    }
                 },
                 config: {}
             }, window.$cart)

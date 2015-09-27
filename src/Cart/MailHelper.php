@@ -6,6 +6,7 @@ use Bixie\Cart\CartModule;
 use Bixie\Cart\Payment\PaymentException;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
+use Pagekit\Event\Event;
 
 class MailHelper {
 
@@ -25,6 +26,12 @@ class MailHelper {
 	 */
 	public function __construct (Order $order) {
 		$this->order = $order;
+		foreach ($this->order->getCartItems() as $cartItem) {
+			$event = new Event('bixie.cart.orderitem');
+			App::trigger($event, [$this->order, $cartItem]);
+			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
+		}
+
 		$this->cart = App::module('bixie/cart');
 	}
 

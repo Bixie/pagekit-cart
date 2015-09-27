@@ -4,12 +4,16 @@ namespace Bixie\Cart\Cart;
 
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
+use Pagekit\Event\Event;
+use Pagekit\System\Model\DataModelTrait;
 
 /**
  * CartItem
  */
 class CartItem implements \JsonSerializable
 {
+	use DataModelTrait;
+
 	/**
 	 * @var string
 	 */
@@ -49,7 +53,12 @@ class CartItem implements \JsonSerializable
 	/**
 	 * @var array
 	 */
-	public $data = [];
+	protected $templates = [];
+
+	/**
+	 * @var array
+	 */
+	protected $item;
 
 	/**
 	 * CartItem constructor.
@@ -70,6 +79,18 @@ class CartItem implements \JsonSerializable
 	}
 
 	/**
+	 * @return mixed
+	 */
+	public function loadItemModel () {
+		if (empty($this->item) && $this->item_id && class_exists($this->item_model)) {
+			$item = call_user_func([$this->item_model, 'find'], $this->item_id);
+			return $item;
+		}
+		return null;
+	}
+
+
+	/**
 	 * @param Order $order
 	 * @return array
 	 */
@@ -88,10 +109,21 @@ class CartItem implements \JsonSerializable
 	}
 
 	public function purchaseKey (Order $order) {
-		if ($order->isValid()) {
+		$event = new Event('bixie.cart.purchaseKey');
+		App::trigger($event, [$order, $this]);
+
+		if ($order->isValid() && !$event['invalidPurchaseKey']) {
 			return sha1($order->status . $order->transaction_id . serialize($order->payment) . serialize($this));
 		}
 		return '';
+	}
+
+	public function setTemplate ($name, $content) {
+		$this->templates[$name] = $content;
+	}
+
+	public function getTemplate ($name) {
+		return isset($this->templates[$name]) ? $this->templates[$name] : '';
 	}
 
 	/**
