@@ -163,7 +163,10 @@ return [
 	'events' => [
 
 		'boot' => function ($event, $app) {
-			$app->subscribe(new Bixie\Cart\Event\FileListener());
+			$app->subscribe(
+				new Bixie\Cart\Event\FileListener(),
+				new Bixie\Cart\Event\UserListener()
+			);
 		},
 
 		'view.data' => function ($event, $data) use ($app) {

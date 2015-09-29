@@ -66,7 +66,10 @@
 	        },
 
 	        userOptions: function () {
-	            return this.users.map(function (user) { return { text: user.username, value: user.id }; });
+	            var options = this.users.map(function (user) { return { text: user.username, value: user.id }; });
+	            options.unshift({ text: this.$trans('Guest user'), value: 0 });
+	            return options;
+
 	        }
 	    },
 
