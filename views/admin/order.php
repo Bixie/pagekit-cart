@@ -19,7 +19,7 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 		</div>
 		<div data-uk-margin>
 
-			<a class="uk-button uk-margin-small-right" v-attr="href: $url.route('admin/cart/orders')">{{ order.id ?
+			<a class="uk-button uk-margin-small-right" v-attr="href: $url.route('admin/cart')">{{ order.id ?
 				'Close' :
 				'Cancel' | trans }}</a>
 			<button class="uk-button uk-button-primary" type="submit">{{ 'Save' | trans }}</button>
@@ -46,13 +46,22 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 										options="statusOptions"></select>
 							</div>
 						</div>
+
+						<div class="uk-form-row">
+							<label for="form-status" class="uk-form-label">{{ 'User' | trans }}</label>
+
+							<div class="uk-form-controls">
+								<select id="form-status" class="uk-form-width-medium" v-model="order.user_id"
+										options="userOptions"></select>
+							</div>
+						</div>
 					</div>
 					<div class="uk-width-medium-1-2">
 						<div class="uk-form-row">
 							<label for="form-status" class="uk-form-label">{{ 'Order comment' | trans }}</label>
 
 							<div class="uk-form-controls">
-                        <textarea name="comment" id="form-comment" cols="30" rows="3" class="uk-width-1-1"
+                        <textarea name="comment" id="form-comment" cols="30" rows="5" class="uk-width-1-1"
 								  v-model="order.data.comment" placeholder="{{ 'Add a comment (visible for user)' | trans }}"></textarea>
 							</div>
 						</div>
@@ -89,7 +98,7 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 							</dl>
 							<dl class="uk-description-list uk-description-list-horizontal">
 								<dt><?= __('Order comment') ?></dt>
-								<dd>{{ order.data.comment }}</dd>
+								<dd>{{{ order.data.comment | nl2br }}}</dd>
 							</dl>
 						</div>
 					</div>

@@ -72,7 +72,9 @@ class Order implements \JsonSerializable {
 	 * @return static
 	 */
 	public static function createNew ($cartItems, $checkout) {
+		$user = App::auth()->getUser();//get from auth, fresh user
 		return static::create([
+			'user_id' => ($user ? $user->id : 0),
 			'status' => self::STATUS_PENDING,
 			'created' => new \DateTime(),
 			'email' => $checkout['billing_address']['email'],

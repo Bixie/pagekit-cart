@@ -7,6 +7,8 @@ var Cart = Vue.extend({
                 currency: window.$cart.config.currency || 'EUR'
             },
             'checkout_url': '',
+            'login_url': '',
+            'user': {},
             'config': {},
             'products': {},
             'gateways': [],

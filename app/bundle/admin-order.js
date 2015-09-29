@@ -54,9 +54,6 @@
 	        }, window.$data);
 	    },
 
-	    created: function () {
-	    },
-
 	    ready: function () {
 	        this.resource = this.$resource('api/cart/order/:id');
 	        this.tab = UIkit.tab(this.$$.tab, {connect: this.$$.content});
@@ -66,8 +63,18 @@
 
 	        statusOptions: function () {
 	            return _.map(this.statuses, function (status, id) { return { text: status, value: id }; });
-	        }
+	        },
 
+	        userOptions: function () {
+	            return this.users.map(function (user) { return { text: user.username, value: user.id }; });
+	        }
+	    },
+
+	    filters: {
+	        nl2br: function (str) {
+	            //  discuss at: http://phpjs.org/functions/nl2br/
+	            return String(str).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br>$2');
+	        }
 	    },
 
 	    methods: {
@@ -88,7 +95,7 @@
 
 	                this.$set('order', data.order);
 
-	                this.$notify(this.$trans('Download %title% saved.', {title: this.order.title}));
+	                this.$notify(this.$trans('Order %transaction_id% saved.', {transaction_id: this.order.transaction_id}));
 
 	            }, function (data) {
 	                this.$notify(data, 'danger');

@@ -2,6 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Cart\UserHelper;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application\Exception;
@@ -119,33 +120,12 @@ class OrderApiController {
 			}
 
 			try {
-				$userModule = App::module('system/user');
 
-				if (App::user()->isAuthenticated() || $userModule->config('registration') == 'admin') {
-					throw new Exception('Registration not allowed');
-				}
+				$data['name'] = $order->get('billing_address.firstName') . ' ' . $order->get('billing_address.lastName');
 
-				$password = @$data['password'];
-				if (trim($password) != $password || strlen($password) < 3) {
-					throw new Exception(__('Invalid Password.'));
-				}
+				$user = (new UserHelper())->createUser($data, User::STATUS_BLOCKED);
 
-				$token = App::get('auth.random')->generateString(32);
-
-				$user = User::create([
-					'registered' => new \DateTime,
-					'name' => $order->get('billing_address.firstName') . ' ' . $order->get('billing_address.lastName'),
-					'username' => @$data['username'],
-					'email' => @$data['email'],
-					'password' => App::get('auth.password')->hash($password),
-					'activation' => $token,
-					'status' => User::STATUS_BLOCKED
-				]);
-
-				$user->validate();
-				$user->save();
-
-				//send mail
+					//send mail
 				$this->sendActivationMail($user, $order);
 
 				//attach user to orders

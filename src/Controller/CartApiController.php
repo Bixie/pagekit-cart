@@ -2,12 +2,15 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Cart\UserHelper;
+use Pagekit\Application as App;
 use Bixie\Cart\Cart\CartFactory;
 use Bixie\Cart\Cart\MailHelper;
 use Bixie\Cart\Model\Order;
+use Pagekit\Application\Exception;
 use Bixie\Cart\Payment\PaymentException;
-use Pagekit\Application as App;
 use Bixie\Cart\Cart\CartItem;
+use Pagekit\User\Model\User;
 
 /**
  * @Route("cart", name="cart")
@@ -43,11 +46,32 @@ class CartApiController
 
     /**
      * @Route("/checkout", methods="POST")
-     * @Request({"cartItems": "array", "cardData": "array", "checkout": "array"}, csrf=true)
+     * @Request({"cartItems": "array", "cardData": "array", "user": "array", "checkout": "array"}, csrf=true)
      */
-    public function checkoutAction($cartItemsData, $cardData, $checkout)
+    public function checkoutAction($cartItemsData, $cardData, $userData, $checkout)
     {
+		$return = ['error'=> true, 'registererror' => '', 'checkouterror' => ''];
+
 		$cartItems = $this->saveAction($cartItemsData);
+
+		//register user?
+		if (empty($userData['id']) && !empty($userData['username'])) {
+
+			try {
+
+				$userData['name'] = $checkout['billing_address']['firstName'] . ' ' . $checkout['billing_address']['lastName'];
+				$userData['email'] = $checkout['billing_address']['email'];
+
+				$userHelper = new UserHelper();
+				$userHelper->createUser($userData, User::STATUS_ACTIVE);
+				$userHelper->login(['username' => $userData['username'], 'password' => $userData['password']]);
+
+			} catch (Exception $e) {
+				$return['registererror'] = $e->getMessage();
+				return $return;
+			}
+
+		}
 
 		$order = Order::createNew($cartItems, $checkout)->calculateOrder();
 
@@ -69,16 +93,19 @@ class CartApiController
 			//send mail
 			(new MailHelper($order))->sendMail();
 
+			return [
+				'cartItems' => array_values($cartItems),
+				'succesurl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
+				'checkout' => $checkout,
+				'order' => $order
+			];
+
 		} catch (PaymentException $e) {
-			return ['error' => $e->getMessage()];
+			$return['checkouterror'] = $e->getMessage();
+			return $return;
 		}
 
-		return [
-			'cartItems' => array_values($cartItems),
-			'succesurl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
-			'checkout' => $checkout,
-			'order' => $order
-		];
+
     }
 
 }

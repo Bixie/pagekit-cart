@@ -36,7 +36,7 @@
 		</dl>
 		<dl class="uk-description-list uk-description-list-horizontal">
 			<dt><?= __('Order comment') ?></dt>
-			<dd><?= $order->get('comment', '-') ?></dd>
+			<dd><?= nl2br($order->get('comment', '-')) ?></dd>
 		</dl>
 	</div>
 

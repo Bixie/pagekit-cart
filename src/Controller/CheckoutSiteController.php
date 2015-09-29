@@ -3,6 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Cart\MailHelper;
+use Bixie\Cart\Cart\UserHelper;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
@@ -27,11 +28,13 @@ class CheckoutSiteController
 	 */
 	public function checkoutAction()
 	{
+
 		return [
 			'$view' => [
 				'title' => __('Checkout'),
 				'name' => 'bixie/cart/checkout.php'
 			],
+			'$checkout' => (new UserHelper(App::user()))->getCheckoutDefaults(),
 			'$cart' => [
 				'countries' => App::module('system/intl')->getCountries(),
 				'gateways' => App::bixiePayment()->activeGatewaysData(),

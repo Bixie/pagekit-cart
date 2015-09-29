@@ -16,8 +16,7 @@
         </div>
 
     </v-modal>
-    <pre>{{ filters.currency | json}}</pre>
-    <pre>{{ totalNetto | json}}</pre>
+
 </template>
 
 <script>

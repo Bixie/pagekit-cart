@@ -4,7 +4,6 @@
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
-//$view->script('bixie-orders', 'bixie/cart:app/bundle/orders.js', ['vue', 'uikit-pagination', 'uikit-form-select']);
 ?>
 
 <section id="bixie-order" v-cloak>
@@ -34,7 +33,7 @@
 		</dl>
 		<dl class="uk-description-list uk-description-list-horizontal">
 			<dt><?= __('Order comment') ?></dt>
-			<dd>{{ order.data.comment }}</dd>
+			<dd><?= nl2br($order->get('comment', '-')) ?></dd>
 		</dl>
 	</div>
 

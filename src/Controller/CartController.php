@@ -70,6 +70,11 @@ class CartController
 			$cartItem->setTemplate('bixie.admin.order', $event['bixie.admin.order'] ? : '');
 			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}
+		$users = App::db()->createQueryBuilder()
+			->from('@system_user')
+			->where('status = 1')
+			->execute('id, username')
+			->fetchAll();
 
 		return [
 			'$view' => [
@@ -78,6 +83,7 @@ class CartController
 			],
 			'$data' => [
 				'statuses' => Order::getStatuses(),
+				'users' => $users,
 				'config' => $this->cart->config(),
 				'order'  => $order
 			],

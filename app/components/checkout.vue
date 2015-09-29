@@ -7,15 +7,19 @@
 
                 <h3 class="uk-panel-title">{{ 'Billing Address' | trans }}</h3>
 
+                <p v-if="!user.id" class="uk-text-small">{{ 'Do you have an account?' | trans }} <a
+                        v-attr="href: login_url">{{ 'Please log in' | trans }}</a></p>
+
+
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-user"></i>
+                            <i class="uk-icon-user uk-text-primary"></i>
                             <input v-model="checkout.billing_address.firstName" name="firstName" type="text"
                                    v-on="blur: validateField('billing_address.firstName')"
                                    class="uk-width-1-1" placeholder="{{ 'First name' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.firstName">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.firstName">
                             {{ 'Please enter your first name' | trans }}</p>
 
                     </div>
@@ -24,12 +28,12 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-user"></i>
+                            <i class="uk-icon-user uk-text-primary"></i>
                             <input v-model="checkout.billing_address.lastName" name="lastName" type="text"
                                    v-on="blur: validateField('billing_address.lastName')"
                                    class="uk-width-1-1" placeholder="{{ 'Last name' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.lastName">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.lastName">
                             {{ 'Please enter your last name' | trans }}</p>
 
                     </div>
@@ -38,12 +42,12 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-envelope-o"></i>
+                            <i class="uk-icon-envelope-o uk-text-primary"></i>
                             <input v-model="checkout.billing_address.email" name="email" type="email"
                                    v-on="blur: validateField('billing_address.email')"
                                    class="uk-width-1-1" placeholder="{{ 'Email address' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.email">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.email">
                             {{ 'Please enter your email address' | trans }}</p>
 
                     </div>
@@ -63,12 +67,12 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-building-o"></i>
+                            <i class="uk-icon-building-o uk-text-primary"></i>
                             <input v-model="checkout.billing_address.address1" name="address1" type="text"
                                    v-on="blur: validateField('billing_address.address1')"
                                    class="uk-width-1-1" placeholder="{{ 'Address' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.address1">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.address1">
                             {{ 'Please enter an address' | trans }}</p>
 
                     </div>
@@ -96,12 +100,12 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-map-pin"></i>
+                            <i class="uk-icon-map-pin uk-text-primary"></i>
                             <input v-model="checkout.billing_address.postcode" name="postcode" type="text"
                                    v-on="blur: validateField('billing_address.postcode')"
                                    class="uk-width-1-1" placeholder="{{ 'Zipcode' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.postcode">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.postcode">
                             {{ 'Please enter a zipcode' | trans }}</p>
 
                     </div>
@@ -110,12 +114,12 @@
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
-                            <i class="uk-icon-map-o"></i>
+                            <i class="uk-icon-map-o uk-text-primary"></i>
                             <input v-model="checkout.billing_address.city" name="city" type="text"
                                    v-on="blur: validateField('billing_address.city')"
                                    class="uk-width-1-1" placeholder="{{ 'City' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.city">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.city">
                             {{ 'Please enter a city' | trans }}</p>
                     </div>
                 </div>
@@ -137,7 +141,7 @@
                                 v-on="change: validateField('billing_address.country')"
                                 class="uk-width-1-1"></select>
                     </div>
-                    <p class="uk-form-help-block uk-text-danger" v-show="invalid.billing_address.country">
+                    <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.country">
                         {{ 'Please select a country' | trans }}</p>
                 </div>
             </div>
@@ -164,7 +168,7 @@
                                    v-on="blur: validateField('card.number')"
                                    class="uk-width-1-1" placeholder="{{ 'Credit card number' | trans }}">
                         </div>
-                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.number">
+                        <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.number">
                             {{ 'Please enter card number' | trans }}</p>
                     </div>
                 </div>
@@ -175,21 +179,21 @@
                                 <select v-model="card.expiryMonth" name="expiryMonth" options="months"
                                         v-on="blur: validateField('card.expiryMonth')"
                                         class="uk-width-1-1"></select>
-                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.expiryMonth">
+                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryMonth">
                                     {{ 'Please enter expiry month' | trans }}</p>
                             </div>
                             <div class="uk-width-1-3">
                                 <select v-model="card.expiryYear" name="expiryYear" options="years"
                                         v-on="blur: validateField('card.expiryYear')"
                                         class="uk-width-1-1"></select>
-                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.expiryYear">
+                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryYear">
                                     {{ 'Please enter expiry year' | trans }}</p>
                             </div>
                             <div class="uk-width-1-3">
                                 <input v-model="card.cvv" name="vvc" type="text"
                                        v-on="blur: validateField('card.cvv')"
                                        class="uk-width-1-1" placeholder="{{ 'CVV' | trans }}">
-                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.cvv">
+                                <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.cvv">
                                     {{ 'Please enter card number' | trans }}</p>
                             </div>
                         </div>
@@ -197,8 +201,6 @@
                     </div>
                 </div>
 
-                <p class="uk-form-help-block uk-text-danger" v-show="invalid.payment.method">
-                    {{ 'Please select a payment method' | trans }}</p>
             </div>
             <div class="uk-panel uk-panel-box uk-form">
 
@@ -211,6 +213,47 @@
                     </div>
                 </div>
 
+                <div v-if="!user.id" class="uk-margin">
+                    <div class="uk-form-row">
+                        <div class="uk-form-controls uk-form-controls-text">
+                            <label><input type="checkbox" value="hide-show_register"
+                                          v-model="show_register"> {{ 'Create an account' | trans }}</label>
+                        </div>
+                    </div>
+
+                    <div v-show="show_register" class="uk-form-row">
+                        <div class="uk-form-controls">
+                            <div class="uk-form-icon uk-width-1-1">
+                                <i class="uk-icon-user uk-text-primary"></i>
+                                <input v-model="user.username" name="username" type="text"
+                                       v-on="blur: validateField('user.username')"
+                                       class="uk-width-1-1" placeholder="{{ 'Username' | trans }}">
+                            </div>
+                            <p class="uk-form-help-block uk-text-danger" v-show="invalid.user.username">
+                                {{ 'Username cannot be empty' | trans }}</p>
+                        </div>
+                    </div>
+
+                    <div v-show="show_register" class="uk-form-row">
+                        <div class="uk-form-controls">
+                            <div class="uk-form-icon uk-form-password">
+                                <i class="uk-icon-key uk-text-primary"></i>
+                                <input id="form-password" class="uk-form-large uk-form-width-large" type="password"
+                                       placeholder="{{ 'Password' | trans}}"
+                                       name="password" v-model="user.password">
+                                <a href="" class="uk-form-password-toggle" tabindex="-1"
+                                   data-uk-form-password="{ lblShow: $trans('Show'), lblHide: $trans('Hide') }">{{
+                                    'Show' | trans }}</a>
+                            </div>
+                            <p class="uk-form-help-block uk-text-danger" v-show="invalid.user.password">
+                                {{ 'Password cannot be blank.' | trans }}</p>
+                        </div>
+                    </div>
+
+                    <div v-if="registererror" class="uk-alert uk-alert-warning">{{ registererror | trans }}</div>
+
+                </div>
+
                 <div class="uk-form-row">
                     <div class="uk-form-controls uk-form-controls-text">
                         <label><input type="checkbox" name="agreed" value="agreed"
@@ -218,19 +261,18 @@
                     </div>
                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.agreed">
                         {{ 'Please agree with the terms and conditions' | trans }}</p>
-                </div>
+                    </div>
 
-                <div class="uk-margin uk-text-right">
+                    <div class="uk-margin uk-text-right">
                     <button class="uk-button uk-button-large uk-button-success">
                         <i v-show="!spin" class="uk-icon-check uk-margin-small-right"></i>
                         <i v-show="spin" class="uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right"></i>
                         {{ 'To payment' | trans }}
                     </button>
+                    </div>
+
+                    <div v-if="checkouterror" class="uk-alert uk-alert-danger">{{ paymenterror | trans }}</div>
                 </div>
-
-                <div v-if="paymenterror" class="uk-alert uk-alert-danger">{{ paymenterror | trans }}</div>
-
-              </div>
         </div>
     </div>
 
@@ -251,25 +293,27 @@
 module.exports = {
 
     data: function () {
-        return {
+        return _.merge({
             spin: false,
-            paymenterror: '',
+            registererror: '',
+            checkouterror: '',
+            show_register: false,
             show_address2: false,
             checkout: {
                 agreed: false,
                 user_tz: '',
                 comment: '',
                 billing_address: {
-                    firstName: 'Piet',
-                    lastName: 'Jansen',
-                    email: 'info@bixie.nl',
-                    phone: '467748',
-                    address1: 'Straat 34',
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: '',
+                    address1: '',
                     address2: '',
-                    postcode: '3456 BE',
-                    city: 'Ede',
+                    postcode: '',
+                    city: '',
                     state: '',
-                    country: 'NL'
+                    country: ''
                 },
                 payment: {
                     method: '',
@@ -283,7 +327,7 @@ module.exports = {
                 cvv: '123'
             },
             invalid: {}
-        };
+        }, window.$checkout);
     },
 
     inherit: true,
@@ -309,17 +353,20 @@ module.exports = {
             if(this.validateCheckout()) {
 
                 this.spin = true;
-                this.$set('paymenterror', '');
+                this.$set('checkouterror', '');
+                this.$set('registererror', '');
 
                 this.resource.save({id: 'checkout'}, {
                     cartItems: this.cartItems,
                     cardData: this.card,
+                    user: this.user,
                     checkout: _.merge({currency: this.filters.currency}, this.checkout)
                 }, function (data) {
 
                     vm.$set('spin', false);
                     if (data.error) {
-                        vm.$set('paymenterror', data.error);
+                        vm.$set('checkouterror', data.checkouterror);
+                        vm.$set('registererror', data.registererror);
                     } else {
                         console.log(data);
                         if (data.succesurl) {
@@ -341,11 +388,11 @@ module.exports = {
             var invalid = false;
 
             this.config.required_checkout.forEach(function (name) {
-                invalid = !this.validateField(name, 'checkout') || invalid;
+                invalid = !this.validateField(name) || invalid;
             }.bind(this));
 
-            ['number', 'expiryMonth', 'expiryYear', 'cvv'].forEach(function (name) {
-                invalid = !this.validateField(name, 'card') || invalid;
+            ['card.number', 'card.expiryMonth', 'card.expiryYear', 'card.cvv'].forEach(function (name) {
+                invalid = !this.validateField(name) || invalid;
             }.bind(this));
 
             if (!this.checkout.payment.method) {
@@ -356,8 +403,8 @@ module.exports = {
             return !invalid;
         },
 
-        validateField: function (name, type) {
-            var valid = !!this.$get(type + '.' + name);
+        validateField: function (name) {
+            var valid = !!this.$get(name);
             this.$set('invalid.' + name, !valid);
             return valid;
         }

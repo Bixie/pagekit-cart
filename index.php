@@ -126,15 +126,15 @@ return [
 		],
 		'gateways' => [],
 		'required_checkout' => [
-			'billing_address.firstName',
-			'billing_address.lastName',
-			'billing_address.email',
-			'billing_address.address1',
-			'billing_address.postcode',
-			'billing_address.city',
-			'billing_address.country',
-			'payment.method',
-			'agreed'
+			'checkout.billing_address.firstName',
+			'checkout.billing_address.lastName',
+			'checkout.billing_address.email',
+			'checkout.billing_address.address1',
+			'checkout.billing_address.postcode',
+			'checkout.billing_address.city',
+			'checkout.billing_address.country',
+			'checkout.payment.method',
+			'checkout.agreed'
 		],
 		'USDtoEUR' => 0.82481,
 		'EURtoUSD' => 1.25415,
@@ -173,15 +173,19 @@ return [
 				$data->add('$cartItems', array_values($cartItems));
 			}
 			$data->add('$cart', [
+				'checkout_url' => App::url('@cart/checkout'),
+				'login_url' => App::url('@user/login', ['redirect' => App::url()->current()]),
+				'user' => App::user(),
 				'config' => App::module('bixie/cart')->publicConfig()
 			]);
 		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {
-			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue']);
+			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue', 'uikit-form-password']);
 			//sections
 			$scripts->register('download-section-cart', 'bixie/cart:app/bundle/download-section-cart.js', ['~bixie-downloads']);
 
+//			$scripts->register('uikit-form-password', 'app/assets/uikit/js/components/form-password.min.js', 'uikit');
 			$scripts->register('uikit-accordion', 'app/assets/uikit/js/components/accordion.min.js', 'uikit');
 			$scripts->register('uikit-lightbox', 'app/assets/uikit/js/components/lightbox.min.js', 'uikit');
 		},
