@@ -25,9 +25,10 @@ class CartController
 	}
 
 	/**
-     * @Request({"filter": "array", "page":"int"})
+	 * @Route("/", name="order")
+	 * @Request({"filter": "array", "page":"int"})
      */
-    public function ordersAction($filter = null, $page = 0)
+    public function indexAction($filter = null, $page = 0)
     {
         return [
             '$view' => [
@@ -54,7 +55,7 @@ class CartController
     public function editAction($id = 0)
     {
 		/** @var Order $order */
-		if (!$order = Order::where(compact('id'))->first()) {
+		if (!$order = Order::where(compact('id'))->related('user')->first()) {
 
 			if ($id) {
 				App::abort(404, __('Invalid file id.'));

@@ -20,4 +20,3 @@ $view->script('bixie-cart');
 
 	</form>
 </section>
-<pre>{{ $data | json}}</pre>

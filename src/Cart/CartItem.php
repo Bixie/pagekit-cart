@@ -108,20 +108,32 @@ class CartItem implements \JsonSerializable
 		];
 	}
 
+	/**
+	 * @param Order $order
+	 * @return string
+	 */
 	public function purchaseKey (Order $order) {
 		$event = new Event('bixie.cart.purchaseKey');
 		App::trigger($event, [$order, $this]);
 
 		if ($order->isValid() && !$event['invalidPurchaseKey']) {
-			return sha1($order->status . $order->transaction_id . serialize($order->payment) . serialize($this));
+			return sha1($order->status . $order->transaction_id . serialize($order->payment) . $this->getId());
 		}
 		return '';
 	}
 
+	/**
+	 * @param $name
+	 * @param $content
+	 */
 	public function setTemplate ($name, $content) {
 		$this->templates[$name] = $content;
 	}
 
+	/**
+	 * @param $name
+	 * @return string
+	 */
 	public function getTemplate ($name) {
 		return isset($this->templates[$name]) ? $this->templates[$name] : '';
 	}

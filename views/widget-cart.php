@@ -1,5 +1,5 @@
 <?php
-$cart->config('currency');
+$view->script('bixie-cart');
 ?>
 <div id="cart-widget">
 

@@ -19,7 +19,7 @@
 		<dt><?= __('Tansaction ID') ?></dt>
 		<dd><?= $order->transaction_id ?></dd>
 		<dt><?= __('Order date') ?></dt>
-		<dd><?= $cart->formatDate($order->created) ?></dd>
+		<dd><?= $cart->formatDate($order->created, 'medium', $order->get('user_tz')) ?></dd>
 		<dt><?= __('Amount excl. VAT') ?></dt>
 		<dd><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
 		<dt><?= __('VAT amount') ?></dt>

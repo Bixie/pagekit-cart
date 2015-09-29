@@ -205,6 +205,13 @@
                 <h3 class="uk-panel-title">{{ 'To payment' | trans }}</h3>
 
                 <div class="uk-form-row">
+                    <div class="uk-form-controls">
+                        <textarea name="comment" id="form-comment" cols="30" rows="3" class="uk-width-1-1"
+                                v-model="checkout.comment" placeholder="{{ 'Add a comment' | trans }}"></textarea>
+                    </div>
+                </div>
+
+                <div class="uk-form-row">
                     <div class="uk-form-controls uk-form-controls-text">
                         <label><input type="checkbox" name="agreed" value="agreed"
                                       v-model="checkout.agreed"> {{ 'I agree with the terms and conditions' | trans }}</label>
@@ -250,6 +257,8 @@ module.exports = {
             show_address2: false,
             checkout: {
                 agreed: false,
+                user_tz: '',
+                comment: '',
                 billing_address: {
                     firstName: 'Piet',
                     lastName: 'Jansen',
@@ -287,6 +296,7 @@ module.exports = {
         if (this.gateways.length === 1) {
             this.$set('checkout.payment.method', this.gateways[0].shortName);
         }
+        this.checkout.user_tz = this.$date((new Date()), 'Z');
     },
 
     methods: {

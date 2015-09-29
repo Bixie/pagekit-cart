@@ -90,7 +90,10 @@
 
 								<?= $mailBody; ?>
 
-                            </td>
+								<p><?= __('Greetings,') ?></p>
+
+								<p><?= __('Team %site%', ['%site%' => '<strong style="color: #444">'.$app->module('system/site')->config('title').'</strong>']) ?></p>
+							</td>
                         </tr>
                     </table>
 

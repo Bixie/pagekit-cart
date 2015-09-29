@@ -4,6 +4,8 @@ namespace Bixie\Cart\Controller;
 
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
+use Pagekit\Application\Exception;
+use Pagekit\User\Model\User;
 
 /**
  * @Route("order", name="order")
@@ -26,14 +28,25 @@ class OrderApiController {
 	/**
 	 * @Route("/", methods="GET")
 	 * @Request({"filter": "array", "page": "int"})
-	 * @Access("cart: manage orders")
 	 */
 	public function indexAction ($filter = [], $page = 0) {
 
 		$query  = Order::query();
-		$filter = array_merge(array_fill_keys(['search', 'status', 'order', 'limit'], ''), $filter);
+		$filter = array_merge(array_fill_keys(['search', 'status', 'user_id', 'order', 'limit'], ''), $filter);
 
 		extract($filter, EXTR_SKIP);
+
+		$user = App::user();
+		if (!$user->id) {
+			App::abort(403, __('Access denied.'));
+		}
+		if (!$user->hasAccess('cart: manage orders')) {
+			$user_id = $user->id;
+		}
+
+		if (is_numeric($user_id)) {
+			$query->where(['user_id' => (int) $user_id]);
+		}
 
 		if (is_numeric($status)) {
 			$query->where(['status' => (int) $status]);
@@ -54,10 +67,106 @@ class OrderApiController {
 		$pages = ceil($count / $limit);
 		$page  = max(0, min($pages - 1, $page));
 
-		$orders = array_values($query->offset($page * $limit)->limit($limit)->orderBy($order[1], $order[2])->get());
+		$orders = array_values($query->offset($page * $limit)->related('user')->limit($limit)->orderBy($order[1], $order[2])->get());
 
 		return compact('orders', 'pages', 'count');
 
+	}
+
+	/**
+	 * @Route("/findorder", methods="POST")
+	 * @Request({"transaction_id": "string", "email": "string"}, csrf=true)
+	 * @param $transaction_id
+	 * @param $email
+	 * @return array
+	 */
+	public function findorderAction($transaction_id, $email)
+	{
+
+		if ($order = Order::where('transaction_id = ? AND email = ?', [$transaction_id, $email])->first()) {
+
+			if ($order->user_id) {
+				return ['error' => 'The order is already associated with a user. Try a password reset.'];
+			}
+
+			if ($user = User::findByEmail($email)) {
+				return ['error' => 'A user with that email address already exists'];
+			}
+
+			App::session()->set('_bixieCart.findorder.active', md5($transaction_id . $email . $order->id));
+
+			return ['success' => true];
+
+		}
+
+		return ['error' => 'No order found on this transaction ID and email address'];
+	}
+
+	/**
+	 * @Route("/register", methods="POST")
+	 * @Request({"transaction_id": "string", "user": "array"}, csrf=true)
+	 * @param string $transaction_id
+	 * @param array $data
+	 * @return array
+	 */
+	public function registerAction($transaction_id, $data)
+	{
+		if ($order = Order::where('transaction_id = ? AND email = ?', [$transaction_id, $data['email']])->first()) {
+
+			if ($order->email != $data['email'] ||
+				md5($transaction_id . $data['email'] . $order->id) != App::session()->get('_bixieCart.findorder.active')) {
+				App::abort(401, __('Invalid request.'));
+			}
+
+			try {
+				$userModule = App::module('system/user');
+
+				if (App::user()->isAuthenticated() || $userModule->config('registration') == 'admin') {
+					throw new Exception('Registration not allowed');
+				}
+
+				$password = @$data['password'];
+				if (trim($password) != $password || strlen($password) < 3) {
+					throw new Exception(__('Invalid Password.'));
+				}
+
+				$token = App::get('auth.random')->generateString(32);
+
+				$user = User::create([
+					'registered' => new \DateTime,
+					'name' => $order->get('billing_address.firstName') . ' ' . $order->get('billing_address.lastName'),
+					'username' => @$data['username'],
+					'email' => @$data['email'],
+					'password' => App::get('auth.password')->hash($password),
+					'activation' => $token,
+					'status' => User::STATUS_BLOCKED
+				]);
+
+				$user->validate();
+				$user->save();
+
+				//send mail
+				$this->sendActivationMail($user, $order);
+
+				//attach user to orders
+				foreach (Order::where('user_id = 0 AND email = ?', [$user->email])->get() as $userOrder) {
+					$userOrder->user_id = $user->id;
+					$userOrder->save();
+				}
+
+				App::session()->remove('_bixieCart.findorder.active');
+
+				return ['success' => true];
+
+			} catch (Exception $e) {
+
+				return ['error' => $e->getMessage()];
+
+			}
+
+		}
+
+		return ['error' => 'No order found on this transaction ID and email address'];
 	}
 
 	/**
@@ -133,6 +242,22 @@ class OrderApiController {
 		}
 
 		return ['message' => 'success'];
+	}
+
+	protected function sendActivationMail (User $user, Order $order) {
+
+		$mailSubject = __('Your account at %site%', ['%site%' => App::module('system/site')->config('title')]);
+		$mailBody = App::view('bixie/cart/mails/account_registration.php', ['cart' => $this->cart, 'user' => $user, 'order' => $order]);
+		$mailTemplate = App::view('bixie/cart/mails/template.php', compact('mailBody'));
+
+		if ($adminMail = $this->cart->config('email.admin_email')) {
+			$mail = App::mailer()->create();
+			$mail->setTo($adminMail)->setSubject($mailSubject)->setBody($mailTemplate, 'text/html')->send();
+		}
+
+		$mail = App::mailer()->create();
+		$mail->setTo($user->email)->setSubject($mailSubject)->setBody($mailTemplate, 'text/html')->send();
+
 	}
 
 }

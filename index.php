@@ -20,7 +20,15 @@ return [
 		'checkout' => [
 			'name' => '@cart',
 			'label' => 'Checkout',
-			'controller' => 'Bixie\\Cart\\Controller\\SiteController',
+			'controller' => 'Bixie\\Cart\\Controller\\CheckoutSiteController',
+			'protected' => true,
+			'frontpage' => false
+		],
+
+		'orders' => [
+			'name' => '@cart/orders',
+			'label' => 'Orders',
+			'controller' => 'Bixie\\Cart\\Controller\\OrderSiteController',
 			'protected' => true,
 			'frontpage' => false
 		]
@@ -30,7 +38,7 @@ return [
 	'routes' => [
 
 		'/cart' => [
-			'name' => '@cart',
+			'name' => '@cart/admin',
 			'controller' => [
 				'Bixie\\Cart\\Controller\\CartController'
 			]
@@ -63,25 +71,25 @@ return [
 		'cart' => [
 			'label' => 'Cart',
 			'icon' => 'bixie/cart:icon.svg',
-			'url' => '@cart/orders',
+			'url' => '@cart/admin/order',
 			'access' => 'bixie/cart: manage cart',
-			'active' => '@cart/*'
+			'active' => '@cart/admin*'
 		],
 
 		'cart: orders' => [
 			'label' => 'Orders',
 			'parent' => 'cart',
-			'url' => '@cart/orders',
+			'url' => '@cart/admin/order',
 			'access' => 'bixie/cart: manage orders',
-			'active' => '@cart/order*'
+			'active' => '@cart/admin/order*'
 		],
 
 		'cart: settings' => [
 			'label' => 'Settings',
 			'parent' => 'cart',
-			'url' => '@cart/settings',
+			'url' => '@cart/admin/settings',
 			'access' => 'bixie/cart: manage settings',
-			'active' => '@cart/settings*'
+			'active' => '@cart/admin/settings'
 		]
 
 	],
@@ -106,7 +114,7 @@ return [
 
 	],
 
-	'settings' => '@cart/settings',
+	'settings' => '@cart/admin/settings',
 
 	'config' => [
 		'currency' => 'EUR',
@@ -147,6 +155,7 @@ return [
 		'markdown_enabled' => false,
 		'ordering' => 'title',
 		'ordering_dir' => 'asc',
+		'server_tz' => '+0200',
 		'orders_per_page' => 20,
 		'products_per_page' => 20
 	],
@@ -157,20 +166,15 @@ return [
 			$app->subscribe(new Bixie\Cart\Event\FileListener());
 		},
 
-		'after@cart/checkout' => function ($event, $request) use ($app) {
-			App::view()->data('$cart', [
-				'countries' => App::module('system/intl')->getCountries(),
-				'gateways' => App::bixiePayment()->activeGatewaysData(),
-				'config' => App::module('bixie/cart')->publicConfig()
-			]);
-		},
-
 		'view.data' => function ($event, $data) use ($app) {
+			//todo only on when cart or module is active
 			$cartItems = $app['bixieCart']->all();
 			if (count($cartItems)) {
 				$data->add('$cartItems', array_values($cartItems));
 			}
-
+			$data->add('$cart', [
+				'config' => App::module('bixie/cart')->publicConfig()
+			]);
 		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {

@@ -7,7 +7,7 @@ use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
 
-class SiteController
+class CheckoutSiteController
 {
     /**
      * @var \Bixie\Cart\CartModule
@@ -31,6 +31,11 @@ class SiteController
 			'$view' => [
 				'title' => __('Checkout'),
 				'name' => 'bixie/cart/checkout.php'
+			],
+			'$cart' => [
+				'countries' => App::module('system/intl')->getCountries(),
+				'gateways' => App::bixiePayment()->activeGatewaysData(),
+				'config' => App::module('bixie/cart')->publicConfig()
 			],
 			'cart' => $this->cart
 		];

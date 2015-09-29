@@ -105,6 +105,9 @@ module.exports = {
         },
 
         getName: function (order) {
+            if (order.user_name) {
+                return order.user_name + ' (' + order.user_username + ')';
+            }
             return order.data.billing_address.firstName + ' ' + order.data.billing_address.lastName;
         }
 

@@ -23,6 +23,9 @@ class Order implements \JsonSerializable {
 	public $id;
 
 	/** @Column(type="integer") */
+	public $user_id = 0;
+
+	/** @Column(type="integer") */
 	public $status = 0;
 
 	/** @Column(type="datetime") */
@@ -49,10 +52,17 @@ class Order implements \JsonSerializable {
 	/** @Column(type="string") */
 	public $transaction_id;
 
+	/**
+	 * @BelongsTo(targetEntity="Pagekit\User\Model\User", keyFrom="user_id")
+	 */
+	public $user;
+
 	/** @var array */
 	protected static $properties = [
 		'valid' => 'isValid',
-		'cartItems' => 'getCartItems'
+		'cartItems' => 'getCartItems',
+		'user_username' => 'getUserUsername',
+		'user_name' => 'getUserName'
 	];
 
 	/**
@@ -74,6 +84,14 @@ class Order implements \JsonSerializable {
 
 	public function isValid () {
 		return $this->status == self::STATUS_CONFIRMED;
+	}
+
+	public function getUserName () {
+		return $this->user ? $this->user->name : null;
+	}
+
+	public function getUserUsername () {
+		return $this->user ? $this->user->username : null;
 	}
 
 	/**

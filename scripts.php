@@ -9,6 +9,7 @@ return [
 		if ($util->tableExists('@cart_order') === false) {
 			$util->createTable('@cart_order', function ($table) {
 				$table->addColumn('id', 'integer', ['unsigned' => true, 'length' => 10, 'autoincrement' => true]);
+				$table->addColumn('user_id', 'integer', ['unsigned' => true, 'length' => 10, 'notnull' => false]);
 				$table->addColumn('status', 'smallint');
 				$table->addColumn('created', 'datetime');
 				$table->addColumn('email', 'string', ['length' => 255]);
@@ -20,6 +21,7 @@ return [
 				$table->addColumn('transaction_id', 'string', ['length' => 255, 'notnull' => false]);
 				$table->addColumn('data', 'json_array', ['notnull' => false]);
 				$table->setPrimaryKey(['id']);
+				$table->addIndex(['user_id'], 'CART_ORDER_USER_ID');
 				$table->addIndex(['status'], 'CART_ORDER_STATUS');
 				$table->addIndex(['email'], 'CART_ORDER_EMAIL');
 				$table->addIndex(['total_netto'], 'CART_ORDER_TOTAL_NETTO');

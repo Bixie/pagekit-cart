@@ -52,10 +52,11 @@ class CartModule extends Module {
 
 	/**
 	 * @param integer|\DateTime|string $date
-	 * @param string $format (fullDate, longDate, medium, mediumDate, mediumTime, short, shortDate, shortTime)
+	 * @param string                   $format (fullDate, longDate, medium, mediumDate, mediumTime, short, shortDate, shortTime)
+	 * @param string                   $timezone
 	 * @return string
 	 */
-	public function formatDate ($date, $format = 'medium') {
+	public function formatDate ($date, $format = 'medium', $timezone = null) {
 		try {
 
 			if (is_numeric($date)) {
@@ -66,7 +67,13 @@ class CartModule extends Module {
 				$date = new \DateTime($date);
 			}
 
-//			$formats = App::module('system/intl')->getFormats(); //todo get form core
+			if (!$timezone) {
+				$timezone = $this->config('server_tz', '');
+			}
+			$date->setTimezone(new \DateTimeZone($timezone));
+			//todo locale!
+
+//			$formats = App::module('system/intl')->getFormats(); //todo get from core
 			return $date->format(isset($this->datetime_formats[$format]) ? $this->datetime_formats[$format] : $this->datetime_formats['medium']);
 
 		} catch (\Exception $e) {

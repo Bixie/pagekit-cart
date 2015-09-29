@@ -1,24 +1,22 @@
 <?php
 /**
  * @var $view
- * @var string $title
- * @var string $content
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
-
+//$view->script('bixie-orders', 'bixie/cart:app/bundle/orders.js', ['vue', 'uikit-pagination', 'uikit-form-select']);
 ?>
 
-<div id="bixie-checkout">
+<section id="bixie-order" v-cloak>
 
-	<h1><?= __($title) ?></h1>
-
-	<?= $content ?>
+	<h1><?= __('Order details') ?></h1>
 
 	<div class="uk-panel uk-panel-box uk-margin">
 
 		<div class="uk-panel-badge uk-badge <?= ($order->status == 1 ? 'uk-badge-success' : 'uk-badge-warning')  ?>">
 			<?= $order->getStatusText() ?></div>
+
+		<h3 class="uk-panel-title"><?= __('Order details') ?></h3>
 
 		<dl class="uk-description-list uk-description-list-horizontal">
 			<dt><?= __('Tansaction ID') ?></dt>
@@ -36,7 +34,7 @@
 		</dl>
 		<dl class="uk-description-list uk-description-list-horizontal">
 			<dt><?= __('Order comment') ?></dt>
-			<dd><?= $order->get('comment', '-') ?></dd>
+			<dd>{{ order.data.comment }}</dd>
 		</dl>
 	</div>
 
@@ -53,6 +51,4 @@
 		</div>
 	</div>
 
-
-</div>
-
+</section>

@@ -30,6 +30,11 @@ class FileListener implements EventSubscriberInterface {
 		'P5Y' => '5 years'
 	];
 
+	/**
+	 * Product displayed in admin
+	 * @param      $event
+	 * @param View $view
+	 */
 	public function onProductView ($event, View $view) {
 		$product = new \stdClass();
 		$id = $event['file']->id;
@@ -53,54 +58,7 @@ class FileListener implements EventSubscriberInterface {
 	}
 
 	/**
-	 * @param Event    $event
-	 * @param Order    $order
-	 * @param CartItem $cartItem
-	 */
-	public function onCartPurchaseKey (Event $event, Order $order, CartItem $cartItem) {
-		/** @var File $file */
-		$file = $cartItem->loadItemModel();
-		$orderValid = $this->validateOrder($order, $cartItem, $file);
-		$event->addParameters([
-			'invalidPurchaseKey' => !empty($event['allowPurchaseKey']) ? $event['allowPurchaseKey'] : !$orderValid
-		], true);
-	}
-
-	/**
-	 * @param Event    $event
-	 * @param Order    $order
-	 * @param CartItem $cartItem
-	 */
-	public function onCalculateOrder (Event $event, Order $order, CartItem $cartItem) {
-		if ($validity_period = $cartItem->get('validity_period')) {
-			$date = (new \DateTime($order->created->format(\DateTime::ISO8601)))->add(new \DateInterval($validity_period));
-			$cartItem->set('valid_until', $date->format(\DateTime::ISO8601));
-			$cartItem->set('validity_text', self::$periods[$validity_period]);
-		} else {
-			$cartItem->set('validity_text', 'No end date');
-		}
-	}
-
-	/**
-	 * @param Event    $event
-	 * @param Order    $order
-	 * @param CartItem $cartItem
-	 */
-	public function onOrderitem (Event $event, Order $order, CartItem $cartItem) {
-		if ($cartItem->item_model == 'Bixie\Download\Model\File') {
-			/** @var File $file */
-			$file = $cartItem->loadItemModel();
-			$orderValid = $this->validateOrder($order, $cartItem, $file);
-
-			$event->addParameters([
-				'bixie.admin.order' => App::view('bixie/cart/templates/file_admin.php', compact('order', 'cartItem', 'file', 'orderValid')),
-				'bixie.cart.order_item' => App::view('bixie/cart/templates/file_cart_order_item.php', compact('order', 'cartItem', 'file', 'orderValid'))
-			]);
-
-		}
-	}
-
-	/**
+	 * product shown in frontend
 	 * @param Event $event
 	 * @param File $file
 	 * @param View $view
@@ -112,7 +70,7 @@ class FileListener implements EventSubscriberInterface {
 		}
 
 		if (!empty($file->id) && $file->get('cart_active')) {
-//			$viewProducts = $view['$cart.products'];
+
 			if (!$product = Product::where(['item_id = ?', 'item_model = ?'], [$file->id, 'Bixie\Download\Model\File'])->first()) {
 
 				$product = Product::createNew([
@@ -133,6 +91,58 @@ class FileListener implements EventSubscriberInterface {
 	}
 
 	/**
+	 * cartItem displayed to user/admin
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onOrderitem (Event $event, Order $order, CartItem $cartItem) {
+		if ($cartItem->item_model == 'Bixie\Download\Model\File') {
+			/** @var File $file */
+			$file = $cartItem->loadItemModel();
+			$orderValid = $this->validateOrder($order, $cartItem, $file);
+
+			$event->addParameters([
+				'bixie.admin.order' => App::view('bixie/cart/templates/file_admin.php', compact('order', 'cartItem', 'file', 'orderValid')),
+				'bixie.cart.order_item' => App::view('bixie/cart/templates/file_cart_order_item.php', compact('order', 'cartItem', 'file', 'orderValid'))
+			]);
+
+		}
+	}
+
+	/**
+	 * purchase key calculated from the cartitem
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onCartPurchaseKey (Event $event, Order $order, CartItem $cartItem) {
+		/** @var File $file */
+		$file = $cartItem->loadItemModel();
+		$orderValid = $this->validateOrder($order, $cartItem, $file);
+		$event->addParameters([
+			'invalidPurchaseKey' => !empty($event['allowPurchaseKey']) ? $event['allowPurchaseKey'] : !$orderValid
+		], true);
+	}
+
+	/**
+	 * CartItem calculated on checkout
+	 * @param Event    $event
+	 * @param Order    $order
+	 * @param CartItem $cartItem
+	 */
+	public function onCalculateOrder (Event $event, Order $order, CartItem $cartItem) {
+		if ($validity_period = $cartItem->get('validity_period')) {
+			$date = (new \DateTime($order->created->format(\DateTime::ISO8601)))->add(new \DateInterval($validity_period));
+			$cartItem->set('valid_until', $date->format(\DateTime::ISO8601));
+			$cartItem->set('validity_text', self::$periods[$validity_period]);
+		} else {
+			$cartItem->set('validity_text', 'No end date');
+		}
+	}
+
+	/**
+	 * save event
 	 * @param Event $event
 	 * @param File $file
 	 */

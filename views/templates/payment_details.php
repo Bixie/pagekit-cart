@@ -25,7 +25,7 @@
 		<dt><?= __('Payment description') ?></dt>
 		<dd><?= $order->payment['description'] ?></dd>
 		<dt><?= __('Payment date') ?></dt>
-		<dd><?= $cart->formatDate($order->payment['created']); ?></dd>
+		<dd><?= $cart->formatDate($order->payment['created'], 'medium', $order->get('user_tz')); ?></dd>
 		<dt><?= __('Payment amount') ?></dt>
 		<dd><?=  $cart->formatMoney(($order->payment['amount']/100), strtoupper($order->payment['currency'])) ?></dd>
 
