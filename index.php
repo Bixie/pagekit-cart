@@ -137,7 +137,7 @@ return [
 			'checkout.agreed'
 		],
 		'USDtoEUR' => 0.82481,
-		'EURtoUSD' => 1.25415,
+		'EURtoUSD' => 1.1204,
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
@@ -154,8 +154,10 @@ return [
 		],
 		'markdown_enabled' => false,
 		'ordering' => 'title',
+		'terms_markdown_enabled' => false,
+		'terms_content' => '<p>Please enter your terms and conditions here</p>',
 		'ordering_dir' => 'asc',
-		'server_tz' => '+0200',
+		'server_tz' => 'Europe/Amsterdam',
 		'orders_per_page' => 20,
 		'products_per_page' => 20
 	],
@@ -184,7 +186,8 @@ return [
 		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {
-			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue', 'uikit-form-password']);
+			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');
+			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue', 'uikit-form-password', 'jstz']);
 			//sections
 			$scripts->register('download-section-cart', 'bixie/cart:app/bundle/download-section-cart.js', ['~bixie-downloads']);
 

@@ -77,6 +77,7 @@ var Cart = Vue.extend({
     },
     components: {
         cartmodal: require('./components/cartmodal.vue'),
+        terms: require('./components/terms.vue'),
         checkout: require('./components/checkout.vue'),
         addtocart: require('./components/addtocart.vue')
     },

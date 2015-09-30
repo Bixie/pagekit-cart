@@ -7,6 +7,7 @@ use Bixie\Cart\Cart\UserHelper;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
+use Bixie\Cart\Payment\PaymentException;
 
 class CheckoutSiteController
 {
@@ -28,13 +29,18 @@ class CheckoutSiteController
 	 */
 	public function checkoutAction()
 	{
+		$checkoutData = App::bixiePayment()->activeCheckoutData();
+		if(empty($checkoutData['checkout'])) {
+			$checkoutData['checkout'] = (new UserHelper(App::user()))->getCheckoutDefaults();
+		}
+		unset($checkoutData['checkout']['agreed']);
 
 		return [
 			'$view' => [
 				'title' => __('Checkout'),
 				'name' => 'bixie/cart/checkout.php'
 			],
-			'$checkout' => (new UserHelper(App::user()))->getCheckoutDefaults(),
+			'$checkout' => $checkoutData,
 			'$cart' => [
 				'countries' => App::module('system/intl')->getCountries(),
 				'gateways' => App::bixiePayment()->activeGatewaysData(),
@@ -58,6 +64,52 @@ class CheckoutSiteController
 		/** @var Order $order */
 		if (!$order = Order::findByTransaction_id($transaction_id)) {
 			App::abort(404, __('Order not found.'));
+		}
+
+		//check payment
+		if ($order->status != Order::STATUS_CONFIRMED && $payment_method = App::session()->get('_bixiePayment.redirected')) {
+			try {
+
+				$paymentResponse = App::bixiePayment()->getReturn($payment_method, $order);
+
+				if ($paymentResponse->isSuccessful()) {
+
+					$order->status = Order::STATUS_CONFIRMED;
+
+					//reset cart
+					App::bixieCart()->reset();
+
+					//send mail
+					(new MailHelper($order))->sendMail();
+
+					App::message()->success(__('Payment successful'));
+
+				}
+
+				$order->payment = $paymentResponse->getData();
+				$order->save();
+
+				if ($paymentResponse->isRedirect()) {
+					return [
+						'$view' => [
+							'title' => __('Please complete your payment'),
+							'name' => 'bixie/cart/paymentredirect.php'
+						],
+						'title' => __('Please complete your payment'),
+						'order' => $order,
+						'response' => $paymentResponse,
+						'cart' => $this->cart
+					];
+				}
+
+			} catch (PaymentException $e) {
+				//todo message does not persist??
+				App::message()->error(__($e->getMessage()));
+				return App::redirect('@cart/checkout');
+
+			}
+
+
 		}
 
 		$content = '';

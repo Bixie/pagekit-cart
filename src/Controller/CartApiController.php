@@ -17,6 +17,18 @@ use Pagekit\User\Model\User;
  */
 class CartApiController
 {
+	/**
+	 * @var \Bixie\Cart\CartModule
+	 */
+	protected $cart;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct()
+	{
+		$this->cart = App::module('bixie/cart');
+	}
 
     /**
      * @Route("/", methods="POST")
@@ -44,7 +56,7 @@ class CartApiController
 		return array_values($bixieCart->all());
     }
 
-    /**
+	/**
      * @Route("/checkout", methods="POST")
      * @Request({"cartItems": "array", "cardData": "array", "user": "array", "checkout": "array"}, csrf=true)
      */
@@ -73,29 +85,45 @@ class CartApiController
 
 		}
 
-		$order = Order::createNew($cartItems, $checkout)->calculateOrder();
+		if ($checkout['order_id'] > 0) {
+			$order = Order::find($checkout['order_id']);
+			$order->currency = $checkout['currency'];
+			$order->cartItemsData = $cartItemsData;
+			$order->calculateOrder();
+		} else {
+			$order = Order::createNew($cartItems, $checkout)->calculateOrder();
+		}
+
+		$redirectUrl = App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true);
 
 		$payment_method = $checkout['payment']['method'];
 
 		try {
 
-			$payment = App::bixiePayment()->getPayment($payment_method, $cardData, $order);
+			$paymentResponse = App::bixiePayment()->getPayment($payment_method, $cardData, $order);
 
-			$order->status = Order::STATUS_CONFIRMED;
-			$order->payment = $payment->getData();
+			if ($paymentResponse->isRedirect()) {
+				$redirectUrl = $paymentResponse->getRedirectUrl();
+			}
 
+			if ($paymentResponse->isSuccessful()) {
+
+				$order->status = Order::STATUS_CONFIRMED;
+
+				//reset cart
+				App::bixieCart()->reset();
+				$cartItems = [];
+
+				//send mail
+				(new MailHelper($order))->sendMail();
+			}
+
+			$order->payment = $paymentResponse->getData();
 			$order->save();
-
-			//reset cart
-			App::bixieCart()->reset();
-			$cartItems = [];
-
-			//send mail
-			(new MailHelper($order))->sendMail();
 
 			return [
 				'cartItems' => array_values($cartItems),
-				'succesurl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
+				'redirectUrl' => $redirectUrl,
 				'checkout' => $checkout,
 				'order' => $order
 			];
@@ -107,5 +135,14 @@ class CartApiController
 
 
     }
+
+	/**
+	 * @Route("/terms", methods="GET")
+	 */
+	public function termsAction()
+	{
+		$content = App::content()->applyPlugins($this->cart->config('terms_content'), ['markdown' => $this->cart->config('terms_markdown_enabled')]);;
+		return ['html' => App::view('bixie/cart/templates/terms.php', compact('content'), 'raw')];
+	}
 
 }

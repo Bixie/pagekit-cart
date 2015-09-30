@@ -86,11 +86,21 @@ class PaymentHelper {
 		return $this->gateways;
 	}
 
+	public function activeCheckoutData () {
+		$checkouterror = $this->app['session']->get('_bixiePayment.checkouterror', '');
+		$this->app['session']->remove('_bixiePayment.checkouterror');
+		return [
+			'checkouterror' => $checkouterror,
+			'order_id' => $this->app['session']->get('_bixiePayment.order_id', 0),
+			'checkout' => $this->app['session']->get('_bixiePayment.checkout')
+		];
+	}
+
 	/**
 	 * @param string $type
 	 * @param array  $cardData
 	 * @param Order  $order
-	 * @return bool|ResponseInterface
+	 * @return ResponseInterface
 	 * @throws PaymentException
 	 */
 	public function getPayment ($type, $cardData, Order &$order) {
@@ -102,50 +112,116 @@ class PaymentHelper {
 		}
 		$gateway->initialize($this->config[$type]);
 		$order->transaction_id = md5(time() . serialize($cardData) . serialize($order->toArray()));
+		$order->set('payment.method_name', $gateway->getName());
 
 		$card = new CreditCard(array_merge($cardData, $order->get('billing_address')));
 
 		try {// Send purchase request
-			$response = $gateway->purchase(
-				[
-					'amount' => $order->total_bruto,
-					'currency' => $order->currency,
-					'description' => __('Purchase %site%, #%transactionId%', [
-						'%site%' => $this->app->config('system/site')['title'],
-						'%transactionId%' => $order->transaction_id]),
-					'transactionId' => $order->transaction_id,
-//					'transactionReference' => $order->transaction_id,
+			$params = [
+				'amount' => $order->total_bruto,
+				'currency' => $order->currency,
+				'description' => __('Purchase %site%, #%transactionId%', [
+					'%site%' => $this->app->config('system/site')['title'],
+					'%transactionId%' => $order->transaction_id]),
+				'transactionId' => $order->transaction_id,
+				'transactionReference' => $order->transaction_id,
 //					'cardReference' => $order->transaction_id,
-					'returnUrl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id]),
-					'cancelUrl' => App::url('@cart/checkout'),
-					'notifyUrl' => '',
-					'issuer' => '',
-					'card' => $card->getParameters()
-				]
-			)->send();
+				'returnUrl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true),
+				'cancelUrl' => App::url('@cart/checkout', [], true),
+				'notifyUrl' => '',
+				'issuer' => '',
+				'card' => $card->getParameters()
+			];
+			$response = $gateway->purchase($params)->send();
+			$params['transactionReference'] = $response->getTransactionReference();
 
+			$order->set('payment.message', $response->getMessage());
 			// Process response
 			if ($response->isSuccessful()) {
 
 				// Payment was successful
+				$order->set('payment.success', true);
 				$this->app['session']->set('_bixiePayment.transaction_id', $order->transaction_id);
+				$this->app['session']->remove('_bixiePayment.checkouterror');
 				return $response;
 
 			} elseif ($response->isRedirect()) {
-				//todo
+
 				// Redirect to offsite payment gateway
-				$response->redirect();
+				$this->app['session']->set('_bixiePayment.redirected', $type);
+				$this->app['session']->set('_bixiePayment.checkout', $order->data);
+				$this->app['session']->set('_bixiePayment.order_id', $order->id);
+				$this->app['session']->set('_bixiePayment.params', $params);
+				$this->app['session']->set('_bixiePayment.transaction_id', $order->transaction_id);
+				return $response;
 
 			} else {
 
 				// Payment failed
-				throw new PaymentException($response->getMessage());
+				throw new \Exception($response->getMessage());
 			}
 
 		} catch (\Exception $e) {
 			throw new PaymentException($e->getMessage(), $e->getCode(), $e);
 		}
-		return false;
+	}
+
+	/**
+	 * @param string $type
+	 * @param Order  $order
+	 * @return ResponseInterface
+	 * @throws PaymentException
+	 */
+	public function getReturn ($type, Order &$order) {
+		// Setup payment gateway
+		if (!isset($this->config[$type])) {
+			throw new PaymentException("Payment method $type not found in configuration");
+		}
+
+		try {
+
+			$gateway = Omnipay::create($type);
+
+			$gateway->initialize($this->config[$type]);
+
+			$params = $this->app['session']->get('_bixiePayment.params');
+
+			$params['clientIp'] = $this->app['request']->getClientIp();
+
+			$response = $gateway->completePurchase($params)->send();
+
+			// Process response
+			if ($response->isSuccessful()) {
+
+				// Payment was successful
+				$order->set('payment.success', true);
+				$this->app['session']->remove('_bixiePayment.checkout');
+				$this->app['session']->remove('_bixiePayment.order_id');
+				$this->app['session']->remove('_bixiePayment.redirected');
+				$this->app['session']->remove('_bixiePayment.params');
+				$this->app['session']->remove('_bixiePayment.checkouterror');
+				return $response;
+
+			} elseif ($response->isRedirect()) {
+
+				$this->app['session']->set('_bixiePayment.transaction_id', $order->transaction_id);
+				// Redirect to offsite payment gateway
+				$this->app['session']->set('_bixiePayment.redirected', $type);
+				$this->app['session']->set('_bixiePayment.checkout', $order->data);
+				$this->app['session']->set('_bixiePayment.order_id', $order->id);
+				$this->app['session']->set('_bixiePayment.params', $params);
+				return $response;
+
+			} else {
+
+				// Payment failed
+				throw new \Exception($response->getMessage());
+			}
+		} catch (\Exception $e) {
+			$this->app['session']->set('_bixiePayment.checkouterror', $e->getMessage());
+			throw new PaymentException($e->getMessage(), $e->getCode(), $e);
+		}
+
 	}
 
 }

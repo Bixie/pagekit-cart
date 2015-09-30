@@ -59,6 +59,10 @@ class CartModule extends Module {
 	public function formatDate ($date, $format = 'medium', $timezone = null) {
 		try {
 
+			if (!$date) {
+				return 'Invalid date';
+			}
+
 			if (is_numeric($date)) {
 				$date = '@' . $date;
 				$date = new \DateTime($date, new \DateTimeZone('UTC'));
@@ -72,7 +76,6 @@ class CartModule extends Module {
 			}
 			$date->setTimezone(new \DateTimeZone($timezone));
 			//todo locale!
-
 //			$formats = App::module('system/intl')->getFormats(); //todo get from core
 			return $date->format(isset($this->datetime_formats[$format]) ? $this->datetime_formats[$format] : $this->datetime_formats['medium']);
 
