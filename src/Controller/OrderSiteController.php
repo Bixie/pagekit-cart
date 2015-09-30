@@ -49,7 +49,8 @@ class OrderSiteController
 				]
 			],
 			'user' => $user,
-			'cart' => $this->cart
+			'cart' => $this->cart,
+			'node' => App::node()
 		];
 	}
 
@@ -88,7 +89,8 @@ class OrderSiteController
 				'name' => 'bixie/cart/order.php'
 			],
 			'order' => $order,
-			'cart' => $this->cart
+			'cart' => $this->cart,
+			'node' => App::node()
 		];
 	}
 
@@ -109,7 +111,8 @@ class OrderSiteController
 				'title' => __('Find your order'),
 				'name' => 'bixie/cart/findorder.php'
 			],
-			'cart' => $this->cart
+			'cart' => $this->cart,
+			'node' => App::node()
 		];
 	}
 

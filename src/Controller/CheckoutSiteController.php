@@ -46,7 +46,8 @@ class CheckoutSiteController
 				'gateways' => App::bixiePayment()->activeGatewaysData(),
 				'config' => App::module('bixie/cart')->publicConfig()
 			],
-			'cart' => $this->cart
+			'cart' => $this->cart,
+			'node' => App::node()
 		];
 	}
 
@@ -132,7 +133,8 @@ class CheckoutSiteController
 			'title' => $this->cart->config('thankyou.title'),
 			'content' => $content,
 			'order' => $order,
-			'cart' => $this->cart
+			'cart' => $this->cart,
+			'node' => App::node()
 		];
 	}
 
