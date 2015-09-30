@@ -44,7 +44,7 @@ trait OrderModelTrait
 	 */
 	public function issetPayment($key)
 	{
-		return Arr::has($this->payment, $key);
+		return Arr::has((array) $this->payment, $key);
 	}
 
 	/**

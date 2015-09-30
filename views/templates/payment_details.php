@@ -67,7 +67,7 @@ use Pagekit\Application as App;
 		<?php endif; ?>
 		<?php if ($order->issetPayment('amount') && $order->issetPayment('locale')) : ?>
 			<dt><?= __('Payment amount') ?></dt>
-			<dd><?=  $cart->formatMoney(($order->getPayment('amount')/100), 'EUR') ?></dd>
+			<dd><?=  $cart->formatMoney(($order->getPayment('amount')), 'EUR') ?></dd>
 		<?php endif; ?>
 		<?php if ($order->issetPayment('PAYMENTINFO_0_AMT') && $order->issetPayment('PAYMENTINFO_0_CURRENCYCODE')) : ?>
 			<dt><?= __('Payment amount') ?></dt>
@@ -101,7 +101,7 @@ use Pagekit\Application as App;
 			<?php endif; ?>
 		<?php endif; ?>
 
-		<?php if ($order->issetPayment('failure_message')) : ?>
+		<?php if ($order->issetPayment('failure_message') && $order->getPayment('failure_message')) : ?>
 			<dt><?= __('Failure message') ?></dt>
 			<dd class="uk-text-danger"><?= $order->getPayment('failure_message') ?></dd>
 		<?php endif; ?>

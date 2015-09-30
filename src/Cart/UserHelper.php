@@ -94,25 +94,23 @@ class UserHelper {
 	public function getCheckoutDefaults () {
 		$names = $this->chopName();
 		$checkout = [
-			'checkout' => [
-				'billing_address' => [
-					'firstName' => $names['firstName'],
-					'lastName' => $names['lastName'],
-					'email' => $this->user->email,
-					'phone' => '',
-					'address1' => '',
-					'address2' => '',
-					'postcode' => '',
-					'city' => '',
-					'state' => '',
-					'country' => ''
-				],
-				'card' => [
-					'number' => '',
-					'expiryMonth' => '',
-					'expiryYear' => '',
-					'cvv' => ''
-				]
+			'billing_address' => [
+				'firstName' => $names['firstName'],
+				'lastName' => $names['lastName'],
+				'email' => $this->user->email,
+				'phone' => '',
+				'address1' => '',
+				'address2' => '',
+				'postcode' => '',
+				'city' => '',
+				'state' => '',
+				'country' => ''
+			],
+			'card' => [
+				'number' => '',
+				'expiryMonth' => '',
+				'expiryYear' => '',
+				'cvv' => ''
 			]
 		];
 

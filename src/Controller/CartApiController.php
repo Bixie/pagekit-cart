@@ -62,7 +62,7 @@ class CartApiController
      */
     public function checkoutAction($cartItemsData, $cardData, $userData, $checkout)
     {
-		$return = ['error'=> true, 'registererror' => '', 'checkouterror' => ''];
+		$return = ['error'=> true, 'registererror' => '', 'checkouterror' => '', 'order' => []];
 
 		$cartItems = $this->saveAction($cartItemsData);
 
@@ -85,6 +85,7 @@ class CartApiController
 
 		}
 
+		/** @var Order $order */
 		if ($checkout['order_id'] > 0) {
 			$order = Order::find($checkout['order_id']);
 			$order->currency = $checkout['currency'];
@@ -94,13 +95,13 @@ class CartApiController
 			$order = Order::createNew($cartItems, $checkout)->calculateOrder();
 		}
 
-		$redirectUrl = App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true);
-
 		$payment_method = $checkout['payment']['method'];
 
 		try {
 
 			$paymentResponse = App::bixiePayment()->getPayment($payment_method, $cardData, $order);
+
+			$redirectUrl = App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true);
 
 			if ($paymentResponse->isRedirect()) {
 				$redirectUrl = $paymentResponse->getRedirectUrl();
@@ -129,6 +130,7 @@ class CartApiController
 			];
 
 		} catch (PaymentException $e) {
+			$return['order'] = $order;
 			$return['checkouterror'] = $e->getMessage();
 			return $return;
 		}

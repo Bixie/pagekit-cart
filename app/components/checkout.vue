@@ -1,6 +1,6 @@
 <template>
 
-    <div class="uk-grid uk-grid-width-medium-1-2">
+    <div v-if="cartItems.length" class="uk-grid uk-grid-width-medium-1-2">
         <div>
 
             <div class="uk-panel uk-panel-box uk-form">
@@ -161,7 +161,7 @@
                     </div>
                 </div>
 
-                <div v-show="checkout.payment.method == 'Stripe'" class="uk-margin">
+                <div v-show="show_card" class="uk-margin">
                     <div class="uk-form-row">
                         <div class="uk-form-controls">
                             <div class="uk-form-icon uk-width-1-1">
@@ -278,7 +278,7 @@
         </div>
     </div>
 
-    <v-modal v-ref="redirectmodal" lightbox options="{{ {center: true} }}">
+    <v-modal v-ref="redirectmodal" lightbox>
         <div class="uk-panel uk-panel-space uk-text-center">
             <h1 class="uk-heading-large"><i class="uk-icon-check uk-text-success uk-margin-small-right"></i>
                 {{ 'Payment successful' | trans }}</h1>
@@ -370,6 +370,9 @@
                     }, function (data) {
 
                         vm.$set('spin', false);
+                        if (data.order.id) {
+                            vm.$set('order_id', data.order.id);
+                        }
                         if (data.error) {
                             vm.$set('checkouterror', data.checkouterror);
                             vm.$set('registererror', data.registererror);
@@ -377,8 +380,8 @@
                             console.log(data);
                             if (data.redirectUrl) {
                                 if (data.order.status === 1) {
-                                    this.$set('cartItems', data.cartItems);
                                     //reset cart oon orig vm
+                                    this.$set('cartItems', data.cartItems);
                                     vm.$.redirectmodal.open();
                                     setTimeout(function () {
                                         window.location.href = data.redirectUrl;
@@ -401,9 +404,11 @@
                     invalid = !this.validateField(name) || invalid;
                 }.bind(this));
 
-                ['card.number', 'card.expiryMonth', 'card.expiryYear', 'card.cvv'].forEach(function (name) {
-                    invalid = !this.validateField(name) || invalid;
-                }.bind(this));
+                if (this.show_card) {
+                    ['card.number', 'card.expiryMonth', 'card.expiryYear', 'card.cvv'].forEach(function (name) {
+                        invalid = !this.validateField(name) || invalid;
+                    }.bind(this));
+                }
 
                 if (!this.checkout.payment.method) {
                     invalid = true;
@@ -421,6 +426,9 @@
         },
 
         computed: {
+            show_card: function () {
+                return ['Stripe'].indexOf(this.checkout.payment.method) > -1;
+            },
             countryList: function () {
                 var options = [{value: '', text: this.$trans('Country')}];
                 _.forIn(this.countries, function (text, value) {

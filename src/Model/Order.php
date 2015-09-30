@@ -69,7 +69,7 @@ class Order implements \JsonSerializable {
 	 * Creates a new instance of this model.
 	 * @param  array $cartItems
 	 * @param  array $checkout
-	 * @return static
+	 * @return static Order
 	 */
 	public static function createNew ($cartItems, $checkout) {
 		$user = App::auth()->getUser();//get from auth, fresh user
