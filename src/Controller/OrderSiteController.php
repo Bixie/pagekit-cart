@@ -41,8 +41,8 @@ class OrderSiteController
 				'user' => $user,
 				'config'   => [
 					'edit_url' => App::url('@cart/orders/detail', ['transaction_id' => ':transaction_id']),
-					'ordering' => $this->cart->config('ordering'),
-					'ordering_dir' => $this->cart->config('ordering_dir'),
+					'ordering' => 'created',
+					'ordering_dir' => 'desc',
 					'filter' => $filter,
 					'page'   => $page,
 					'limit'   => $this->cart->config('orders_per_page')

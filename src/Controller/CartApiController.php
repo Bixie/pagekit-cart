@@ -143,8 +143,9 @@ class CartApiController
 	 */
 	public function termsAction()
 	{
-		$content = App::content()->applyPlugins($this->cart->config('terms_content'), ['markdown' => $this->cart->config('terms_markdown_enabled')]);;
-		return ['html' => App::view('bixie/cart/templates/terms.php', compact('content'), 'raw')];
+		$title = $this->cart->config('terms.title');
+		$content = App::content()->applyPlugins($this->cart->config('terms.content'), ['markdown' => $this->cart->config('terms.markdown_enabled')]);;
+		return ['html' => App::view('bixie/cart/templates/terms.php', compact('content', 'title'), 'raw')];
 	}
 
 }

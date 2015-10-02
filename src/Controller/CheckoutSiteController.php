@@ -115,7 +115,7 @@ class CheckoutSiteController
 
 		$content = '';
 		if ($this->cart->config('thankyou.content')) {
-			$content = App::content()->applyPlugins($this->cart->config('thankyou.content'), ['markdown' => $this->cart->config('markdown_enabled')]);
+			$content = App::content()->applyPlugins($this->cart->config('thankyou.content'), ['markdown' => $this->cart->config('thankyou.markdown_enabled')]);
 			$content = (new MailHelper($order))->replaceString($content);
 		}
 

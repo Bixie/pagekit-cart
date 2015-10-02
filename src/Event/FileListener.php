@@ -51,8 +51,7 @@ class FileListener implements EventSubscriberInterface {
 
 		$view->data('$cart', [
 			'product' => $product,
-			'periods' => self::$periods,
-			'config' => App::module('bixie/cart')->publicConfig()
+			'periods' => self::$periods
 		]);
 	}
 

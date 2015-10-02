@@ -38,8 +38,8 @@ class CartController
             '$data' => [
 				'statuses' => Order::getStatuses(),
 				'config'   => [
-                    'ordering' => $this->cart->config('ordering'),
-                    'ordering_dir' => $this->cart->config('ordering_dir'),
+                    'ordering' => 'created',
+                    'ordering_dir' => 'desc',
                     'filter' => $filter,
                     'page'   => $page
                 ]
@@ -106,7 +106,8 @@ class CartController
                 'name'  => 'bixie/cart/admin/settings.php'
             ],
             '$data' => [
-                'config' => $config
+                'config' => $config,
+                'timezones' => $this->cart->getTimeZomes()
             ],
 			'gateways' => App::bixiePayment()->getGateways()
 		];

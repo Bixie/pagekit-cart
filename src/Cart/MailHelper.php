@@ -37,7 +37,7 @@ class MailHelper {
 
 		$mailSubject = $this->replaceString($this->cart->config('email.subject'));
 		$mailBody = $this->replaceString($this->cart->config('email.body'));
-		$mailBody = App::content()->applyPlugins($mailBody, ['order' => $this->order, 'markdown' => $this->cart->config('markdown_enabled')]);
+		$mailBody = App::content()->applyPlugins($mailBody, ['order' => $this->order, 'markdown' => $this->cart->config('email.markdown_enabled')]);
 		$mailBody .= App::view('bixie/cart/mails/order_confirmation.php', ['cart' => $this->cart, 'order' => $this->order]);
 		$mailTemplate = App::view('bixie/cart/mails/template.php', compact('mailBody'));
 		try {

@@ -120,7 +120,6 @@ return [
 		'currency' => 'EUR',
 		'vat' => 'high',
 		'vat_view' => 'incl',
-		'date_format' => 'M d Y, H:i:s',
 		'addtocart' => [
 			'show_vat' => true
 		],
@@ -136,8 +135,6 @@ return [
 			'checkout.payment.method',
 			'checkout.agreed'
 		],
-		'USDtoEUR' => 0.82481,
-		'EURtoUSD' => 1.1204,
 		'vatclasses' => [
 			'none' => ['rate' => 0, 'name' => 'No taxes'],
 			'low' => ['rate' => 6, 'name' => 'Low taxclass'],
@@ -145,26 +142,31 @@ return [
 		],
 		'thankyou' => [
 			'title' => 'Thank you for your order',
-			'content' => '<p>Below are the details of your order.</p>'
+			'content' => '<p>Below are the details of your order with id $$transaction_id$$.</p>',
+			'markdown_enabled' => false
 		],
 		'email' => [
-			'admin_email' => 'admin@bixie.nl',
+			'admin_email' => '',
 			'subject' => 'Order confirmation #$$transaction_id$$',
-			'body' => '<p>Below are the details of your order.</p>'
+			'body' => '<p>Below are the details of your order.</p>',
+			'markdown_enabled' => false
 		],
-		'markdown_enabled' => false,
-		'ordering' => 'title',
-		'terms_markdown_enabled' => false,
-		'terms_content' => '<p>Please enter your terms and conditions here</p>',
-		'ordering_dir' => 'asc',
-		'server_tz' => 'Europe/Amsterdam',
+		'terms' => [
+			'title' => 'Terms and conditions',
+			'content' => '<p>Please enter your terms and conditions here</p>',
+			'markdown_enabled' => false
+		],
 		'orders_per_page' => 20,
+		'server_tz' => 'Europe/Amsterdam',
+		'USDtoEUR' => 0.82481,
+		'EURtoUSD' => 1.1204,
 		'products_per_page' => 20
 	],
 
 	'events' => [
 
 		'boot' => function ($event, $app) {
+			//todo put providercode in provider component
 			$app->subscribe(
 				new Bixie\Cart\Event\FileListener(),
 				new Bixie\Cart\Event\UserListener()
