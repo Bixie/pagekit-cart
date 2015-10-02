@@ -166,9 +166,7 @@ return [
 	'events' => [
 
 		'boot' => function ($event, $app) {
-			//todo put providercode in provider component
 			$app->subscribe(
-				new Bixie\Cart\Event\FileListener(),
 				new Bixie\Cart\Event\UserListener()
 			);
 		},
@@ -190,8 +188,6 @@ return [
 		'view.scripts' => function ($event, $scripts) use ($app) {
 			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');
 			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue', 'uikit-form-password', 'jstz']);
-			//sections
-			$scripts->register('download-section-cart', 'bixie/cart:app/bundle/download-section-cart.js', ['~bixie-downloads']);
 
 //			$scripts->register('uikit-form-password', 'app/assets/uikit/js/components/form-password.min.js', 'uikit');
 			$scripts->register('uikit-accordion', 'app/assets/uikit/js/components/accordion.min.js', 'uikit');

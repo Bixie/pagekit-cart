@@ -2,8 +2,6 @@ module.exports = [
 
     {
         entry: {
-            "download-section-cart": "./app/components/download-section-cart.vue",
-
             "widget-cart": "./app/components/widget-cart.vue",
             "bixie-cart": "./app/cart.js",
             /*views*/
