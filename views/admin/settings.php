@@ -213,6 +213,15 @@
 						</div>
 
 						<div class="uk-form-row">
+							<label for="form-validation_key" class="uk-form-label">{{ 'Validation key' | trans }}</label>
+
+							<div class="uk-form-controls">
+								<input id="form-validation_key" class="uk-form-width-large" type="text" name="validation_key"
+									   v-model="config.validation_key" >
+							</div>
+						</div>
+
+						<div class="uk-form-row">
 							<label for="form-USDtoEUR" class="uk-form-label">{{ 'USD to EUR conversion rate' | trans }}</label>
 
 							<div class="uk-form-controls">

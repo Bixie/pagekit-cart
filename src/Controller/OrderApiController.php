@@ -3,6 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Cart\UserHelper;
+use Bixie\Cart\CartException;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application\Exception;
@@ -223,6 +224,39 @@ class OrderApiController {
 
 		return ['message' => 'success'];
 	}
+
+	/**
+	 * @Route("/validateTransaction", methods="POST")
+	 * @Request({"transaction_id": "string", "product_identifier": "string", "seal": "string"})
+	 * @param string $transaction_id
+	 * @param string $product_identifier
+	 * @param string $seal
+	 * @return array
+	 */
+ 	public function validateTransactionAction ($transaction_id, $product_identifier, $seal) {
+		//check seal
+		if ($seal !== sha1($transaction_id . $product_identifier . $this->cart->config('validation_key'))) {
+			//todo return proper 400
+			App::abort(400, 'Seal not valid');
+		}
+
+		try {
+
+			$purchaseKey = $this->cart->validateTransaction($transaction_id, $product_identifier);
+
+			$valid = true;
+			$message = 'Validation successful';
+
+		} catch (CartException $e) {
+
+			$purchaseKey = '';
+			$valid = false;
+			$message = $e->getMessage();
+		}
+
+		return ['valid' => $valid, 'purchaseKey' => $purchaseKey, 'message' => $message];
+	}
+	
 
 	protected function sendActivationMail (User $user, Order $order) {
 

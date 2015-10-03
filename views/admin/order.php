@@ -182,6 +182,6 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 			</div>
 		</div>
 	</div>
-	<pre>{{$data.order.cartItems|json}}</pre>
+
 </form>
 

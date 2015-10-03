@@ -2,10 +2,13 @@
 
 namespace Bixie\Cart;
 
+use Bixie\Cart\Model\Order;
 use Bixie\Cart\Payment\PaymentHelper;
 use Pagekit\Application as App;
+use Pagekit\Event\Event;
 use Pagekit\Module\Module;
 use Bixie\Cart\Cart\CartFactory;
+use Pagekit\Application\Exception;
 
 class CartModule extends Module {
 
@@ -48,6 +51,37 @@ class CartModule extends Module {
 		$config = $this->config();
 		unset($config['gateways']);
 		return $config;
+	}
+
+	/**
+	 * @param string $transaction_id
+	 * @param string $product_identifier
+	 * @return string
+	 */
+	public function validateTransaction ($transaction_id, $product_identifier) {
+		$purchaseKey = false;
+
+		if (!$order = Order::findByTransaction_id($transaction_id)) {
+			throw new CartException('Transaction not found');
+		}
+
+		foreach ($order->getCartItems() as $cartItem) {
+
+			if ($cartItem->get('product_identifier') == $product_identifier) {
+				$purchaseKey = $cartItem->purchaseKey($order);
+			}
+
+		}
+
+		if (false === $purchaseKey) {
+			throw new CartException('Product not found in order');
+		}
+
+		if ('' === $purchaseKey) {
+			throw new CartException('Product not valid');
+		}
+
+		return $purchaseKey;
 	}
 
 	/**
@@ -107,6 +141,14 @@ class CartModule extends Module {
 			}
 		}
 		return $locations;
+	}
+
+}
+
+class CartException extends Exception {
+
+	public function __construct($message = "", $code = 0, Exception $previous = null) {
+		parent::__construct($message, $code, $previous);
 	}
 
 }

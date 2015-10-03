@@ -157,6 +157,7 @@ return [
 			'markdown_enabled' => false
 		],
 		'orders_per_page' => 20,
+		'validation_key' => 'awe57GfkhkHSa74wghsgbFdg9874vbrf93',
 		'server_tz' => 'Europe/Amsterdam',
 		'USDtoEUR' => 0.82481,
 		'EURtoUSD' => 1.1204,
