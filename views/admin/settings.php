@@ -40,18 +40,6 @@
 					<div class="uk-form-horizontal">
 
 						<div class="uk-form-row">
-							<label for="form-config_currency" class="uk-form-label">{{ 'Default currency' | trans }}</label>
-
-							<div class="uk-form-controls uk-form-controls-text">
-								<select id="form-config_currency" name="config_currency" class="uk-form-width-medium"
-										v-model="config.currency">
-									<option value="EUR">{{ 'Euro' | trans }}</option>
-									<option value="USD">{{ 'Dollar' | trans }}</option>
-								</select>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
 							<label for="form-config_vat" class="uk-form-label">{{ 'Default VAT' | trans }}</label>
 
 							<div class="uk-form-controls uk-form-controls-text">
@@ -73,26 +61,7 @@
 							</div>
 						</div>
 
-						<div class="uk-form-row">
-							<label for="form-vat_view" class="uk-form-label">{{ 'VAT display' | trans }}</label>
-
-							<div class="uk-form-controls uk-form-controls-text">
-								<select id="form-vat_view" name="vat_view" class="uk-form-width-medium"
-										v-model="config.vat_view">
-									<option value="incl">{{ 'Show prices including VAT' | trans }}</option>
-									<option value="excl">{{ 'Show prices excluding VAT' | trans }}</option>
-								</select>
-							</div>
-						</div>
-
-						<h3>{{ 'Add to cart buttons' | trans }}</h3>
-
-						<div class="uk-form-row">
-							<span class="uk-form-label">{{ 'VAT' | trans }}</span>
-							<div class="uk-form-controls uk-form-controls-text">
-								<label><input type="checkbox" value="center-content" v-model="config.addtocart.show_vat"> {{ 'Show VAT amount' | trans }}</label>
-							</div>
-						</div>
+						<fields config="{{ $options.fields.cart }}" model="{{@ config }}" template="formrow"></fields>
 
 					</div>
 
@@ -192,53 +161,8 @@
 					</div>
 
 					<div class="uk-form-horizontal">
-						<div class="uk-form-row">
-							<label class="uk-form-label">{{ 'Orders per page' | trans }}</label>
 
-							<div class="uk-form-controls uk-form-controls-text">
-								<p class="uk-form-controls-condensed">
-									<input type="number" v-model="config.orders_per_page" class="uk-form-width-small">
-								</p>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-config_vat" class="uk-form-label">{{ 'Server timezone' | trans }}</label>
-
-							<div class="uk-form-controls uk-form-controls-text">
-								<select id="form-config_server_tz" name="config_server_tz" class="uk-form-width-medium"
-										v-model="config.server_tz" options="timezoneOptions">
-								</select>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-validation_key" class="uk-form-label">{{ 'Validation key' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input id="form-validation_key" class="uk-form-width-large" type="text" name="validation_key"
-									   v-model="config.validation_key" >
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-USDtoEUR" class="uk-form-label">{{ 'USD to EUR conversion rate' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input id="form-USDtoEUR" class="uk-form-width-medium uk-text-right" type="number" name="USDtoEUR"
-									   v-model="config.USDtoEUR" number>
-							</div>
-						</div>
-
-						<div class="uk-form-row">
-							<label for="form-EURtoUSD" class="uk-form-label">{{ 'EUR to USD conversion rate' | trans }}</label>
-
-							<div class="uk-form-controls">
-								<input id="form-EURtoUSD" class="uk-form-width-medium uk-text-right" type="number" name="EURtoUSD"
-									   v-model="config.EURtoUSD" number>
-							</div>
-						</div>
-
+						<fields config="{{ $options.fields.general }}" model="{{@ config }}" template="formrow"></fields>
 
 					</div>
 				</li>
