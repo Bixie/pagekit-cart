@@ -1,11 +1,11 @@
 <template>
-    <div class="uk-flex uk-flex-middle uk-flex-center uk-flex-space-around uk-flex-wrap uk-margin" data-uk-margin="">
-        <div class="uk-text-right">
+    <div class="uk-flex uk-flex-wrap">
+        <div class="{{ priceHldr }}">
             <strong>{{{ product | productprice }}}</strong>
             <div v-if="config.addtocart.show_vat"><small>{{{ includingVat }}}</small></div>
         </div>
-        <div class="">
-            <button type="button" class="uk-button uk-button-success" v-on="click: addToCart(product)">
+        <div class="{{ buttonHldr }}">
+            <button type="button" class="uk-button uk-button-success uk-width-1-1" v-on="click: addToCart(product)">
                 <i class="uk-icon-shopping-cart uk-margin-small-right"></i>{{ 'Add to cart' | trans }}
             </button>
         </div>
@@ -18,7 +18,14 @@
 
     module.exports = {
 
-        props: ['product', 'item_id'],
+        data: function () {
+            return {
+                priceHldr: 'uk-text-right',
+                buttonHldr: ''
+            };
+        },
+
+        props: ['product', 'item_id', 'buttonHldr', 'priceHldr'],
 
         inherit: true,
 

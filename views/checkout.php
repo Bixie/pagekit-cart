@@ -12,7 +12,7 @@ $view->script('bixie-cart');
 	<h1><?= __('Checkout') ?></h1>
 
 	<div class="uk-margin">
-		<cartlist></cartlist>
+		<cartlist is-checkout="1"></cartlist>
 	</div>
 	<form name="form" v-on="submit: checkoutSubmit">
 

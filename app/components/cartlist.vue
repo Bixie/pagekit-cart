@@ -23,13 +23,13 @@
         <li>
             <div class="uk-grid uk-grid-small">
                 <div class="uk-width-medium-3-4 uk-text-right uk-text-small">
-                    <div v-if="config.vat_view == 'incl'"><span>{{ 'Total excluding taxes' | trans }}</span> {{{ totalNetto | formatprice }}}</div>
+                    <div v-if="config.vat_view == 'incl' || isCheckout"><span>{{ 'Total excluding taxes' | trans }}</span> {{{ totalNetto | formatprice }}}</div>
                     <div><span>{{ 'Total taxes' | trans }}</span> {{{ totalTaxes | formatprice }}}</div>
-                    <div v-if="config.vat_view == 'excl'"><span>{{ 'Total including taxes' | trans }}</span> {{{ totalBruto | formatprice }}}</div>
+                    <div v-if="config.vat_view == 'excl' && !isCheckout"><span>{{ 'Total including taxes' | trans }}</span> {{{ totalBruto | formatprice }}}</div>
                 </div>
                 <div class="uk-width-medium-1-4 uk-text-right">
-                    <h3 v-if="config.vat_view == 'incl'">{{{ totalBruto | formatprice }}}</h3>
-                    <h3 v-if="config.vat_view == 'excl'">{{{ totalNetto | formatprice }}}</h3>
+                    <h3 v-if="config.vat_view == 'incl' || isCheckout">{{{ totalBruto | formatprice }}}</h3>
+                    <h3 v-if="config.vat_view == 'excl' && !isCheckout">{{{ totalNetto | formatprice }}}</h3>
                 </div>
             </div>
         </li>
@@ -42,6 +42,8 @@
     module.exports = {
 
         inherit: true,
+
+        props: ['isCheckout'],
 
         methods: {
             removeFromCart: function (idx) {
