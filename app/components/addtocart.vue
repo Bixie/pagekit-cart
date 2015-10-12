@@ -1,5 +1,6 @@
 <template>
-    <div class="uk-flex uk-flex-wrap">
+
+    <div class="uk-flex uk-flex-space-around uk-flex-wrap">
         <div class="{{ priceHldr }}">
             <strong>{{{ product | productprice }}}</strong>
             <div v-if="config.addtocart.show_vat"><small>{{{ includingVat }}}</small></div>
@@ -9,7 +10,6 @@
                 <i class="uk-icon-shopping-cart uk-margin-small-right"></i>{{ 'Add to cart' | trans }}
             </button>
         </div>
-
     </div>
 
 </template>

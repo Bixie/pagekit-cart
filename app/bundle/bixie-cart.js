@@ -626,7 +626,7 @@
 /* 23 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"uk-flex uk-flex-wrap\">\r\n        <div class=\"{{ priceHldr }}\">\r\n            <strong>{{{ product | productprice }}}</strong>\r\n            <div v-if=\"config.addtocart.show_vat\"><small>{{{ includingVat }}}</small></div>\r\n        </div>\r\n        <div class=\"{{ buttonHldr }}\">\r\n            <button type=\"button\" class=\"uk-button uk-button-success uk-width-1-1\" v-on=\"click: addToCart(product)\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'Add to cart' | trans }}\r\n            </button>\r\n        </div>\r\n\r\n    </div>";
+	module.exports = "<div class=\"uk-flex uk-flex-space-around uk-flex-wrap\">\r\n        <div class=\"{{ priceHldr }}\">\r\n            <strong>{{{ product | productprice }}}</strong>\r\n            <div v-if=\"config.addtocart.show_vat\"><small>{{{ includingVat }}}</small></div>\r\n        </div>\r\n        <div class=\"{{ buttonHldr }}\">\r\n            <button type=\"button\" class=\"uk-button uk-button-success uk-width-1-1\" v-on=\"click: addToCart(product)\">\r\n                <i class=\"uk-icon-shopping-cart uk-margin-small-right\"></i>{{ 'Add to cart' | trans }}\r\n            </button>\r\n        </div>\r\n    </div>";
 
 /***/ },
 /* 24 */
