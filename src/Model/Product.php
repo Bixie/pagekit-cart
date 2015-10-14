@@ -59,9 +59,6 @@ class Product implements \JsonSerializable
 	 */
 	public function jsonSerialize () {
 		$data = [
-//			'fileName' => basename($this->path),
-//			'download' => $this->getDownloadLink(),
-//			'url' => App::url('@download/id', ['id' => $this->id ?: 0], 'base')
 		];
 
 		return $this->toArray($data);
