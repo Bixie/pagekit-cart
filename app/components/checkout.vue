@@ -5,7 +5,7 @@
 
             <div class="uk-panel uk-panel-box uk-form">
 
-                <h3 class="uk-panel-title">{{ 'Billing Address' | trans }}</h3>
+                <h3 class="uk-panel-title">{{ 'Billing address' | trans }}</h3>
 
                 <p v-if="!user.id" class="uk-text-small">{{ 'Do you have an account?' | trans }} <a
                         v-attr="href: login_url">{{ 'Please log in' | trans }}</a></p>

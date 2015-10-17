@@ -1,0 +1,539 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Pagekit UNKNOWN (bixie/cart, messages)\n"
+"POT-Creation-Date: 2015-10-17 14:50+0000\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Guest user"
+msgstr ""
+
+msgid "Order %transaction_id% saved."
+msgstr ""
+
+msgid "No items in cart yet"
+msgstr ""
+
+msgid "Filter by"
+msgstr ""
+
+msgid "Items in cart"
+msgstr ""
+
+msgid "Please agree with the terms and conditions"
+msgstr ""
+
+msgid "Billing address"
+msgstr ""
+
+msgid "Add to cart"
+msgstr ""
+
+msgid "I agree with the %link%terms and conditions%/link%."
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Year"
+msgstr ""
+
+msgid "Shopping cart"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Total excluding taxes"
+msgstr ""
+
+msgid "Total taxes"
+msgstr ""
+
+msgid "Total including taxes"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "To checkout"
+msgstr ""
+
+msgid "Do you have an account?"
+msgstr ""
+
+msgid "Please log in"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+msgid "Please enter your first name"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Please enter your last name"
+msgstr ""
+
+msgid "Email address"
+msgstr ""
+
+msgid "Please enter your email address"
+msgstr ""
+
+msgid "Phone number"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Please enter an address"
+msgstr ""
+
+msgid "Address line 2"
+msgstr ""
+
+msgid "Show address line 2"
+msgstr ""
+
+msgid "Zipcode"
+msgstr ""
+
+msgid "Please enter a zipcode"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Please enter a city"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Please select a country"
+msgstr ""
+
+msgid "Payment method"
+msgstr ""
+
+msgid "Credit card number"
+msgstr ""
+
+msgid "Please enter card number"
+msgstr ""
+
+msgid "Please enter expiry month"
+msgstr ""
+
+msgid "Please enter expiry year"
+msgstr ""
+
+msgid "CVV"
+msgstr ""
+
+msgid "Please select a payment method"
+msgstr ""
+
+msgid "To payment"
+msgstr ""
+
+msgid "Add a comment"
+msgstr ""
+
+msgid "Create an account"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Username cannot be empty"
+msgstr ""
+
+msgid "Show"
+msgstr ""
+
+msgid "Password cannot be blank."
+msgstr ""
+
+msgid "Payment successful"
+msgstr ""
+
+msgid "You are redirected..."
+msgstr ""
+
+msgid "Title cannot be blank."
+msgstr ""
+
+msgid "Currency"
+msgstr ""
+
+msgid "Show currency selector"
+msgstr ""
+
+msgid "Unable to send confirmation mail."
+msgstr ""
+
+msgid "Invalid Password."
+msgstr ""
+
+msgid "Already logged in"
+msgstr ""
+
+msgid "Invalid username or password."
+msgstr ""
+
+msgid "Orders"
+msgstr ""
+
+msgid "Invalid file id."
+msgstr ""
+
+msgid "Orders cannot be created."
+msgstr ""
+
+msgid "Edit order"
+msgstr ""
+
+msgid "Cart Settings"
+msgstr ""
+
+msgid "Checkout"
+msgstr ""
+
+msgid "Invalid request."
+msgstr ""
+
+msgid "Order not found."
+msgstr ""
+
+msgid "Please complete your payment"
+msgstr ""
+
+msgid "Access denied."
+msgstr ""
+
+msgid "Your account at %site%"
+msgstr ""
+
+msgid "Your orders"
+msgstr ""
+
+msgid "Invalid transaction id."
+msgstr ""
+
+msgid "Transaction ID missing"
+msgstr ""
+
+msgid "No access to this order."
+msgstr ""
+
+msgid "Details of order %transaction_id%"
+msgstr ""
+
+msgid "Find your order"
+msgstr ""
+
+msgid "Order pending"
+msgstr ""
+
+msgid "Order confirmed"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Purchase %site%, #%transactionId%"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Items"
+msgstr ""
+
+msgid "Order status"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Order comment"
+msgstr ""
+
+msgid "Add a comment (visible for user)"
+msgstr ""
+
+msgid "Order details"
+msgstr ""
+
+msgid "Tansaction ID"
+msgstr ""
+
+msgid "Order date"
+msgstr ""
+
+msgid "Amount excl. VAT"
+msgstr ""
+
+msgid "VAT amount"
+msgstr ""
+
+msgid "Amount incl. VAT"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "To user profile"
+msgstr ""
+
+msgid "Purchase key"
+msgstr ""
+
+msgid "Price excl. VAT"
+msgstr ""
+
+msgid "VAT"
+msgstr ""
+
+msgid "Price incl. VAT"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Transaction ID"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "User / Email"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "No orders found."
+msgstr ""
+
+msgid "{0} %count% Orders|{1} %count% Order|]1,Inf[ %count% Orders"
+msgstr ""
+
+msgid "{1} %count% Order selected|]1,Inf[ %count% Orders selected"
+msgstr ""
+
+msgid "Cart settings"
+msgstr ""
+
+msgid "Payment settings"
+msgstr ""
+
+msgid "Thank you message"
+msgstr ""
+
+msgid "Email confirmation"
+msgstr ""
+
+msgid "Terms and Conditions"
+msgstr ""
+
+msgid "General settings"
+msgstr ""
+
+msgid "Default VAT"
+msgstr ""
+
+msgid "VAT rates"
+msgstr ""
+
+msgid "Payment gateways settings"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Payment method active"
+msgstr ""
+
+msgid "<?= $key ?>"
+msgstr ""
+
+msgid "Email address admin"
+msgstr ""
+
+msgid "Email confirmation subject"
+msgstr ""
+
+msgid "Email confirmation text"
+msgstr ""
+
+msgid "You can use the following placeholders to display data from the order:"
+msgstr ""
+
+msgid "Terms and Conditions title"
+msgstr ""
+
+msgid "Terms and Conditions text"
+msgstr ""
+
+msgid "Thank you title"
+msgstr ""
+
+msgid "Thank you text"
+msgstr ""
+
+msgid "Step 1"
+msgstr ""
+
+msgid "Please enter a Transaction ID"
+msgstr ""
+
+msgid "Please enter a valid email address"
+msgstr ""
+
+msgid "Find order"
+msgstr ""
+
+msgid "Step 2"
+msgstr ""
+
+msgid "Please enter a username"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "Step 3"
+msgstr ""
+
+msgid "Email has been sent to "
+msgstr ""
+
+msgid "Fill in the transaction ID and the email address from your order."
+msgstr ""
+
+msgid "When the order is found, you will be asked to create an account."
+msgstr ""
+
+msgid "Choose a username and password that will be associated with this order."
+msgstr ""
+
+msgid "An activation link will be sent to the email address entered in the previous step."
+msgstr ""
+
+msgid "Hide"
+msgstr ""
+
+msgid "An email with activiation link has been sent to this email address."
+msgstr ""
+
+msgid "Activate the account. Once you are logged in, you can access the orders in your account."
+msgstr ""
+
+msgid "Account created"
+msgstr ""
+
+msgid "Your account has been prepared! Now it only needs to be confirmed."
+msgstr ""
+
+msgid "Click this link to confirm your account"
+msgstr ""
+
+msgid "The order with transaction ID %transaction_id% will be accessable in your account."
+msgstr ""
+
+msgid "Greetings,"
+msgstr ""
+
+msgid "Team %site%"
+msgstr ""
+
+msgid "You are not logged in. If you have an account, please log in to see your orders."
+msgstr ""
+
+msgid "If you don't have an account yet, click \"Find your order\" to search for your order."
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Your payment requires redirect to an off-site payment page."
+msgstr ""
+
+msgid "Redirect Now"
+msgstr ""
+
+msgid "Billing address"
+msgstr ""
+
+msgid "Address 2"
+msgstr ""
+
+msgid "Purchased items"
+msgstr ""
+
+msgid "Payment details"
+msgstr ""
+
+msgid "Payment status"
+msgstr ""
+
+msgid "Order paid"
+msgstr ""
+
+msgid "Order not paid"
+msgstr ""
+
+msgid "Payment message"
+msgstr ""
+
+msgid "Payment ID"
+msgstr ""
+
+msgid "Payment description"
+msgstr ""
+
+msgid "Payment date"
+msgstr ""
+
+msgid "Payment amount"
+msgstr ""
+
+msgid "Fee amount"
+msgstr ""
+
+msgid "Pending reason"
+msgstr ""
+
+msgid "Credit card"
+msgstr ""
+
+msgid "Credit card info"
+msgstr ""
+
+msgid "Failure message"
+msgstr ""
+
+msgid "Euro"
+msgstr ""
+
+msgid "US Dollar"
+msgstr ""
+

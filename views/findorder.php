@@ -19,7 +19,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 				<div class="uk-panel-badge uk-badge uk-text-large">{{ 'Step 1' | trans }}</div>
 
-				<p><?= __('Fill in the transaction ID an the email address from your order.') ?></p>
+				<p><?= __('Fill in the transaction ID and the email address from your order.') ?></p>
 
 				<p><?= __('When the order is found, you will be asked to create an account.') ?></p>
 
@@ -57,7 +57,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 				<div class="uk-panel-badge uk-badge uk-text-large">{{ 'Step 2' | trans }}</div>
 
-				<p><?= __('Choose a username and pssword that will be associated with this order.') ?></p>
+				<p><?= __('Choose a username and password that will be associated with this order.') ?></p>
 
 				<p>{{ '' | trans }}</p>
 				<p><?= __('An activation link will be sent to the email address entered in the previous step.') ?></p>

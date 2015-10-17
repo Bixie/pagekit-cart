@@ -24,7 +24,7 @@
 	</div>
 
 	<div class="uk-form-row">
-		<label for="form-email_subject" class="uk-form-label">{{ 'Email confimation subject' | trans }}</label>
+		<label for="form-email_subject" class="uk-form-label">{{ 'Email confirmation subject' | trans }}</label>
 
 		<div class="uk-form-controls">
 			<input id="form-email_subject" class="uk-width-1-1" type="text" name="email_subject"
@@ -37,7 +37,7 @@
 
 <div class="uk-form-stacked uk-margin">
 	<div class="uk-form-row">
-		<span class="uk-form-label">{{ 'Email confimation text' | trans }}</span>
+		<span class="uk-form-label">{{ 'Email confirmation text' | trans }}</span>
 
 		<div class="uk-form-controls">
 			<v-editor id="form-email_body" value="{{@ config.email.body }}"
