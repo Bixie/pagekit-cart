@@ -56,7 +56,7 @@
   'Please select a payment method' => 'Selecteer een betaalmethode',
   'To payment' => 'Naar betaling',
   'Add a comment' => 'Voeg een commentaar toe',
-  'Create an account' => 'Creëer een account',
+  'Create an account' => 'CreÃ«er een account',
   'Username cannot be empty' => 'Username kan niet leeggelaten worden',
   'Payment successful' => 'Betaling geslaagd',
   'You are redirected...' => 'Redirecting...',
