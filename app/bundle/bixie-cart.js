@@ -288,27 +288,114 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(10)
-	module.exports.template = __webpack_require__(11)
 
+	if (module.exports.__esModule) module.exports = module.exports.default
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(11)
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "C:\\BixieProjects\\pagekit\\pagekit\\packages\\bixie\\cart\\app\\components\\cartlist.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+	  }
+	})()}
 
 /***/ },
 /* 10 */
 /***/ function(module, exports) {
 
+	'use strict';
+
+	// <template>
+
+	//     <div v-show="!cartItems.length" class="uk-alert">{{ 'No items in cart yet' | trans }}</div>
+
+	//     <ul v-show="cartItems.length" class="uk-list uk-list-line">
+
+	//         <li v-repeat="cartItem: cartItems">
+
+	//             <div class="uk-grid uk-grid-small">
+
+	//                 <div class="uk-width-medium-1-2">
+
+	//                     <a href="{{ cartItem.item_url}}">{{ cartItem.item_title  }}</a>
+
+	//                 </div>
+
+	//                 <div class="uk-width-medium-1-2 uk-text-right">
+
+	//                     <div class="uk-grid uk-grid-small">
+
+	//                         <div class="uk-width-1-2">
+
+	//                             <a v-on="click: removeFromCart($index)" class="uk-icon-trash-o uk-icon-justify uk-icon-hover"></a>
+
+	//                         </div>
+
+	//                         <div class="uk-width-1-2">
+
+	//                             {{{ cartItem | productprice }}}
+
+	//                         </div>
+
+	//                     </div>
+
+	//                 </div>
+
+	//             </div>
+
+	//         </li>
+
+	//         <li>
+
+	//             <div class="uk-grid uk-grid-small">
+
+	//                 <div class="uk-width-medium-3-4 uk-text-right uk-text-small">
+
+	//                     <div v-if="config.vat_view == 'incl' || isCheckout"><span>{{ 'Total excluding taxes' | trans }}</span> {{{ totalNetto | formatprice }}}</div>
+
+	//                     <div><span>{{ 'Total taxes' | trans }}</span> {{{ totalTaxes | formatprice }}}</div>
+
+	//                     <div v-if="config.vat_view == 'excl' && !isCheckout"><span>{{ 'Total including taxes' | trans }}</span> {{{ totalBruto | formatprice }}}</div>
+
+	//                 </div>
+
+	//                 <div class="uk-width-medium-1-4 uk-text-right">
+
+	//                     <h3 v-if="config.vat_view == 'incl' || isCheckout">{{{ totalBruto | formatprice }}}</h3>
+
+	//                     <h3 v-if="config.vat_view == 'excl' && !isCheckout">{{{ totalNetto | formatprice }}}</h3>
+
+	//                 </div>
+
+	//             </div>
+
+	//         </li>
+
+	//     </ul>
+
+	// </template>
+
+	// <script>
+
 	module.exports = {
 
-	        inherit: true,
+	    inherit: true,
 
-	        props: ['isCheckout'],
+	    props: ['isCheckout'],
 
-	        methods: {
-	            removeFromCart: function (idx) {
-	                window.$bixieCart.removeFromCart(idx);
-	            }
+	    methods: {
+	        removeFromCart: function removeFromCart(idx) {
+	            window.$bixieCart.removeFromCart(idx);
 	        }
+	    }
 
+	};
 
-	    };
+	// </script>
 
 /***/ },
 /* 11 */
@@ -321,25 +408,75 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(13)
-	module.exports.template = __webpack_require__(14)
 
+	if (module.exports.__esModule) module.exports = module.exports.default
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(14)
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "C:\\BixieProjects\\pagekit\\pagekit\\packages\\bixie\\cart\\app\\components\\cartmodal.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+	  }
+	})()}
 
 /***/ },
 /* 13 */
 /***/ function(module, exports) {
 
+	'use strict';
+
+	// <template>
+
+	//     <v-modal v-ref="cartmodal" large>
+
+	//         <div class="uk-modal-header">
+
+	//             <h3>{{ 'Items in cart' | trans }}</h3>
+
+	//         </div>
+
+	//         <div class="uk-margin">
+
+	//             <cartlist></cartlist>
+
+	//         </div>
+
+	//         <div class="uk-modal-footer uk-text-right">
+
+	//             <button type="button" class="uk-button uk-modal-close">{{ 'Close' | trans }}</button>
+
+	//             <a v-attr="href: cart_loading ? 'javascript:void(0)' : checkout_url" class="uk-button uk-button-success uk-margin-left">
+
+	//                 <i v-show="!cart_loading" class="uk-icon-shopping-cart uk-margin-small-right"></i>
+
+	//                 <i v-show="cart_loading" class="uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right"></i>
+
+	//                 {{ 'To checkout' | trans }}</a>
+
+	//         </div>
+
+	//     </v-modal>
+
+	// </template>
+
+	// <script>
 	module.exports = {
 
+	    inherit: true,
 
-	        inherit: true,
+	    ready: function ready() {
+	        this.$on('show.bixie.cart', function () {
+	            this.$.cartmodal.open();
+	        });
+	    }
 
-	        ready: function () {
-	            this.$on('show.bixie.cart', function () {
-	                this.$.cartmodal.open();
-	            });
-	        }
+	};
 
-	    };
+	// </script>
 
 /***/ },
 /* 14 */
@@ -352,27 +489,65 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(16)
-	module.exports.template = __webpack_require__(17)
 
+	if (module.exports.__esModule) module.exports = module.exports.default
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(17)
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "C:\\BixieProjects\\pagekit\\pagekit\\packages\\bixie\\cart\\app\\components\\terms.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+	  }
+	})()}
 
 /***/ },
 /* 16 */
 /***/ function(module, exports) {
 
+	'use strict';
+
+	// <template>
+
+	//     <div class="uk-form-row">
+
+	//         <div class="uk-form-controls uk-form-controls-text">
+
+	//             <label><input type="checkbox" name="agreed" value="agreed"
+
+	//                           v-model="agreed"> {{ termsText1 }}<a v-on="click: showTerms">{{ linkText }}</a>{{ termsText2 }}</label>
+
+	//         </div>
+
+	//         <p class="uk-form-help-block uk-text-danger" v-show="invalid">
+
+	//             {{ 'Please agree with the terms and conditions' | trans }}</p>
+
+	//     </div>
+
+	//     <v-modal v-ref="termsmodal" large>{{{ content }}}</v-modal>
+
+	// </template>
+
+	// <script>
+
 	module.exports = {
 
-	    data: function () {
+	    data: function data() {
 	        return {
 	            textParts: [],
 	            content: ''
-	        }
+	        };
 	    },
 
 	    props: ['agreed', 'invalid'],
 
-	    created: function () {
+	    created: function created() {
 	        //this is silly
-	        this.textParts = this.$trans('I agree with the %link%terms and conditions%/link%.', {'link': '||', '/link': '||'}).split('||');
+	        this.textParts = this.$trans('I agree with the %link%terms and conditions%/link%.', { 'link': '||', '/link': '||' }).split('||');
 	    },
 
 	    methods: {
@@ -380,27 +555,28 @@
 	            e.preventDefault();
 	            this.$http.get('api/cart/cart/terms', {}, function (data) {
 	                this.content = data.html;
-	                this.$.termsmodal.open()
+	                this.$.termsmodal.open();
 	            }).error(function (data) {
 	                this.$notify(data, 'danger');
 	            });
-
-	        }, 1000, {leading: true, trailing: false})
+	        }, 1000, { leading: true, trailing: false })
 	    },
 
 	    computed: {
-	        termsText1: function () {
+	        termsText1: function termsText1() {
 	            return this.textParts[0];
 	        },
-	        termsText2: function () {
+	        termsText2: function termsText2() {
 	            return this.textParts[2];
 	        },
-	        linkText: function () {
+	        linkText: function linkText() {
 	            return this.textParts[1];
 	        }
 	    }
 
 	};
+
+	// </script>
 
 /***/ },
 /* 17 */
@@ -413,173 +589,675 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(19)
-	module.exports.template = __webpack_require__(20)
 
+	if (module.exports.__esModule) module.exports = module.exports.default
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(20)
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "C:\\BixieProjects\\pagekit\\pagekit\\packages\\bixie\\cart\\app\\components\\checkout.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+	  }
+	})()}
 
 /***/ },
 /* 19 */
 /***/ function(module, exports) {
 
+	'use strict';
+
+	// <template>
+
+	//     <div v-if="cartItems.length" class="uk-grid uk-grid-width-medium-1-2">
+
+	//         <div>
+
+	//             <div class="uk-panel uk-panel-box uk-form">
+
+	//                 <h3 class="uk-panel-title">{{ 'Billing address' | trans }}</h3>
+
+	//                 <p v-if="!user.id" class="uk-text-small">{{ 'Do you have an account?' | trans }} <a
+
+	//                         v-attr="href: login_url">{{ 'Please log in' | trans }}</a></p>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-user uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.firstName" name="firstName" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.firstName')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'First name' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger"
+
+	//                            v-show="invalid.checkout.billing_address.firstName">
+
+	//                             {{ 'Please enter your first name' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-user uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.lastName" name="lastName" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.lastName')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Last name' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.lastName">
+
+	//                             {{ 'Please enter your last name' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-envelope-o uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.email" name="email" type="email"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.email')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Email address' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.email">
+
+	//                             {{ 'Please enter your email address' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-phone"></i>
+
+	//                             <input v-model="checkout.billing_address.phone" name="phone" type="text"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Phone number' | trans }}">
+
+	//                         </div>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-building-o uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.address1" name="address1" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.address1')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Address' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.address1">
+
+	//                             {{ 'Please enter an address' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div v-show="show_address2" class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-building-o"></i>
+
+	//                             <input v-model="checkout.billing_address.address2" name="address2" type="text"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Address line 2' | trans }}">
+
+	//                         </div>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls uk-form-controls-text">
+
+	//                         <label><input type="checkbox" value="hide-show_address2"
+
+	//                                       v-model="show_address2"> {{ 'Show address line 2' | trans }}</label>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-map-pin uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.postcode" name="postcode" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.postcode')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'Zipcode' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.postcode">
+
+	//                             {{ 'Please enter a zipcode' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-map-o uk-text-primary"></i>
+
+	//                             <input v-model="checkout.billing_address.city" name="city" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.city')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'City' | trans }}">
+
+	//                         </div>
+
+	//                         <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.city">
+
+	//                             {{ 'Please enter a city' | trans }}</p>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <div class="uk-form-icon uk-width-1-1">
+
+	//                             <i class="uk-icon-map-o"></i>
+
+	//                             <input v-model="checkout.billing_address.state" name="state" type="text"
+
+	//                                    v-on="blur: validateField('checkout.billing_address.state')"
+
+	//                                    class="uk-width-1-1" placeholder="{{ 'State' | trans }}">
+
+	//                         </div>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <select v-model="checkout.billing_address.country" name="country" options="countryList"
+
+	//                                 v-on="change: validateField('checkout.billing_address.country')"
+
+	//                                 class="uk-width-1-1"></select>
+
+	//                     </div>
+
+	//                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.checkout.billing_address.country">
+
+	//                         {{ 'Please select a country' | trans }}</p>
+
+	//                 </div>
+
+	//             </div>
+
+	//         </div>
+
+	//         <div>
+
+	//             <div class="uk-panel uk-panel-box uk-form">
+
+	//                 <h3 class="uk-panel-title">{{ 'Payment method' | trans }}</h3>
+
+	//                 <div v-repeat="gateway: gateways" class="uk-form-row">
+
+	//                     <div class="uk-form-controls uk-form-controls-text">
+
+	//                         <label><input type="radio" value="{{ gateway.shortName | trans }}"
+
+	//                                       v-model="checkout.payment.method"> {{ gateway.name | trans }}</label>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div v-show="show_card" class="uk-margin">
+
+	//                     <div class="uk-form-row">
+
+	//                         <div class="uk-form-controls">
+
+	//                             <div class="uk-form-icon uk-width-1-1">
+
+	//                                 <i class="uk-icon-credit-card"></i>
+
+	//                                 <input v-model="card.number" name="number" type="text"
+
+	//                                        v-on="blur: validateField('card.number')"
+
+	//                                        class="uk-width-1-1" placeholder="{{ 'Credit card number' | trans }}">
+
+	//                             </div>
+
+	//                             <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.number">
+
+	//                                 {{ 'Please enter card number' | trans }}</p>
+
+	//                         </div>
+
+	//                     </div>
+
+	//                     <div class="uk-form-row">
+
+	//                         <div class="uk-form-controls uk-form-controls-text">
+
+	//                             <div class="uk-grid uk-grid-small">
+
+	//                                 <div class="uk-width-1-3">
+
+	//                                     <select v-model="card.expiryMonth" name="expiryMonth" options="months"
+
+	//                                             v-on="blur: validateField('card.expiryMonth')"
+
+	//                                             class="uk-width-1-1"></select>
+
+	//                                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryMonth">
+
+	//                                         {{ 'Please enter expiry month' | trans }}</p>
+
+	//                                 </div>
+
+	//                                 <div class="uk-width-1-3">
+
+	//                                     <select v-model="card.expiryYear" name="expiryYear" options="years"
+
+	//                                             v-on="blur: validateField('card.expiryYear')"
+
+	//                                             class="uk-width-1-1"></select>
+
+	//                                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryYear">
+
+	//                                         {{ 'Please enter expiry year' | trans }}</p>
+
+	//                                 </div>
+
+	//                                 <div class="uk-width-1-3">
+
+	//                                     <input v-model="card.cvv" name="vvc" type="text"
+
+	//                                            v-on="blur: validateField('card.cvv')"
+
+	//                                            class="uk-width-1-1" placeholder="{{ 'CVV' | trans }}">
+
+	//                                     <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.cvv">
+
+	//                                         {{ 'Please enter card number' | trans }}</p>
+
+	//                                 </div>
+
+	//                             </div>
+
+	//                         </div>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <p class="uk-text-danger" v-show="invalid.payment.method">
+
+	//                     {{ 'Please select a payment method' | trans }}</p>
+
+	//                 <div v-if="checkouterror" class="uk-alert uk-alert-danger">{{ checkouterror | trans }}</div>
+
+	//             </div>
+
+	//             <div class="uk-panel uk-panel-box uk-form">
+
+	//                 <h3 class="uk-panel-title">{{ 'To payment' | trans }}</h3>
+
+	//                 <div class="uk-form-row">
+
+	//                     <div class="uk-form-controls">
+
+	//                         <textarea name="comment" id="form-comment" cols="30" rows="3" class="uk-width-1-1"
+
+	//                                   v-model="checkout.comment" placeholder="{{ 'Add a comment' | trans }}"></textarea>
+
+	//                     </div>
+
+	//                 </div>
+
+	//                 <div v-if="!user.id" class="uk-margin">
+
+	//                     <div class="uk-form-row">
+
+	//                         <div class="uk-form-controls uk-form-controls-text">
+
+	//                             <label><input type="checkbox" value="hide-show_register"
+
+	//                                           v-model="show_register"> {{ 'Create an account' | trans }}</label>
+
+	//                         </div>
+
+	//                     </div>
+
+	//                     <div v-show="show_register" class="uk-form-row">
+
+	//                         <div class="uk-form-controls">
+
+	//                             <div class="uk-form-icon uk-width-1-1">
+
+	//                                 <i class="uk-icon-user uk-text-primary"></i>
+
+	//                                 <input v-model="user.username" name="username" type="text"
+
+	//                                        v-on="blur: validateField('user.username')"
+
+	//                                        class="uk-width-1-1" placeholder="{{ 'Username' | trans }}">
+
+	//                             </div>
+
+	//                             <p class="uk-form-help-block uk-text-danger" v-show="invalid.user.username">
+
+	//                                 {{ 'Username cannot be empty' | trans }}</p>
+
+	//                         </div>
+
+	//                     </div>
+
+	//                     <div v-show="show_register" class="uk-form-row">
+
+	//                         <div class="uk-form-controls">
+
+	//                             <div class="uk-form-icon uk-form-password">
+
+	//                                 <i class="uk-icon-key uk-text-primary"></i>
+
+	//                                 <input id="form-password" class="uk-form-large uk-form-width-large" type="password"
+
+	//                                        placeholder="{{ 'Password' | trans}}"
+
+	//                                        name="password" v-model="user.password">
+
+	//                                 <a href="" class="uk-form-password-toggle" tabindex="-1"
+
+	//                                    data-uk-form-password="{ lblShow: $trans('Show'), lblHide: $trans('Hide') }">{{
+
+	//                                     'Show' | trans }}</a>
+
+	//                             </div>
+
+	//                             <p class="uk-form-help-block uk-text-danger" v-show="invalid.user.password">
+
+	//                                 {{ 'Password cannot be blank.' | trans }}</p>
+
+	//                         </div>
+
+	//                     </div>
+
+	//                     <div v-if="registererror" class="uk-alert uk-alert-warning">{{ registererror | trans }}</div>
+
+	//                 </div>
+
+	//                 <terms agreed="{{@ checkout.agreed }}" invalid="{{ invalid.checkout.agreed }}"></terms>
+
+	//             </div>
+
+	//             <div class="uk-margin uk-text-right">
+
+	//                 <button class="uk-button uk-button-large uk-button-success">
+
+	//                     <i v-show="!spin" class="uk-icon-check uk-margin-small-right"></i>
+
+	//                     <i v-show="spin" class="uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right"></i>
+
+	//                     {{ 'To payment' | trans }}
+
+	//                 </button>
+
+	//             </div>
+
+	//         </div>
+
+	//     </div>
+
+	//     <v-modal v-ref="redirectmodal" lightbox>
+
+	//         <div class="uk-panel uk-panel-space uk-text-center">
+
+	//             <h1 class="uk-heading-large"><i class="uk-icon-check uk-text-success uk-margin-small-right"></i>
+
+	//                 {{ 'Payment successful' | trans }}</h1>
+
+	//             <p>{{ 'You are redirected...' | trans }}</p>
+
+	//             <p><i class="uk-icon-refresh uk-icon-spin"></i></p>
+
+	//         </div>
+
+	//     </v-modal>
+
+	// </template>
+
+	// <script>
+
 	module.exports = {
 
-	        data: function () {
-	            return _.merge({
-	                spin: false,
-	                order_id: 0,
-	                registererror: '',
-	                checkouterror: '',
-	                show_card: false,
-	                show_register: false,
-	                show_address2: false,
-	                checkout: {
-	                    agreed: false,
-	                    user_tz: '',
-	                    comment: '',
-	                    billing_address: {
-	                        firstName: '',
-	                        lastName: '',
-	                        email: '',
-	                        phone: '',
-	                        address1: '',
-	                        address2: '',
-	                        postcode: '',
-	                        city: '',
-	                        state: '',
-	                        country: ''
-	                    },
-	                    payment: {
-	                        method: '',
-	                        price: 0
-	                    }
+	    data: function data() {
+	        return _.merge({
+	            spin: false,
+	            order_id: 0,
+	            registererror: '',
+	            checkouterror: '',
+	            show_card: false,
+	            show_register: false,
+	            show_address2: false,
+	            checkout: {
+	                agreed: false,
+	                user_tz: '',
+	                comment: '',
+	                billing_address: {
+	                    firstName: '',
+	                    lastName: '',
+	                    email: '',
+	                    phone: '',
+	                    address1: '',
+	                    address2: '',
+	                    postcode: '',
+	                    city: '',
+	                    state: '',
+	                    country: ''
 	                },
-	                card: {
-	                    number: '',
-	                    expiryMonth: '',
-	                    expiryYear: '',
-	                    cvv: ''
-	                },
-	                invalid: {}
-	            }, window.$checkout);
-	        },
-
-	        inherit: true,
-
-	        created: function () {
-	            this.config.required_checkout.forEach(function (name) {
-	                this.$set('invalid.' + name, false);
-	            }.bind(this));
-	            this.$set('invalid.payment.method', false);
-	            if (this.gateways.length === 1) {
-	                this.$set('checkout.payment.method', this.gateways[0].shortName);
-	            }
-	            this.checkout.user_tz = jstz.determine().name();
-	        },
-
-	        methods: {
-	            doCheckout: function () {
-	                if (this.spin) {
-	                    return;
-	                }
-	                var vm = this;
-
-	                if (this.validateCheckout()) {
-
-	                    this.spin = true;
-	                    this.$set('checkouterror', '');
-	                    this.$set('registererror', '');
-
-	                    this.resource.save({id: 'checkout'}, {
-	                        cartItems: this.cartItems,
-	                        cardData: this.card,
-	                        user: this.show_register ? this.user : [],
-	                        checkout: _.merge({currency: this.filters.currency, order_id: this.order_id}, this.checkout)
-	                    }, function (data) {
-
-	                        vm.$set('spin', false);
-	                        if (data.order.id) {
-	                            vm.$set('order_id', data.order.id);
-	                        }
-	                        if (data.error) {
-	                            vm.$set('checkouterror', data.checkouterror);
-	                            vm.$set('registererror', data.registererror);
-	                        } else {
-	                            console.log(data);
-	                            if (data.redirectUrl) {
-	                                if (data.order.status === 1) {
-	                                    //reset cart oon orig vm
-	                                    this.$set('cartItems', data.cartItems);
-	                                    vm.$.redirectmodal.open();
-	                                    setTimeout(function () {
-	                                        window.location.href = data.redirectUrl;
-	                                    }, 500)
-	                                } else {
-	                                    window.location.href = data.redirectUrl;
-	                                }
-	                            }
-
-	                        }
-
-	                    });
+	                payment: {
+	                    method: '',
+	                    price: 0
 	                }
 	            },
-
-	            validateCheckout: function () {
-	                var invalid = false;
-
-	                this.config.required_checkout.forEach(function (name) {
-	                    invalid = !this.validateField(name) || invalid;
-	                }.bind(this));
-
-	                if (this.show_card) {
-	                    ['card.number', 'card.expiryMonth', 'card.expiryYear', 'card.cvv'].forEach(function (name) {
-	                        invalid = !this.validateField(name) || invalid;
-	                    }.bind(this));
-	                }
-
-	                if (!this.checkout.payment.method) {
-	                    invalid = true;
-	                }
-	                this.$set('invalid.payment.method', !this.checkout.payment.method);
-
-	                return !invalid;
+	            card: {
+	                number: '',
+	                expiryMonth: '',
+	                expiryYear: '',
+	                cvv: ''
 	            },
+	            invalid: {}
+	        }, window.$checkout);
+	    },
 
-	            validateField: function (name) {
-	                var valid = !!this.$get(name);
-	                this.$set('invalid.' + name, !valid);
-	                return valid;
-	            }
-	        },
+	    inherit: true,
 
-	        computed: {
-	            show_card: function () {
-	                return ['Stripe'].indexOf(this.checkout.payment.method) > -1;
-	            },
-	            countryList: function () {
-	                var options = [{value: '', text: this.$trans('Country')}];
-	                _.forIn(this.countries, function (text, value) {
-	                    options.push({value: value, text: text});
-	                });
-	                return options;
-	            },
-	            months: function () {
-	                var options = [{value: '', text: this.$trans('Month')}];
-	                for (var m = 1; m <= 12; m++) {
-	                    options.push({value: m.toString(), text: m.toString()});
-	                }
-	                return options;
-	            },
-	            years: function () {
-	                var nowYear = (new Date()).getFullYear(),
-	                        options = [{value: '', text: this.$trans('Year')}];
-	                for (var y = nowYear; y < (nowYear + 10); y++) {
-	                    options.push({value: y.toString(), text: y.toString()});
-	                }
-	                return options;
-	            }
+	    created: function created() {
+	        this.config.required_checkout.forEach((function (name) {
+	            this.$set('invalid.' + name, false);
+	        }).bind(this));
+	        this.$set('invalid.payment.method', false);
+	        if (this.gateways.length === 1) {
+	            this.$set('checkout.payment.method', this.gateways[0].shortName);
 	        }
+	        this.checkout.user_tz = jstz.determine().name();
+	    },
 
-	    };
+	    methods: {
+	        doCheckout: function doCheckout() {
+	            if (this.spin) {
+	                return;
+	            }
+	            var vm = this;
+
+	            if (this.validateCheckout()) {
+
+	                this.spin = true;
+	                this.$set('checkouterror', '');
+	                this.$set('registererror', '');
+
+	                this.resource.save({ id: 'checkout' }, {
+	                    cartItems: this.cartItems,
+	                    cardData: this.card,
+	                    user: this.show_register ? this.user : [],
+	                    checkout: _.merge({ currency: this.filters.currency, order_id: this.order_id }, this.checkout)
+	                }, function (data) {
+
+	                    vm.$set('spin', false);
+	                    if (data.order.id) {
+	                        vm.$set('order_id', data.order.id);
+	                    }
+	                    if (data.error) {
+	                        vm.$set('checkouterror', data.checkouterror);
+	                        vm.$set('registererror', data.registererror);
+	                    } else {
+	                        console.log(data);
+	                        if (data.redirectUrl) {
+	                            if (data.order.status === 1) {
+	                                //reset cart oon orig vm
+	                                this.$set('cartItems', data.cartItems);
+	                                vm.$.redirectmodal.open();
+	                                setTimeout(function () {
+	                                    window.location.href = data.redirectUrl;
+	                                }, 500);
+	                            } else {
+	                                window.location.href = data.redirectUrl;
+	                            }
+	                        }
+	                    }
+	                });
+	            }
+	        },
+
+	        validateCheckout: function validateCheckout() {
+	            var invalid = false;
+
+	            this.config.required_checkout.forEach((function (name) {
+	                invalid = !this.validateField(name) || invalid;
+	            }).bind(this));
+
+	            if (this.show_card) {
+	                ['card.number', 'card.expiryMonth', 'card.expiryYear', 'card.cvv'].forEach((function (name) {
+	                    invalid = !this.validateField(name) || invalid;
+	                }).bind(this));
+	            }
+
+	            if (!this.checkout.payment.method) {
+	                invalid = true;
+	            }
+	            this.$set('invalid.payment.method', !this.checkout.payment.method);
+
+	            return !invalid;
+	        },
+
+	        validateField: function validateField(name) {
+	            var valid = !!this.$get(name);
+	            this.$set('invalid.' + name, !valid);
+	            return valid;
+	        }
+	    },
+
+	    computed: {
+	        show_card: function show_card() {
+	            return ['Stripe'].indexOf(this.checkout.payment.method) > -1;
+	        },
+	        countryList: function countryList() {
+	            var options = [{ value: '', text: this.$trans('Country') }];
+	            _.forIn(this.countries, function (text, value) {
+	                options.push({ value: value, text: text });
+	            });
+	            return options;
+	        },
+	        months: function months() {
+	            var options = [{ value: '', text: this.$trans('Month') }];
+	            for (var m = 1; m <= 12; m++) {
+	                options.push({ value: m.toString(), text: m.toString() });
+	            }
+	            return options;
+	        },
+	        years: function years() {
+	            var nowYear = new Date().getFullYear(),
+	                options = [{ value: '', text: this.$trans('Year') }];
+	            for (var y = nowYear; y < nowYear + 10; y++) {
+	                options.push({ value: y.toString(), text: y.toString() });
+	            }
+	            return options;
+	        }
+	    }
+
+	};
+
+	// </script>
 
 /***/ },
 /* 20 */
@@ -592,35 +1270,79 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(22)
-	module.exports.template = __webpack_require__(23)
 
+	if (module.exports.__esModule) module.exports = module.exports.default
+	;(typeof module.exports === "function" ? module.exports.options : module.exports).template = __webpack_require__(23)
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "C:\\BixieProjects\\pagekit\\pagekit\\packages\\bixie\\cart\\app\\components\\addtocart.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+	  }
+	})()}
 
 /***/ },
 /* 22 */
 /***/ function(module, exports) {
 
+	'use strict';
+
+	// <template>
+
+	//     <div class="uk-flex uk-flex-space-around uk-flex-wrap">
+
+	//         <div class="{{ priceHldr }}">
+
+	//             <strong>{{{ product | productprice }}}</strong>
+
+	//             <div v-if="config.addtocart.show_vat"><small>{{{ includingVat }}}</small></div>
+
+	//         </div>
+
+	//         <div class="{{ buttonHldr }}">
+
+	//             <button type="button" class="uk-button uk-button-success uk-width-1-1" v-on="click: addToCart(product)">
+
+	//                 <i class="uk-icon-shopping-cart uk-margin-small-right"></i>{{ 'Add to cart' | trans }}
+
+	//             </button>
+
+	//         </div>
+
+	//     </div>
+
+	// </template>
+
+	// <script>
+
 	module.exports = {
 
-	        data: function () {
-	            return {
-	                priceHldr: 'uk-text-right',
-	                buttonHldr: ''
-	            };
-	        },
+	    data: function data() {
+	        return {
+	            priceHldr: 'uk-text-right',
+	            buttonHldr: ''
+	        };
+	    },
 
-	        props: ['product', 'item_id', 'buttonHldr', 'priceHldr'],
+	    props: ['product', 'item_id', 'buttonHldr', 'priceHldr'],
 
-	        inherit: true,
+	    inherit: true,
 
-	        computed: {
-	            includingVat: function () {
-	                var vatString = this.formatprice(this.getVat(this.product)),
-	                        text = this.config.vat_view == 'excl' ? '+ %vat% VAT' : 'incl. %vat% VAT';
-	                return this.$trans(text, {vat: vatString});
-	            }
+	    computed: {
+	        includingVat: function includingVat() {
+	            var vatString = this.formatprice(this.getVat(this.product)),
+	                text = this.config.vat_view == 'excl' ? '+ %vat% VAT' : 'incl. %vat% VAT';
+	            return this.$trans(text, { vat: vatString });
 	        }
+	    }
 
-	    };
+	};
+
+	// </script>
 
 /***/ },
 /* 23 */
