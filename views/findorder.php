@@ -13,7 +13,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 	<div class="uk-margin">
 
-		<form class="uk-form" name="form" v-on="submit: submitForm | valid">
+		<form class="uk-form" name="form" @submit.prevent="submitForm | valid">
 
 			<div v-show="step == 1" class="uk-panel">
 

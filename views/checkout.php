@@ -14,7 +14,7 @@ $view->script('bixie-cart');
 	<div class="uk-margin">
 		<cartlist is-checkout="1"></cartlist>
 	</div>
-	<form name="form" v-on="submit: checkoutSubmit">
+	<form name="form" @submit.prevent="checkoutSubmit">
 
 		<checkout v-ref="checkout"></checkout>
 

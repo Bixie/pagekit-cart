@@ -7,7 +7,7 @@
 */
 $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/admin-order.js', ['vue', 'editor']); ?>
 
-<form id="order-edit" class="uk-form" name="form" v-validator="form" v-on="submit: save | valid" v-cloak>
+<form id="order-edit" class="uk-form" name="form" v-validator="form" @submit.prevent="save | valid" v-cloak>
 
 	<div class="uk-margin uk-flex uk-flex-space-between uk-flex-wrap" data-uk-margin>
 		<div data-uk-margin>
