@@ -27,7 +27,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 					<div class="uk-form-controls">
 						<input type="text" id="form-transaction_id" placeholder="{{ 'Transaction ID' | trans}}"
 							   class="uk-form-large uk-form-width-large" name="transaction_id" v-model="transaction_id"
-							   v-validate="required">
+							   v-validate:required>
 					</div>
 					<p class="uk-form-help-block uk-text-danger" v-show="form.transaction_id.invalid">
 						{{ 'Please enter a Transaction ID' | trans }}</p>
@@ -37,7 +37,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 					<div class="uk-form-controls">
 						<input type="email" id="form-email" placeholder="{{ 'Email address' | trans}}"
 							   class="uk-form-large uk-form-width-large" name="email" v-model="email"
-							   v-validate="required">
+							   v-validate:required>
 					</div>
 					<p class="uk-form-help-block uk-text-danger" v-show="form.email.invalid">
 						{{ 'Please enter a valid email address' | trans }}</p>
@@ -66,7 +66,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 					<div class="uk-form-controls">
 						<input type="text" id="form-username" placeholder="{{ 'Username' | trans}}"
 							   class="uk-form-large uk-form-width-large" name="username" v-model="username"
-							   v-validate="required">
+							   v-validate:required>
 					</div>
 					<p class="uk-form-help-block uk-text-danger" v-show="form.username.invalid">
 						{{ 'Please enter a username' | trans }}</p>
@@ -76,7 +76,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 					<div class="uk-form-controls">
 						<div class="uk-form-password">
 							<input id="form-password" class="uk-form-large uk-form-width-large" type="password" placeholder="{{ 'Password' | trans}}"
-								   name="password" v-model="password" v-validate="required">
+								   name="password" v-model="password" v-validate:required>
 							<a href="" class="uk-form-password-toggle" tabindex="-1"
 							   data-uk-form-password="{ lblShow: '<?= __('Show') ?>', lblHide: '<?= __('Hide') ?>' }"><?= __('Show') ?></a>
 						</div>
