@@ -13,7 +13,7 @@ module.exports = {
     },
 
     created: function () {
-        this.resource = this.$resource('api/cart/order/:id');
+        this.resource = this.$resource('api/cart/order{/id}');
         this.config.filter = _.extend({
             status: '',
             search: '',
