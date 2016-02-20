@@ -56,7 +56,7 @@
 	    },
 
 	    created: function () {
-	        this.resource = this.$resource('api/cart/order/:id');
+	        this.resource = this.$resource('api/cart/order{/id}');
 	        this.config.filter = _.extend({
 	            user_id: this.user.id,
 	            status: '',

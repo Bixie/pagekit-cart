@@ -63,7 +63,7 @@
 	    },
 
 	    created: function () {
-	        this.resource = this.$resource('api/cart/cart/:id');
+	        this.resource = this.$resource('api/cart/cart{/id}');
 	        this.filters = _.assign(this.filters, JSON.parse((this.$localstorage('cart.filters') || '{}')));
 	    },
 

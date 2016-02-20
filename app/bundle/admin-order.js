@@ -55,7 +55,7 @@
 	    },
 
 	    ready: function () {
-	        this.resource = this.$resource('api/cart/order/:id');
+	        this.resource = this.$resource('api/cart/order{/id}');
 	        this.tab = UIkit.tab(this.$$.tab, {connect: this.$$.content});
 	    },
 
