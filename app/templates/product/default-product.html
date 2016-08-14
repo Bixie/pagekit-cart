@@ -8,7 +8,7 @@
             <span></span>
             <select v-model="item.quantity">
                 <option v-for="option in item.quantity_options" :value="option.quantity">
-                    {{ option.quantity }} - {{ option.price | currency option.currency }}
+                    {{ option.quantity }} - {({ option | productprice  })}
                 </option>
             </select>
         </div>

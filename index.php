@@ -172,26 +172,24 @@ return [
 			);
 		},
 
-		'view.data' => function ($event, $data) use ($app) {
-			//todo only on when cart or module is active
-			$cartItems = $app['bixieCart']->all();
-			if (count($cartItems)) {
-				$data->add('$cartItems', array_values($cartItems));
-			}
-			$data->add('$cart', [
-				'checkout_url' => App::url('@cart/checkout'),
-				'login_url' => App::url('@user/login', ['redirect' => App::url()->current()]),
-				'user' => App::user(),
-				'config' => App::module('bixie/cart')->publicConfig()
-			]);
-		},
-
 		'view.scripts' => function ($event, $scripts) use ($app) {
 			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');
 			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js',
                 ['bixie-framework', 'uikit-form-select', 'uikit-tooltip', 'uikit-notify', 'uikit-form-password', 'jstz']
             );
         },
+
+        'view.data' => function ($event, $data) use ($app) {
+            $data->add('$bix_cart', [
+                'cart' => [],
+                'countries' => $app->module('system/intl')->getCountries(),
+                'checkout_url' => $app['url']('@cart/checkout'),
+                'login_url' => $app['url']('@user/login', ['redirect' => $app['url']->current()]),
+                'user' => $app['user'],
+                'config' => $app->module('bixie/cart')->publicConfig()
+            ]);
+        }
+        ,
 
 		'console.init' => function ($event, $console) {
 

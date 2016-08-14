@@ -32,7 +32,7 @@
         title: '',
         quantity: 1,
         price: 0,
-        currency: 0,
+        currency: 'EUR',
         vat: 'high',
         quantity_options: [],
         data: {},
@@ -86,6 +86,10 @@
                     reference: '',
                     data: {comment: ''}
                 },
+                checkout_url: '',
+                login_url: '',
+                user: {},
+                config: {},
                 cart: {}
             }, window.$bix_cart);
         },

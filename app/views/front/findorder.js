@@ -1,4 +1,4 @@
-module.exports = Vue.extend({
+module.exports = {
 
     name: 'find-order',
 
@@ -69,10 +69,6 @@ module.exports = Vue.extend({
         }
     }
 
-});
+};
 
-$(function () {
-
-    (new module.exports()).$mount('#bixie-findorder');
-
-});
+Vue.ready(module.exports);

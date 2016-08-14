@@ -45,7 +45,7 @@
 							<div class="uk-form-controls uk-form-controls-text">
 								<select id="form-config_vat" name="config_vat" class="uk-form-width-medium"
 										v-model="config.vat">
-									<option v-for="vatclass in config.vatclasses" value="$key">{{ vatclass.name }}</option>
+									<option v-for="vatclass in config.vatclasses" :value="$key">{{ vatclass.name }}</option>
 								</select>
 							</div>
 						</div>

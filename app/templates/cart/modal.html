@@ -14,7 +14,7 @@
                 <a class="uk-close uk-position-top-right uk-margin-small-right uk-margin-small-top" @click="closeCart"></a>
                 <div class="uk-flex uk-flex-middle uk-flex-space-around">
                     <strong>{{ nr_items_format }}</strong>
-                    <h4 class="uk-margin-remove">{{ total_price | currency filter.currency }}</h4>
+                    <h4 class="uk-margin-remove">{{{ total_price | formatprice }}}</h4>
                 </div>
             </div>
             <div class="uk-width-1-1" style="overflow-y: auto; height:calc(100vh - 185px);">

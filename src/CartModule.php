@@ -52,47 +52,14 @@ class CartModule extends Module {
             };
 		};
 
-        $util = $app['db']->getUtility();
-
-        if ($util->tableExists('@cart_order') === false) {
-            $util->createTable('@cart_order', function ($table) {
-                $table->addColumn('id', 'integer', ['unsigned' => true, 'length' => 10, 'autoincrement' => true]);
-                $table->addColumn('user_id', 'integer', ['unsigned' => true, 'length' => 10, 'notnull' => false]);
-                $table->addColumn('status', 'smallint');
-                $table->addColumn('ext_key', 'string', ['length' => 255, 'notnull' => false]);
-                $table->addColumn('reference', 'string', ['length' => 255, 'notnull' => false]);
-                $table->addColumn('created', 'datetime');
-                $table->addColumn('email', 'string', ['length' => 255]);
-                $table->addColumn('cartItemsData', 'json_array');
-                $table->addColumn('payment', 'json_array', ['notnull' => false]);
-                $table->addColumn('total_netto', 'decimal', ['precision' => 9, 'scale' => 2]);
-                $table->addColumn('total_bruto', 'decimal', ['precision' => 9, 'scale' => 2]);
-                $table->addColumn('currency', 'string', ['length' => 16]);
-                $table->addColumn('transaction_id', 'string', ['length' => 255, 'notnull' => false]);
-                $table->addColumn('data', 'json_array', ['notnull' => false]);
-                $table->setPrimaryKey(['id']);
-                $table->addIndex(['user_id'], 'CART_ORDER_USER_ID');
-                $table->addIndex(['status'], 'CART_ORDER_STATUS');
-                $table->addIndex(['ext_key'], 'CART_ORDER_EXT_KEY');
-                $table->addIndex(['email'], 'CART_ORDER_EMAIL');
-                $table->addIndex(['total_netto'], 'CART_ORDER_TOTAL_NETTO');
-                $table->addIndex(['total_bruto'], 'CART_ORDER_TOTAL_BRUTO');
-                $table->addIndex(['transaction_id'], 'CART_ORDER_TRANSACTION_ID');
-            });
-        }
 	}
 
-	public function publicConfig () {
-		$config = $this->config();
-		unset($config['gateways']);
-		return $config;
-	}
-
-	/**
-	 * @param string $transaction_id
-	 * @param string $product_identifier
-	 * @return string
-	 */
+    /**
+     * @param string $transaction_id
+     * @param string $product_identifier
+     * @return string
+     * @throws CartException
+     */
 	public function validateTransaction ($transaction_id, $product_identifier) {
 		$purchaseKey = false;
 
@@ -177,13 +144,14 @@ class CartModule extends Module {
 		}
 		return $locations;
 	}
-
-}
-
-class CartException extends Exception {
-
-	public function __construct($message = "", $code = 0, Exception $previous = null) {
-		parent::__construct($message, $code, $previous);
-	}
+    /**
+     * public accessable config
+     * @return array
+     */
+    public function publicConfig () {
+        return array_intersect_key(static::config(), array_flip([
+            'currency', 'vat', 'vat_view', 'required_checkout', 'vatclasses', 'USDtoEUR', 'EURtoUSD'
+        ]));
+    }
 
 }
