@@ -9,7 +9,7 @@
         </div>
         <div class="uk-modal-footer uk-text-right">
             <button type="button" class="uk-button uk-modal-close">{{ 'Close' | trans }}</button>
-            <a v-attr="href: cart_loading ? 'javascript:void(0)' : checkout_url" class="uk-button uk-button-success uk-margin-left">
+            <a :href="cart_loading ? 'javascript:void(0)' : checkout_url" class="uk-button uk-button-success uk-margin-left">
                 <i v-show="!cart_loading" class="uk-icon-shopping-cart uk-margin-small-right"></i>
                 <i v-show="cart_loading" class="uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right"></i>
                 {{ 'To checkout' | trans }}</a>

@@ -2,150 +2,189 @@
 
 namespace Bixie\Cart\Controller;
 
-use Bixie\Cart\Cart\UserHelper;
 use Pagekit\Application as App;
-use Bixie\Cart\Cart\CartFactory;
-use Bixie\Cart\Cart\MailHelper;
+use Bixie\Cart\Cart\CartHandler;
+use Bixie\Cart\Cart\DeliveryHelper;
+use Bixie\Cart\CartException;
+use Bixie\Cart\Helper\UserHelper;
+use Bixie\Cart\Cart\CartItemCollection;
+use Bixie\Cart\Helper\MailHelper;
 use Bixie\Cart\Model\Order;
-use Pagekit\Application\Exception;
 use Bixie\Cart\Payment\PaymentException;
 use Bixie\Cart\Cart\CartItem;
 use Pagekit\User\Model\User;
+use Pagekit\Application\Exception;
+use Pagekit\Util\Arr;
 
 /**
  * @Route("cart", name="cart")
  */
-class CartApiController
-{
-	/**
-	 * @var \Bixie\Cart\CartModule
-	 */
-	protected $cart;
+class CartApiController {
+    /**
+     * @var \Bixie\Cart\CartModule
+     */
+    protected $cart;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct()
-	{
-		$this->cart = App::module('bixie/cart');
-	}
+    /**
+     * Constructor.
+     */
+    public function __construct () {
+        $this->cart = App::module('bixie/cart');
+    }
 
     /**
      * @Route("/", methods="POST")
-     * @Request({"cartItems": "array"}, csrf=true)
-	 * @return CartItem[]
-	 */
-    public function saveAction($data)
-    {
-		/** @var CartFactory $bixieCart */
-		/** @var CartItem $cartItem */
-		$bixieCart = App::bixieCart()->loadFromSession();
-		$ids = [];
-		foreach ($data as $cartData) {
-			if ($cartItem = $bixieCart->load($cartData)) {
-				$ids[] = $cartItem->getId();
-				$bixieCart[$cartItem->getId()] = $cartItem;
-			}
-		}
-		foreach(array_diff($bixieCart->ids(), $ids) as $id) {
-			unset($bixieCart[$id]);
-		}
-
-		$bixieCart->saveCartItems();
-
-		return array_values($bixieCart->all());
-    }
-
-	/**
-     * @Route("/checkout", methods="POST")
-     * @Request({"cartItems": "array", "cardData": "array", "user": "array", "checkout": "array"}, csrf=true)
+     * @Request({"cart": "array"}, csrf=true)
+     * @return array
      */
-    public function checkoutAction($cartItemsData, $cardData, $userData, $checkout)
-    {
-		$return = ['error'=> true, 'registererror' => '', 'checkouterror' => '', 'order' => []];
+    public function saveAction ($cart) {
+        /** @var CartItemCollection $bixieCart */
+        /** @var CartItem $cartItem */
+        $bixieCart = App::bixieCart();
+        $cartItems = $this->saveCartItems($cart['items']);
 
-		$cartItems = $this->saveAction($cartItemsData);
+        try {
+            $handler = new CartHandler($bixieCart);
+            $deliveryHelper = new DeliveryHelper($handler);
 
-		//register user?
-		if (empty($userData['id']) && !empty($userData['username'])) {
+            $handler->setDeliveryAddress($cart['delivery_address']);
+            $delivery_options = $deliveryHelper->getDeliveryOptions();
 
-			try {
+            $payment_options = App::bixiePayment()->activeGatewaysData();
 
-				$userData['name'] = $checkout['billing_address']['firstName'] . ' ' . $checkout['billing_address']['lastName'];
-				$userData['email'] = $checkout['billing_address']['email'];
+            return array_merge($cart, [
+                'delivery_address' => $handler->getDeliveryAddress(),
+                'delivery_options' => $delivery_options,
+                'payment_options' => $payment_options,
+                'items' => array_values($cartItems),
+            ]);
+        } catch (CartException $e) {
+            App::abort(400, $e->getMessage());
+        }
+    }
 
-				$userHelper = new UserHelper();
-				$userHelper->createUser($userData, User::STATUS_ACTIVE);
-				$userHelper->login(['username' => $userData['username'], 'password' => $userData['password']]);
+    /**
+     * @Route("/checkout", methods="POST")
+     * @Request({"cart": "array", "order_data": "array", "user_data": "array"}, csrf=true)
+     */
+    public function checkoutAction ($cart, $order_data, $user_data = []) {
+        $checkout = ['error' => false, 'registererror' => '', 'errormessage' => '', 'redirect_url' => ''];
+        $bixieCart = App::bixieCart();
+        $cartItems = $this->saveCartItems($cart['items']);
 
-			} catch (Exception $e) {
-				$return['registererror'] = $e->getMessage();
-				return $return;
-			}
+        //register user?
+        if (empty($userData['id']) && !empty($userData['username'])) {
 
-		}
+//            try {
+//
+//                $userData['name'] = $checkout['billing_address']['firstName'] . ' ' . $checkout['billing_address']['lastName'];
+//                $userData['email'] = $checkout['billing_address']['email'];
+//
+//                $userHelper = new UserHelper();
+//                $userHelper->createUser($userData, User::STATUS_ACTIVE);
+//                $userHelper->login(['username' => $userData['username'], 'password' => $userData['password']]);//sessionkey todo
+//
+//            } catch (Exception $e) {
+//                $checkout['error'] = true;
+//            $checkout['registererror'] = $e->getMessage();
+//                return $checkout;
+//            }
+//
+        }
+        try {
 
-		/** @var Order $order */
-		if ($checkout['order_id'] > 0) {
-			$order = Order::find($checkout['order_id']);
-			$order->currency = $checkout['currency'];
-			$order->cartItemsData = $cartItemsData;
-			$order->calculateOrder();
-		} else {
-			$order = Order::createNew($cartItems, $checkout)->calculateOrder();
-		}
+            $handler = (new CartHandler($bixieCart))
+                ->setDeliveryAddress($cart['delivery_address'])
+                ->setBillingAddress($cart['delivery_address']); //todo
 
-		$payment_method = $checkout['payment']['method'];
+            $deliveryHelper = new DeliveryHelper($handler);
+            if (!$deliveryOption = $deliveryHelper->getDeliveryOption($cart['delivery_option_id'])) {
+                throw new CartException(__('Invalid delivery option!'));
+            }
 
-		try {
+            if (!$paymentOption =  App::bixiePayment()->getPaymentOption($cart['payment_option_name'])) {
+                throw new CartException(__('Invalid payment option!'));
+            }
 
-			$paymentResponse = App::bixiePayment()->getPayment($payment_method, $cardData, $order);
+            $handler->setDeliveryOption($deliveryOption)
+                ->setPaymentOption($paymentOption);
 
-			$redirectUrl = App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true);
+            /** @var Order $order */
+            if (!empty($order_data['id'])) {
+                $order = Order::find($order_data['id']);
+                $order->currency = $handler->getCurrency();
+                $order->ext_key = $order_data['ext_key'];
+                $order->reference = $order_data['reference'];
+                $order->cartItemsData = $cartItems;
+                $order->data = array_merge((array)$order->data, $order_data['data'], $handler->getOrderData());
+                $order->calculateOrder();
+            } else {
+                $order = Order::create($handler, $order_data)->calculateOrder();
+            }
 
-			if ($paymentResponse->isRedirect()) {
-				$redirectUrl = $paymentResponse->getRedirectUrl();
-			}
+            /** @var \Omnipay\Common\Message\ResponseInterface $paymentResponse */
+            $paymentResponse = App::bixiePayment()->getPayment($handler, $order, $cart['card']);
 
-			if ($paymentResponse->isSuccessful()) {
+            $checkout['redirect_url'] = App::url('@cart/checkout/paymentreturn', ['transaction_id' => $order->transaction_id], true);
 
-				$order->status = Order::STATUS_CONFIRMED;
+            if ($paymentResponse->isRedirect()) {
+                $checkout['redirect_url'] = $paymentResponse->getRedirectUrl();
+            }
 
-				//reset cart
-				App::bixieCart()->reset();
-				$cartItems = [];
+            if ($paymentResponse->isSuccessful()) {
 
-				//send mail
-				(new MailHelper($order))->sendMail();
-			}
+                $order->status = Order::STATUS_CONFIRMED;
 
-			$order->payment = $paymentResponse->getData();
-			$order->save();
+                //reset cart
+                App::bixieCart()->reset();
+                $cartItems = [];
 
-			return [
-				'cartItems' => array_values($cartItems),
-				'redirectUrl' => $redirectUrl,
-				'checkout' => $checkout,
-				'order' => $order
-			];
+                //send mail
+//                (new MailHelper($order))->sendMail();
+            }
 
-		} catch (PaymentException $e) {
-			$return['order'] = $order;
-			$return['checkouterror'] = $e->getMessage();
-			return $return;
-		}
+            $order->payment = $paymentResponse->getData();
+            $order->save();
+
+
+        } catch (Exception $e) {
+            $checkout['error'] = true;
+            $checkout['errormessage'] = $e->getMessage();
+        }
+        return [
+            'cartItems' => array_values($cartItems),
+            'checkout' => $checkout,
+            'order' => $order
+        ];
 
 
     }
 
-	/**
-	 * @Route("/terms", methods="GET")
-	 */
-	public function termsAction()
-	{
-		$title = $this->cart->config('terms.title');
-		$content = App::content()->applyPlugins($this->cart->config('terms.content'), ['markdown' => $this->cart->config('terms.markdown_enabled')]);;
-		return ['html' => App::view('bixie/cart/templates/terms.php', compact('content', 'title'), 'raw')];
-	}
+    /**
+     * @Route("/terms", methods="GET")
+     */
+    public function termsAction () {
+        $title = $this->cart->config('terms.title');
+        $content = App::content()->applyPlugins($this->cart->config('terms.content'), ['markdown' => $this->cart->config('terms.markdown_enabled')]);;
+        return ['html' => App::view('bixie/cart/templates/terms.php', compact('content', 'title'), 'raw')];
+    }
+
+    /**
+     * @param $cartItems
+     * @return array
+     */
+    protected function saveCartItems ($cartItems) {
+        /** @var CartItemCollection $bixieCart */
+        /** @var CartItem $cartItem */
+        $bixieCart = App::bixieCart();
+        $ids = [];
+        foreach ($cartItems as $cartData) {
+            if ($cartItem = $bixieCart->addItemFromData($cartData)) {
+                $ids[] = $cartItem->getId();
+            }
+        }
+        $bixieCart->remove(array_diff($bixieCart->ids(), $ids));
+        return $bixieCart->all();
+    }
 
 }

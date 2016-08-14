@@ -13,9 +13,9 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 	<div class="uk-margin">
 
-		<form class="uk-form" name="form" @submit.prevent="submitForm | valid">
+		<form class="uk-form"  name="form" v-validator="form" @submit.prevent="submitForm | valid">
 
-			<div v-show="step == 1" class="uk-panel">
+			<div v-if="step == 1" class="uk-panel">
 
 				<div class="uk-panel-badge uk-badge uk-text-large">{{ 'Step 1' | trans }}</div>
 
@@ -53,13 +53,12 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 			</div>
 
-			<div v-show="step == 2" class="uk-panel">
+			<div v-if="step == 2" class="uk-panel">
 
 				<div class="uk-panel-badge uk-badge uk-text-large">{{ 'Step 2' | trans }}</div>
 
 				<p><?= __('Choose a username and password that will be associated with this order.') ?></p>
 
-				<p>{{ '' | trans }}</p>
 				<p><?= __('An activation link will be sent to the email address entered in the previous step.') ?></p>
 
 				<div class="uk-form-row">
@@ -95,7 +94,7 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 			</div>
 
-			<div v-show="step == 3" class="uk-panel">
+			<div v-if="step == 3" class="uk-panel">
 
 				<div class="uk-panel-badge uk-badge uk-text-large">{{ 'Step 3' | trans }}</div>
 

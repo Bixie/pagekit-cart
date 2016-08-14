@@ -8,15 +8,15 @@
                 <h3 class="uk-panel-title">{{ 'Billing address' | trans }}</h3>
 
                 <p v-if="!user.id" class="uk-text-small">{{ 'Do you have an account?' | trans }} <a
-                        v-attr="href: login_url">{{ 'Please log in' | trans }}</a></p>
+                        :href="login_url">{{ 'Please log in' | trans }}</a></p>
 
 
                 <div class="uk-form-row">
                     <div class="uk-form-controls">
                         <div class="uk-form-icon uk-width-1-1">
                             <i class="uk-icon-user uk-text-primary"></i>
-                            <input v-model="checkout.billing_address.firstName" name="firstName" type="text"
-                                   v-on="blur: validateField('checkout.billing_address.firstName')"
+                            <input v-model="checkout.billing_address.class="uk-margin-small-top"" name="class="uk-margin-small-top"" type="text"
+                                   v-on="blur: validateField('checkout.billing_address.class="uk-margin-small-top"')"
                                    class="uk-width-1-1" placeholder="{{ 'First name' | trans }}">
                         </div>
                         <p class="uk-form-help-block uk-text-danger"
@@ -154,7 +154,7 @@
 
                 <h3 class="uk-panel-title">{{ 'Payment method' | trans }}</h3>
 
-                <div v-repeat="gateway: gateways" class="uk-form-row">
+                <div v-for="gateway in gateways" class="uk-form-row">
                     <div class="uk-form-controls uk-form-controls-text">
                         <label><input type="radio" value="{{ gateway.shortName | trans }}"
                                       v-model="checkout.payment.method"> {{ gateway.name | trans }}</label>

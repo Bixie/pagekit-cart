@@ -8,12 +8,7 @@
 
 ?>
 
-<div class="uk-modal-header">
-	<h2><?= __($title) ?></h2>
-</div>
+<h2><?= __($title) ?></h2>
 <div class="uk-margin">
 	<?= $content ?>
-</div>
-<div class="uk-modal-footer uk-text-right">
-	<button class="uk-button uk-modal-close"><?= __('Close') ?></button>
 </div>

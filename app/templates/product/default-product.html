@@ -1,0 +1,21 @@
+
+<p><small>{{ item.sku }}</small> <strong>{{ item.title }}</strong></p>
+
+<div class="uk-flex uk-flex-middle uk-flex-space-between">
+    <div class="uk-flex-item-1 uk-text-right">
+
+        <div class="uk-button uk-form-select" data-uk-form-select>
+            <span></span>
+            <select v-model="item.quantity">
+                <option v-for="option in item.quantity_options" :value="option.quantity">
+                    {{ option.quantity }} - {{ option.price | currency option.currency }}
+                </option>
+            </select>
+        </div>
+
+    </div>
+    <div class="uk-margin-left"><strong>{{ item.price | currency item.currency }}</strong></div>
+    <a class="uk-margin-left" @click="$bixCart.removeItem(item)" :title="$trans('Remove item')" data-uk-tooltip="delay:300">
+        <i class="uk-icon-trash-o uk-icon-hover uk-icon-justify"></i></a>
+</div>
+

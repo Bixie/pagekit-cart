@@ -28,7 +28,7 @@ class CartController
 	 * @Route("/", name="order")
 	 * @Request({"filter": "array", "page":"int"})
      */
-    public function indexAction($filter = null, $page = 0)
+    public function indexAction($filter = [], $page = null)
     {
         return [
             '$view' => [
@@ -37,11 +37,9 @@ class CartController
             ],
             '$data' => [
 				'statuses' => Order::getStatuses(),
-				'config'   => [
-                    'ordering' => 'created',
-                    'ordering_dir' => 'desc',
-                    'filter' => $filter,
-                    'page'   => $page
+                'config' => [
+                    'filter' => (object) $filter,
+                    'page' => $page
                 ]
             ]
         ];
@@ -64,15 +62,15 @@ class CartController
 			App::abort(401, __('Orders cannot be created.'));
 
 		}
+
 		foreach ($order->getCartItems() as $cartItem) {
-			$event = new Event('bixie.admin.orderitem');
+			$event = new Event('bixie.cart.admin.orderitem');
 			App::trigger($event, [$order, $cartItem]);
-			$cartItem->setTemplate('bixie.admin.order', $event['bixie.admin.order'] ? : '');
+			$cartItem->setTemplate('bixie.cart.admin.order', $event['bixie.cart.admin.order'] ? : '');
 			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}
 		$users = App::db()->createQueryBuilder()
 			->from('@system_user')
-			->where('status = 1')
 			->execute('id, username')
 			->fetchAll();
 

@@ -2,15 +2,38 @@
 
 namespace Bixie\Cart\Model;
 
+use Bixie\Cart\Cart\CartHandler;
 use Pagekit\Util\Arr;
 use Pagekit\Application as App;
 use Pagekit\Database\ORM\ModelTrait;
 
 trait OrderModelTrait
 {
-    use ModelTrait;
+    use ModelTrait {
+        create as modelCreate;
+    }
 
-	/**
+    /**
+     * Creates a new instance of this model.
+     * @param  CartHandler $cartHandler
+     * @param array        $data
+     * @return static Order
+     */
+    public static function create (CartHandler $cartHandler, $data = []) {
+        $user = App::auth()->getUser();//get from auth, fresh user
+        $order_data = !empty($data['data']) ? array_merge($data['data'], $cartHandler->getOrderData()): $cartHandler->getOrderData();
+        return static::modelCreate(array_merge($data, [
+            'user_id' => ($user ? $user->id : 0),
+            'status' => self::STATUS_PENDING,
+            'created' => new \DateTime(),
+            'email' => $cartHandler->getDeliveryAddress()->email,
+            'currency' => $cartHandler->getCurrency(),
+            'data' => $order_data,
+            'cartItemsData' => $cartHandler->getItems()
+        ]));
+    }
+
+    /**
 	 * Gets a payment value.
 	 *
 	 * @param  string $key

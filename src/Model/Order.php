@@ -2,7 +2,9 @@
 
 namespace Bixie\Cart\Model;
 
+use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\CartItem;
+use Bixie\Cart\Cart\CartItemCollection;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
@@ -28,7 +30,13 @@ class Order implements \JsonSerializable {
 	/** @Column(type="integer") */
 	public $status = 0;
 
-	/** @Column(type="datetime") */
+    /** @Column(type="string") */
+    public $ext_key;
+
+    /** @Column(type="string") */
+    public $reference;
+
+    /** @Column(type="datetime") */
 	public $created;
 
 	/** @Column(type="string") */
@@ -65,25 +73,6 @@ class Order implements \JsonSerializable {
 		'user_name' => 'getUserName'
 	];
 
-	/**
-	 * Creates a new instance of this model.
-	 * @param  array $cartItems
-	 * @param  array $checkout
-	 * @return static Order
-	 */
-	public static function createNew ($cartItems, $checkout) {
-		$user = App::auth()->getUser();//get from auth, fresh user
-		return static::create([
-			'user_id' => ($user ? $user->id : 0),
-			'status' => self::STATUS_PENDING,
-			'created' => new \DateTime(),
-			'email' => $checkout['billing_address']['email'],
-			'currency' => $checkout['currency'],
-			'data' => $checkout,
-			'cartItemsData' => $cartItems
-		]);
-	}
-
 	public function isValid () {
 		return $this->status == self::STATUS_CONFIRMED;
 	}
@@ -103,9 +92,10 @@ class Order implements \JsonSerializable {
 		static $cartItems;
 		if (!$cartItems) {
 			$cartItems = [];
+            /** @var CartItemCollection $bixieCart */
 			$bixieCart = App::bixieCart();
 			foreach ($this->cartItemsData as $cartItemData) {
-				$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->load($cartItemData);
+				$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->loadItemFromData($cartItemData);
 			}
 		}
 		return $cartItems;
@@ -114,6 +104,7 @@ class Order implements \JsonSerializable {
 	public function calculateOrder () {
 		$this->total_netto = 0;
 		$this->total_bruto = 0;
+        $vat_calc = ['none' => 0, 'low' => 0, 'high' => 0];
 		foreach ($this->getCartItems() as $cartItem) {
 
 			$event = new Event('bixie.calculate.order');
@@ -122,8 +113,18 @@ class Order implements \JsonSerializable {
 			$prices = $cartItem->calcPrices($this);
 
 			$this->total_netto += $prices['netto'];
-			$this->total_bruto += $prices['bruto'];
+            $vat_calc[$cartItem->vat] += $prices['vat'];
 		}
+		if ($delivery_price = $this->get('delivery_option.price', 0)) {
+            $this->total_netto += $delivery_price;
+            $vat_calc['high'] += App::cartCalcVat($delivery_price, 'high');
+        }
+		if ($payment_price = $this->get('payment_option.price', 0)) {
+            $this->total_netto += $payment_price;
+            $vat_calc['high'] += App::cartCalcVat($payment_price, 'high');
+        }
+
+        $this->total_bruto += round($vat_calc['high'] + $vat_calc['low'] + $this->total_netto, 2);
 		return $this;
 	}
 

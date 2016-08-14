@@ -1,8 +1,21 @@
 module.exports = {
 
+    name: 'orders',
+
+    el: '#cart-orders',
+
+    mixins: [require('../../lib/currency')],
+
     data: function () {
         return _.merge({
             orders: false,
+            config: {
+                filter: this.$session.get('bixie.cart.orders.filter', {
+                    status: '',
+                    search: '',
+                    order: 'created desc'
+                })
+            },
             pages: 0,
             count: '',
             selected: [],
@@ -14,12 +27,7 @@ module.exports = {
 
     created: function () {
         this.resource = this.$resource('api/cart/order{/id}');
-        this.config.filter = _.extend({
-            status: '',
-            search: '',
-            order: 'created desc',
-            limit: this.config.orders_per_page
-        }, this.config.filter);
+        this.$watch('config.page', this.load, {immediate: true});
     },
 
     computed: {
@@ -38,26 +46,23 @@ module.exports = {
 
         cartItems: function (order) {
             var cartItems = order.cartItems.map(function (cartItem) {
-                return cartItem.item_title;
+                return cartItem.title;
             });
             return cartItems.join(', ');
         },
 
-        active: function (portfolio) {
-            return this.selected.indexOf(portfolio.id) != -1;
+        active: function (order) {
+            return this.selected.indexOf(order.id) !== -1;
         },
 
-        load: function (page) {
-
-            page = page !== undefined ? page : this.config.page;
-
-            return this.resource.query({ filter: this.config.filter, page: page }, function (data) {
-                this.$set('orders', data.orders);
-                this.$set('pages', data.pages);
-                this.$set('count', data.count);
-                this.$set('config.page', page);
+        load: function () {
+            return this.resource.query(this.config).then(function (res) {
+                this.$set('orders', res.data.orders);
+                this.$set('pages', res.data.pages);
+                this.$set('count', res.data.count);
                 this.$set('selected', []);
             });
+
         },
 
         save: function (order) {
@@ -114,22 +119,23 @@ module.exports = {
     },
 
     watch: {
-        'config.page': 'load',
 
         'config.filter': {
-            handler: function () { this.load(0); },
+            handler: function (filter) {
+                if (this.config.page) {
+                    this.config.page = 0;
+                } else {
+                    this.load();
+                }
+
+                this.$session.set('bixie.cart.orders.filter', filter);
+            },
             deep: true
         }
-    },
 
-    mixins: [require('../../lib/currency')]
+    }
 
 
 };
 
-$(function () {
-
-    new Vue(module.exports).$mount('#cart-orders');
-
-});
-
+Vue.ready(module.exports);

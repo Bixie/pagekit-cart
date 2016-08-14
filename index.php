@@ -18,7 +18,7 @@ return [
 	'nodes' => [
 
 		'checkout' => [
-			'name' => '@cart',
+			'name' => '@cart/checkout',
 			'label' => 'Checkout',
 			'controller' => 'Bixie\\Cart\\Controller\\CheckoutSiteController',
 			'protected' => true,
@@ -188,12 +188,10 @@ return [
 
 		'view.scripts' => function ($event, $scripts) use ($app) {
 			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');
-			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js', ['vue', 'uikit-form-password', 'jstz']);
-
-//			$scripts->register('uikit-form-password', 'app/assets/uikit/js/components/form-password.min.js', 'uikit');
-			$scripts->register('uikit-accordion', 'app/assets/uikit/js/components/accordion.min.js', 'uikit');
-			$scripts->register('uikit-lightbox', 'app/assets/uikit/js/components/lightbox.min.js', 'uikit');
-		},
+			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js',
+                ['bixie-framework', 'uikit-form-select', 'uikit-tooltip', 'uikit-notify', 'uikit-form-password', 'jstz']
+            );
+        },
 
 		'console.init' => function ($event, $console) {
 

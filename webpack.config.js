@@ -1,9 +1,12 @@
+var assets = __dirname + "/../../../app/assets";
+
 module.exports = [
 
     {
         entry: {
             "widget-cart": "./app/components/widget-cart.vue",
             "bixie-cart": "./app/cart.js",
+            "bixie-cart-widget": "./app/views/cart-widget.js",
             /*views*/
             "orders": "./app/views/front/orders.js",
             "findorder": "./app/views/front/findorder.js",
@@ -14,6 +17,11 @@ module.exports = [
         output: {
             filename: "./app/bundle/[name].js"
         },
+        resolve: {
+            alias: {
+                "md5$": assets + "/js-md5/js/md5.js"
+            }
+        },
         externals: {
             "lodash": "_",
             "jquery": "jQuery",
@@ -23,7 +31,7 @@ module.exports = [
         module: {
             loaders: [
                 {test: /\.vue$/, loader: "vue"},
-                {test: /\.html/, loader: "html"}
+                {test: /\.html/, loader: "vue-html"}
             ]
         }
     }

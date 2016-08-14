@@ -7,7 +7,7 @@
 	</div>
 	<div data-uk-margin>
 
-		<button class="uk-button uk-button-primary" v-on="click: save">{{ 'Save' | trans }}</button>
+		<button class="uk-button uk-button-primary" @click="save">{{ 'Save' | trans }}</button>
 
 	</div>
 </div>
@@ -30,8 +30,8 @@
 		<span class="uk-form-label">{{ 'Terms and Conditions text' | trans }}</span>
 
 		<div class="uk-form-controls">
-			<v-editor id="form-terms_content" value="{{@ config.terms.content }}"
-					  options="{{ {markdown : config.terms.markdown_enabled, height: 350} }}"></v-editor>
+			<v-editor id="form-terms_content" :value.sync="config.terms.content"
+					  :options="{markdown : config.email.markdown_enabled, height: 350}"></v-editor>
 		</div>
 		<p class="uk-form-controls-condensed">
 			<label><input type="checkbox" v-model="config.terms.markdown_enabled"> {{ 'Enable

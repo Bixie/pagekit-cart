@@ -19,9 +19,13 @@ class CartItem implements \JsonSerializable
 	 */
 	public $id;
 	/**
-	 * @var integer
+	 * @var string
 	 */
-	public $product_id;
+	public $sku;
+    /**
+     * @var string
+     */
+    public $title;
 	/**
 	 * @var integer
 	 */
@@ -30,10 +34,6 @@ class CartItem implements \JsonSerializable
 	 * @var string
 	 */
 	public $item_model;
-	/**
-	 * @var string
-	 */
-	public $item_title;
 	/**
 	 * @var string
 	 */
@@ -98,12 +98,12 @@ class CartItem implements \JsonSerializable
 
 		$netto = $this->convertPrice($this->price, $order);
 		$vatclass = App::module('bixie/cart')->config('vatclasses.' . $this->vat);
-		$bruto = (round(($netto * 100) * (($vatclass['rate'] / 100) + 1))) / 100;
+		$vat = App::cartCalcVat($netto, $this->vat);
 
 		return [
 			'netto' => $netto,
-			'bruto' => $bruto,
-			'vat' => $bruto - $netto,
+			'bruto' => $netto + $vat,
+			'vat' => $vat,
 			'vatclass' => $vatclass
 		];
 	}

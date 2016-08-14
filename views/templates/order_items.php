@@ -16,13 +16,9 @@
 			$prices = $cartItem->calcPrices($order);
 			?>
 			<li>
-				<div class="uk-grid uk-grid-small" data-uk-grid-margin="">
+				<div class="uk-grid" data-uk-grid-margin="">
 					<div class="uk-width-medium-2-3">
-						<h3><a href="<?= $cartItem->item_url ?>"><?= $cartItem->item_title ?></a></h3>
-						<dl class="uk-description-list uk-description-list-horizontal">
-							<dt><?= __('Purchase key') ?></dt>
-							<dd><em><?= $cartItem->purchaseKey($order) ?></em></dd>
-						</dl>
+						<h3><a href="<?= $cartItem->item_url ?>"><?= $cartItem->title ?></a></h3>
 					</div>
 					<div class="uk-width-medium-1-3">
 						<dl class="uk-description-list uk-description-list-horizontal">

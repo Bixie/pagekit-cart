@@ -1,5 +1,9 @@
 module.exports = Vue.extend({
 
+    name: 'find-order',
+
+    el: '#bixie-findorder',
+
     data: function () {
         return {
             loading: false,
@@ -13,7 +17,7 @@ module.exports = Vue.extend({
     },
 
     created: function () {
-        this.resource = this.$resource('api/cart/order/:task');
+        this.Order = this.$resource('api/cart/order{/task}');
     },
 
     methods: {
@@ -21,44 +25,44 @@ module.exports = Vue.extend({
         submitForm: function () {
             this.$set('loading', true);
             this.$set('alert', '');
-            if (this.step == 1) {
+            if (this.step === 1) {
                 this.lookUp();
             }
-            if (this.step == 2) {
+            if (this.step === 2) {
                 this.register();
             }
         },
 
         lookUp: function () {
 
-            this.resource.save({task: 'findorder'}, {
+            this.Order.save({task: 'findorder'}, {
                 transaction_id: this.transaction_id,
                 email: this.email
-            }, function (data) {
+            }).then(function (res) {
                 this.$set('loading', false);
-                if (data.success) {
+                if (res.data.success) {
                     this.$set('step', 2);
-                } else if (data.error) {
-                    this.$set('alert', data.error);
+                } else if (res.data.error) {
+                    this.$set('alert', res.data.error);
                 }
             });
 
         },
 
         register: function () {
-            this.resource.save({task: 'register'}, {
+            this.Order.save({task: 'register'}, {
                 transaction_id: this.transaction_id,
                 user: {
                     email: this.email,
                     username: this.username,
                     password: this.password
                 }
-            }, function (data) {
+            }).then(function (res) {
                 this.$set('loading', false);
-                if (data.success) {
+                if (res.data.success) {
                     this.$set('step', 3);
-                } else if (data.error) {
-                    this.$set('alert', data.error);
+                } else if (res.data.error) {
+                    this.$set('alert', res.data.error);
                 }
             });
 

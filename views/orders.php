@@ -7,7 +7,7 @@
 $view->script('bixie-orders', 'bixie/cart:app/bundle/orders.js', ['vue', 'uikit-pagination', 'uikit-form-select']);
 ?>
 
-<section id="bixie-orders">
+<section id="cart-orders">
 
 	<h1><?= __('Your orders') ?></h1>
 
@@ -37,37 +37,38 @@ $view->script('bixie-orders', 'bixie/cart:app/bundle/orders.js', ['vue', 'uikit-
 		</div>
 
 		<div class="uk-grid uk-grid-small uk-text-bold">
-			<div class="uk-width-medium-2-6" v-order="transaction_id: config.filter.order">{{ 'Transaction ID' | trans }}</div>
-			<div class="uk-width-1-2 uk-width-medium-1-6" v-order="created: config.filter.order">{{ 'Date' | trans }}</div>
+			<div class="uk-width-medium-2-6" v-order:transaction_id="config.filter.order">{{ 'Transaction ID' | trans }}</div>
+			<div class="uk-width-1-2 uk-width-medium-1-6" v-order:created="config.filter.order">{{ 'Date' | trans }}</div>
 			<div class="uk-width-1-2 uk-width-medium-1-6 uk-text-center">
-				<input-filter title="{{ 'Status' | trans }}" value="{{@ config.filter.status}}" options="{{ statusOptions }}"></input-filter>
+				<input-filter :title="$trans('Status')" :value.sync="config.filter.status" :options="statusOptions"></input-filter>
 			</div>
 			<div class="uk-width-medium-2-6 uk-hidden-small">{{ 'Items' | trans }}</div>
 		</div>
 
 		<ul class="uk-list uk-margin-small-top uk-list-striped">
-			<li v-repeat="order: orders">
+			<li v-for="order in orders">
 				<div class="uk-grid uk-grid-small">
 					<div class="uk-width-medium-2-6">
-						<a v-attr="href: $url.route(config.edit_url, { transaction_id: order.transaction_id })">{{ order.transaction_id }}</a>
+						<a :href="$url.route(config.edit_url, { transaction_id: order.transaction_id })">{{ order.transaction_id }}</a>
 					</div>
 					<div class="uk-width-1-3 uk-width-medium-1-6">{{ order.created | date }}</div>
 					<div class="uk-width-1-3 uk-width-medium-1-6 uk-text-center">
-				<span title="{{ getStatusText(order) }}" class="uk-icon-circle" v-class="
-                                uk-text-danger: order.status == 0,
-                                uk-text-success: order.status == 1"></span>
+				<span :title="getStatusText(order)" class="uk-icon-circle" :class="{
+                                'uk-text-danger': order.status == 0,
+                                'uk-text-success': order.status == 1
+                                }"></span>
 					</div>
 					<div class="uk-width-medium-2-6">{{ cartItems(order) }}</div>
 				</div>
 			</li>
 		</ul>
 
-		<p v-show="!orders" class="uk-text-center"><i class="uk-icon-circle-o-notch uk-icon-spin"></i></p>
+		<p v-show="orders == false" class="uk-text-center"><i class="uk-icon-circle-o-notch uk-icon-spin"></i></p>
 
 		<h3 class="uk-h1 uk-text-muted uk-text-center"
 			v-show="orders && !orders.length">{{ 'No orders found.' | trans }}</h3>
 
-		<v-pagination page="{{@ config.page }}" pages="{{ pages }}" v-show="pages > 1"></v-pagination>
+		<v-pagination :page.sync="config.page" :pages="pages" v-show="pages > 1"></v-pagination>
 
 
 	<?php endif; ?>

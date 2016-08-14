@@ -3,15 +3,15 @@
     <div v-show="!cartItems.length" class="uk-alert">{{ 'No items in cart yet' | trans }}</div>
 
     <ul v-show="cartItems.length" class="uk-list uk-list-line">
-        <li v-repeat="cartItem: cartItems">
+        <li v-for="cartItem in cartItems">
             <div class="uk-grid uk-grid-small">
                 <div class="uk-width-medium-1-2">
-                    <a href="{{ cartItem.item_url}}">{{ cartItem.item_title  }}</a>
+                    <a :href="cartItem.item_url">{{ cartItem.item_title  }}</a>
                 </div>
                 <div class="uk-width-medium-1-2 uk-text-right">
                     <div class="uk-grid uk-grid-small">
                         <div class="uk-width-1-2">
-                            <a v-on="click: removeFromCart($index)" class="uk-icon-trash-o uk-icon-justify uk-icon-hover"></a>
+                            <a @click="removeFromCart($index)" class="uk-icon-trash-o uk-icon-justify uk-icon-hover"></a>
                         </div>
                         <div class="uk-width-1-2">
                             {{{ cartItem | productprice }}}

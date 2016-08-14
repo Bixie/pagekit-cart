@@ -12,6 +12,7 @@ module.exports = {
                 return zoneOptions;
             }(zones));
         });
+        console.log(options);
         return options;
     }
 

@@ -43,7 +43,7 @@ class OrderSiteController
 					'edit_url' => App::url('@cart/orders/detail', ['transaction_id' => ':transaction_id']),
 					'ordering' => 'created',
 					'ordering_dir' => 'desc',
-					'filter' => $filter,
+					'filter' => (object)$filter,
 					'page'   => $page,
 					'limit'   => $this->cart->config('orders_per_page')
 				]
@@ -78,7 +78,7 @@ class OrderSiteController
 		}
 
 		foreach ($order->getCartItems() as $cartItem) {
-			$event = new Event('bixie.admin.orderitem');
+			$event = new Event('bixie.cart.admin.orderitem');
 			App::trigger($event, [$order, $cartItem]);
 			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}

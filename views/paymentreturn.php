@@ -6,10 +6,11 @@
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
-
+$delivery_price = $order->get('delivery_option.price', 0);
+$payment_price = $order->get('payment_option.price', 0);
 ?>
 
-<div id="bixie-checkout">
+<div id="bixie-paymentreturn">
 
 	<h1><?= __($title) ?></h1>
 
@@ -25,19 +26,46 @@
 			<dd><?= $order->transaction_id ?></dd>
 			<dt><?= __('Order date') ?></dt>
 			<dd><?= $cart->formatDate($order->created, 'medium', $order->get('user_tz')) ?></dd>
+			<?php if ($order->reference) : ?>
+				<dt><?= __('Order reference') ?></dt>
+				<dd><?= $order->reference ?></dd>
+			<?php endif; ?>
 		</dl>
-		<dl class="uk-description-list uk-description-list-horizontal">
-			<dt><?= __('Amount excl. VAT') ?></dt>
-			<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
-			<dt><?= __('VAT amount') ?></dt>
-			<dd class="uk-text-right"><?= $cart->formatMoney($order->total_bruto - $order->total_netto, $order->currency) ?></dd>
-			<dt><?= __('Amount incl. VAT') ?></dt>
-			<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
-		</dl>
-		<dl class="uk-description-list uk-description-list-horizontal">
-			<dt><?= __('Order comment') ?></dt>
-			<dd><?= nl2br($order->get('comment', '-')) ?></dd>
-		</dl>
+
+        <h3 class="uk-panel-title"><?= __('Order details') ?></h3>
+
+        <div class="uk-grid" data-uk-grid-margin>
+		    <div class="uk-width-medium-2-3">
+                <dl class="uk-description-list uk-description-list-horizontal">
+					<?php if ($delivery_price || $payment_price) : ?>
+						<dt><?= __('Ordered items') ?></dt>
+						<dd class="uk-text-right"><?= $cart->formatMoney(($order->total_netto - $delivery_price - $payment_price), $order->currency) ?></dd>
+						<?php if ($delivery_price) : ?>
+							<dt><?= __('Delivery costs') ?></dt>
+							<dd class="uk-text-right"><?= $cart->formatMoney($delivery_price, $order->currency) ?></dd>
+						<?php endif; ?>
+						<?php if ($payment_price) : ?>
+							<dt><?= __('Payment costs') ?></dt>
+							<dd class="uk-text-right"><?= $cart->formatMoney($payment_price, $order->currency) ?></dd>
+						<?php endif; ?>
+					<?php endif; ?>
+					<dt><?= __('Amount excl. VAT') ?></dt>
+					<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
+					<dt><?= __('VAT amount') ?></dt>
+					<dd class="uk-text-right"><?= $cart->formatMoney($order->total_bruto - $order->total_netto, $order->currency) ?></dd>
+					<dt><?= __('Amount incl. VAT') ?></dt>
+					<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
+				</dl>
+                <dl class="uk-description-list uk-description-list-horizontal">
+                    <dt><?= __('Order comment') ?></dt>
+                    <dd><?= nl2br($order->get('comment', '-')) ?></dd>
+                </dl>
+
+			</div>
+		    <div class="uk-width-medium-1-3">
+                <?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
+		    </div>
+		</div>
 	</div>
 
 	<div class="uk-margin">
@@ -46,10 +74,28 @@
 
 	<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">
 		<div class="uk-width-medium-1-2">
-			<?= $view->render('bixie/cart/templates/billing_address.php', compact('cart', 'order')) ?>
+            <div class="uk-panel uk-panel-box">
+
+                <h3 class="uk-panel-title"><?= __('Delivery address') ?></h3>
+
+                <?= $view->render('bixie/cart/templates/address.php', [
+                    'cart' => $cart, 'order' => $order, 'address' => $order->get('delivery_address')
+                ]) ?>
+
+            </div>
+
 		</div>
 		<div class="uk-width-medium-1-2">
-			<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
+            <div class="uk-panel uk-panel-box">
+
+                <h3 class="uk-panel-title"><?= __('Billing address') ?></h3>
+
+                <?= $view->render('bixie/cart/templates/address.php', [
+                    'cart' => $cart, 'order' => $order, 'address' => $order->get('billing_address')
+                ]) ?>
+
+            </div>
+
 		</div>
 	</div>
 

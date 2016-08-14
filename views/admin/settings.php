@@ -1,4 +1,4 @@
-<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['vue', 'editor', 'uikit-accordion']) ?>
+<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['bixie-framework', 'editor', 'uikit-accordion']) ?>
 
 <div id="cart-settings" class="uk-form">
 
@@ -32,7 +32,7 @@
 						</div>
 						<div data-uk-margin>
 
-							<button class="uk-button uk-button-primary" v-on="click: save">{{ 'Save' | trans }}</button>
+							<button class="uk-button uk-button-primary" @click="save">{{ 'Save' | trans }}</button>
 
 						</div>
 					</div>
@@ -44,7 +44,8 @@
 
 							<div class="uk-form-controls uk-form-controls-text">
 								<select id="form-config_vat" name="config_vat" class="uk-form-width-medium"
-										v-model="config.vat" options="vatOptions">
+										v-model="config.vat">
+									<option v-for="vatclass in config.vatclasses" value="$key">{{ vatclass.name }}</option>
 								</select>
 							</div>
 						</div>
@@ -52,16 +53,16 @@
 						<div class="uk-form-row">
 							<span class="uk-form-label">{{ 'VAT rates' | trans }}</span>
 							<div class="uk-form-controls uk-form-controls-text">
-								<p v-repeat="config.vatclasses" class="uk-form-controls-condensed">
-									<span class="uk-display-inline-block" style="width: 110px">{{ name | trans }}</span>
+								<p v-for="vatclass in config.vatclasses" class="uk-form-controls-condensed">
+									<span class="uk-display-inline-block" style="width: 110px">{{ vatclass.name | trans }}</span>
 									<input class="uk-form-width-small uk-text-right" type="number"
-										   v-model="config.vatclasses[$key].rate" number> %
+										   v-model="vatclass.rate" number> %
 
 								</p>
 							</div>
 						</div>
 
-						<fields config="{{ $options.fields.cart }}" model="{{@ config }}" template="formrow"></fields>
+						<fields :config="$options.fields.cart" :model.sync="config" template="formrow"></fields>
 
 					</div>
 
@@ -78,21 +79,21 @@
 							</div>
 							<div data-uk-margin>
 
-								<button class="uk-button uk-button-primary" v-on="click: save">{{ 'Save' | trans }}</button>
+								<button class="uk-button uk-button-primary" @click="save">{{ 'Save' | trans }}</button>
 
 							</div>
 						</div>
 
-						<div class="uk-accordion uk-form-horizontal" data-uk-accordion="{showfirst: false}">
+						<div class="uk-margin uk-accordion uk-form-horizontal" data-uk-accordion="{showfirst: false}">
 
 							<?php foreach ($gateways as $gateway) :
 								$shortName = $gateway->getShortName()
 								?>
 
 								<h3 class="uk-accordion-title">
-									<i v-attr="class: config.gateways['<?= $shortName ?>'].active ?
-									'uk-icon-circle uk-text-success uk-margin-small-right' :
-									'uk-icon-circle uk-text-danger uk-margin-small-right'"></i>
+									<i class="uk-icon-circle uk-margin-small-right"
+									   :class="{'uk-text-success': config.gateways['<?= $shortName ?>'].active,
+									'uk-text-danger': !config.gateways['<?= $shortName ?>'].active}"></i>
 									<?= $gateway->getName() ?></h3>
 
 								<div class="uk-accordion-content">
@@ -100,9 +101,36 @@
 										<span class="uk-form-label">{{ 'Active' | trans }}</span>
 
 										<div class="uk-form-controls uk-form-controls-text">
-											<label><input type="checkbox" value="hide-title"
+											<label><input type="checkbox" value="active"
 														  v-model="config.gateways['<?= $shortName ?>'].active"> {{ 'Payment method active' |
 												trans }}</label>
+										</div>
+									</div>
+
+									<div class="uk-form-row">
+										<label class="uk-form-label">{{ 'Title' | trans }}</label>
+
+										<div class="uk-form-controls uk-form-controls-text">
+											<input type="text" v-model="config.gateways['<?= $shortName ?>'].title"
+												class="uk-form-width-large">
+										</div>
+									</div>
+
+									<div class="uk-form-row">
+										<label class="uk-form-label">{{ 'Image' | trans }}</label>
+
+										<div class="uk-form-controls uk-form-controls-text">
+											<input-image-meta class="pk-image-max-height"
+														 :image.sync="config.gateways['<?= $shortName ?>'].data.image"></input-image-meta>
+										</div>
+									</div>
+
+									<div class="uk-form-row">
+										<label class="uk-form-label">{{ 'Price' | trans }}</label>
+
+										<div class="uk-form-controls uk-form-controls-text">
+											<input type="number" v-model="config.gateways['<?= $shortName ?>'].price"
+												   class="uk-form-width-small uk-text-right" step="0.01" number>
 										</div>
 									</div>
 
@@ -155,14 +183,14 @@
 						</div>
 						<div data-uk-margin>
 
-							<button class="uk-button uk-button-primary" v-on="click: save">{{ 'Save' | trans }}</button>
+							<button class="uk-button uk-button-primary" @click="save">{{ 'Save' | trans }}</button>
 
 						</div>
 					</div>
 
 					<div class="uk-form-horizontal">
 
-						<fields config="{{ $options.fields.general }}" model="{{@ config }}" template="formrow"></fields>
+						<fields :config="$options.fields.general" :model.sync="config" template="formrow"></fields>
 
 					</div>
 				</li>

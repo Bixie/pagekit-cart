@@ -6,7 +6,7 @@
             <div v-if="config.addtocart.show_vat"><small>{{{ includingVat }}}</small></div>
         </div>
         <div class="{{ buttonHldr }}">
-            <button type="button" class="uk-button uk-button-success uk-width-1-1" v-on="click: addToCart(product)">
+            <button type="button" class="uk-button uk-button-success uk-width-1-1" @click="addToCart(product)">
                 <i class="uk-icon-shopping-cart uk-margin-small-right"></i>{{ 'Add to cart' | trans }}
             </button>
         </div>

@@ -4,7 +4,7 @@
     <div class="uk-form-row">
         <div class="uk-form-controls uk-form-controls-text">
             <label><input type="checkbox" name="agreed" value="agreed"
-                          v-model="agreed"> {{ termsText1 }}<a v-on="click: showTerms">{{ linkText }}</a>{{ termsText2 }}</label>
+                          v-model="agreed"> {{ termsText1 }}<a @click="showTerms">{{ linkText }}</a>{{ termsText2 }}</label>
         </div>
         <p class="uk-form-help-block uk-text-danger" v-show="invalid">
             {{ 'Please agree with the terms and conditions' | trans }}</p>

@@ -2,7 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
-use Bixie\Cart\Cart\UserHelper;
+use Bixie\Cart\Helper\UserHelper;
 use Bixie\Cart\CartException;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
@@ -64,10 +64,10 @@ class OrderApiController {
 			$order = [1 => 'created', 2 => 'desc'];
 		}
 
-		$limit = (int) $limit ?: $this->cart->config('orders_per_page');
-		$count = $query->count();
-		$pages = ceil($count / $limit);
-		$page  = max(0, min($pages - 1, $page));
+        $limit = (int)$limit ?: $this->cart->config('orders_per_page');
+        $count = $query->count();
+        $pages = ceil($count / $limit);
+        $page = max(0, min($pages - 1, $page));
 
 		$orders = array_values($query->offset($page * $limit)->related('user')->limit($limit)->orderBy($order[1], $order[2])->get());
 

@@ -44,6 +44,7 @@
         props: ['widget', 'config', 'form'],
 
         created: function () {
+            this.$options.partials = this.$parent.$options.partials;
             this.widget.data = _.assign({show_currency: true}, this.widget.data);
         }
     };

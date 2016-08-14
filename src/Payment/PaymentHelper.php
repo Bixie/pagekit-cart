@@ -3,17 +3,18 @@
 
 namespace Bixie\Cart\Payment;
 
+use Bixie\Cart\Cart\CartHandler;
+use Bixie\Cart\Cart\PaymentOption;
+use Bixie\Cart\CartException;
 use Bixie\Cart\CartModule;
 use Omnipay\Common\CreditCard;
 use Omnipay\Common\Message\ResponseInterface;
 use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
 use Omnipay\Omnipay;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 class PaymentHelper {
-
-	const MODE_LIVE = 'live';
-	const MODE_TEST = 'test';
 
 	/**
 	 * @var App
@@ -34,29 +35,19 @@ class PaymentHelper {
 	public function __construct (App $app, CartModule $cart) {
 		$this->app = $app;
 		$this->config = $cart->config('gateways');
-		$this->mode = $cart->config('payment_live') ? PaymentHelper::MODE_LIVE : PaymentHelper::MODE_TEST;
 	}
 
-	/**
-	 * @param mixed $mode
-	 */
-	public function setMode ($mode) {
-		$this->mode = $mode;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getMode () {
-		return $this->mode;
-	}
-
+    /**
+     * @return array
+     */
 	public function getSettings () {
 		$settings = [];
 		foreach ($this->getGateways() as $gateway) {
 			$shortName = $gateway->getShortName();
 			if (!isset($this->config[$shortName])) {
-				$this->config[$shortName] = ['active' => false];
+				$this->config[$shortName] = [
+				    'active' => false, 'title' => '', 'price' => 0, 'settings' => [], 'data' => ['image' => ['src' => '']]
+                ];
 			}
 			$settings[$shortName] = array_merge($gateway->getDefaultParameters(), $this->config[$shortName]);
 
@@ -64,19 +55,44 @@ class PaymentHelper {
 		return $settings;
 	}
 
+    /**
+     * @return PaymentOption[]
+     */
 	public function activeGatewaysData () {
 		$gatewaysData = [];
-		foreach ($this->getGateways() as $gateway) {
-			if (!empty($this->config[$gateway->getShortName()]['active'])) {
-				$gatewaysData[] = [
-					'shortName' => $gateway->getShortName(),
-					'name' => $gateway->getName()
-				];
+        /** @var \Omnipay\Common\GatewayInterface $gateway */
+        foreach ($this->getGateways() as $gateway) {
+            $shortName = $gateway->getShortName();
+			if (!empty($this->config[$shortName]['active'])) {
+			    $config = array_merge(['title' => '', 'price' => 0, 'data' => []], $this->config[$shortName]);
+                $card = in_array($shortName, ['Stripe']) ? true : false;
+				$gatewaysData[] = new PaymentOption([
+					'name' => $shortName,
+					'title' => $config['title'] ?: $gateway->getName(),
+                    'price' => $config['price'],
+                    'settings' => ['card' => $card],
+                    'data' => $config['data']
+				]);
 			}
 		}
 		return $gatewaysData;
 	}
 
+    /**
+     * @param $payment_option_name
+     * @return bool|PaymentOption
+     */
+    public function getPaymentOption ($payment_option_name) {
+        foreach ($this->activeGatewaysData() as $paymentOption) {
+            if ($paymentOption->name == $payment_option_name) {
+                return $paymentOption;
+            }
+        }
+        return false;
+    }
+    /**
+     * @return array
+     */
 	public function getGateways () {
 		if (!isset($this->gateways)) {
 			$this->gateways = array_map(function($name) {
@@ -86,6 +102,9 @@ class PaymentHelper {
 		return $this->gateways;
 	}
 
+    /**
+     * @return array
+     */
 	public function activeCheckoutData () {
 		$checkouterror = $this->app['session']->get('_bixiePayment.checkouterror', '');
 		$this->app['session']->remove('_bixiePayment.checkouterror');
@@ -97,13 +116,14 @@ class PaymentHelper {
 	}
 
 	/**
-	 * @param string $type
+	 * @param CartHandler $cartHandler
 	 * @param array  $cardData
 	 * @param Order  $order
 	 * @return ResponseInterface
 	 * @throws PaymentException
 	 */
-	public function getPayment ($type, $cardData, Order &$order) {
+	public function getPayment (CartHandler $cartHandler, Order &$order, $cardData = []) {
+        $type = $cartHandler->getPaymentOption()->name;
 		// Setup payment gateway
 		$gateway = Omnipay::create($type);
 
@@ -114,7 +134,7 @@ class PaymentHelper {
 		$order->transaction_id = md5(time() . serialize($cardData) . serialize($order->toArray()));
 		$order->set('payment.method_name', $gateway->getName());
 
-		$card = new CreditCard(array_merge($cardData, $order->get('billing_address')));
+		$card = new CreditCard(array_merge($cardData, $cartHandler->getBillingAddress()->toArray()));
 
 		try {// Send purchase request
 			$params = [
@@ -126,12 +146,13 @@ class PaymentHelper {
 				'transactionId' => $order->transaction_id,
 				'transactionReference' => $order->transaction_id,
 //					'cardReference' => $order->transaction_id,
-				'returnUrl' => App::url('@cart/paymentreturn', ['transaction_id' => $order->transaction_id], true),
-				'cancelUrl' => App::url('@cart/checkout', [], true),
+				'returnUrl' => App::url('@cart/checkout/paymentreturn', ['transaction_id' => $order->transaction_id], UrlGenerator::ABSOLUTE_URL),
+				'cancelUrl' => App::url('@cart/checkout', [], UrlGenerator::ABSOLUTE_URL),
 				'notifyUrl' => '',
 				'issuer' => '',
 				'card' => $card->getParameters()
 			];
+            /** @var \Omnipay\Common\Message\ResponseInterface $response */
 			$response = $gateway->purchase($params)->send();
 			$params['transactionReference'] = $response->getTransactionReference();
 
@@ -158,7 +179,7 @@ class PaymentHelper {
 			} else {
 
 				// Payment failed
-				throw new \Exception($response->getMessage());
+				throw new CartException($response->getMessage());
 			}
 
 		} catch (\Exception $e) {

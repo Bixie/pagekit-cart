@@ -5,9 +5,13 @@
 * @var Bixie\Cart\CartModule $cart
 * @var Bixie\Cart\Cart\CartItem $cartItem
 */
-$view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/admin-order.js', ['vue', 'editor']); ?>
+$view->style('codemirror'); $view->script('cart-order-edit', 'bixie/cart:app/bundle/admin-order.js', ['bixie-framework', 'editor']);
+$delivery_price = $order->get('delivery_option.price', 0);
+$payment_price = $order->get('payment_option.price', 0);
 
-<form id="order-edit" class="uk-form" name="form" v-validator="form" @submit.prevent="save | valid" v-cloak>
+?>
+
+<form id="cart-order" class="uk-form" name="form" v-validator="form" @submit.prevent="save | valid" v-cloak>
 
 	<div class="uk-margin uk-flex uk-flex-space-between uk-flex-wrap" data-uk-margin>
 		<div data-uk-margin>
@@ -15,11 +19,10 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 			<h2 class="uk-margin-remove" v-if="order.id">{{ 'Edit order' | trans }} <em>{{
 					order.title | trans }}</em></h2>
 
-
 		</div>
 		<div data-uk-margin>
 
-			<a class="uk-button uk-margin-small-right" v-attr="href: $url.route('admin/cart')">{{ order.id ?
+			<a class="uk-button uk-margin-small-right" :href="$url.route('admin/cart')">{{ order.id ?
 				'Close' :
 				'Cancel' | trans }}</a>
 			<button class="uk-button uk-button-primary" type="submit">{{ 'Save' | trans }}</button>
@@ -27,23 +30,25 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 		</div>
 	</div>
 
-	<ul class="uk-tab" v-el="tab">
+	<ul class="uk-tab" data-uk-tab="connect:'#order-content'">
 		<li><a>{{ 'Overview' | trans }}</a></li>
 		<li><a>{{ 'Items' | trans }}</a></li>
+		<li v-for="section in sections"><a>{{ section.label | trans }}</a></li>
 	</ul>
 
-	<div class="uk-switcher uk-margin" v-el="content">
+	<div class="uk-switcher uk-margin" id="order-content">
 		<div>
 			<div class="uk-margin">
 
 				<div class="uk-grid uk-grid-small" data-uk-grid-margin="">
-					<div class="uk-width-medium-1-2">
+					<div class="uk-width-medium-1-2 uk-form-horizontal">
 						<div class="uk-form-row">
 							<label for="form-status" class="uk-form-label">{{ 'Order status' | trans }}</label>
 
 							<div class="uk-form-controls">
-								<select id="form-status" class="uk-form-width-medium" v-model="order.status"
-										options="statusOptions"></select>
+								<select id="form-status" class="uk-form-width-medium" v-model="order.status">
+									<option v-for="option in statusOptions" :value="option.value">{{ option.text }}</option>
+								</select>
 							</div>
 						</div>
 
@@ -51,8 +56,9 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 							<label for="form-status" class="uk-form-label">{{ 'User' | trans }}</label>
 
 							<div class="uk-form-controls">
-								<select id="form-status" class="uk-form-width-medium" v-model="order.user_id"
-										options="userOptions"></select>
+								<select id="form-status" class="uk-form-width-medium" v-model="order.user_id">
+									<option v-for="option in userOptions" :value="option.value">{{ option.text }}</option>
+								</select>
 							</div>
 						</div>
 					</div>
@@ -70,7 +76,7 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 
 
 				<div class="uk-grid uk-margin" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">
-					<div class="<?= ($order->user_id ? 'uk-width-medium-2-3' : 'uk-width-1-1') ?>">
+					<div class="<?= ($order->user_id ? 'uk-width-medium-1-3' : 'uk-width-2-3') ?>">
 						<div class="uk-panel uk-panel-box">
 
 							<div
@@ -83,12 +89,31 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 							<dl class="uk-description-list uk-description-list-horizontal">
 								<dt><?= __('Tansaction ID') ?></dt>
 								<dd><?= $order->transaction_id ?></dd>
+								<dt><?= __('External key') ?></dt>
+								<dd><?= $order->ext_key ?></dd>
 								<dt><?= __('Email address') ?></dt>
 								<dd><?= $order->email ?></dd>
 								<dt><?= __('Order date') ?></dt>
 								<dd>{{ order.created | date 'medium' }}</dd>
+								<?php if ($order->reference) : ?>
+									<dt><?= __('Order reference') ?></dt>
+									<dd><?= $order->reference ?></dd>
+								<?php endif; ?>
+								delivery
 							</dl>
 							<dl class="uk-description-list uk-description-list-horizontal">
+								<?php if ($delivery_price || $payment_price) : ?>
+									<dt><?= __('Ordered items') ?></dt>
+									<dd class="uk-text-right"><?= $cart->formatMoney(($order->total_netto - $delivery_price - $payment_price), $order->currency) ?></dd>
+									<?php if ($delivery_price) : ?>
+										<dt><?= __('Delivery costs') ?></dt>
+										<dd class="uk-text-right"><?= $cart->formatMoney($delivery_price, $order->currency) ?></dd>
+									<?php endif; ?>
+									<?php if ($payment_price) : ?>
+										<dt><?= __('Payment costs') ?></dt>
+										<dd class="uk-text-right"><?= $cart->formatMoney($payment_price, $order->currency) ?></dd>
+									<?php endif; ?>
+								<?php endif; ?>
 								<dt><?= __('Amount excl. VAT') ?></dt>
 								<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
 								<dt><?= __('VAT amount') ?></dt>
@@ -96,10 +121,11 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 								<dt><?= __('Amount incl. VAT') ?></dt>
 								<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
 							</dl>
-							<dl class="uk-description-list uk-description-list-horizontal">
-								<dt><?= __('Order comment') ?></dt>
-								<dd>{{{ order.data.comment | nl2br }}}</dd>
-							</dl>
+						</div>
+					</div>
+					<div class="uk-width-medium-1-3">
+						<div class="uk-panel uk-panel-box">
+							<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
 						</div>
 					</div>
 					<?php if ($order->user_id) : ?>
@@ -132,10 +158,28 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 
 				<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">
 					<div class="uk-width-medium-1-2">
-						<?= $view->render('bixie/cart/templates/billing_address.php', compact('cart', 'order')) ?>
+						<div class="uk-panel uk-panel-box">
+
+							<h3 class="uk-panel-title"><?= __('Delivery address') ?></h3>
+
+							<?= $view->render('bixie/cart/templates/address.php', [
+								'cart' => $cart, 'order' => $order, 'address' => $order->get('delivery_address')
+							]) ?>
+
+						</div>
+
 					</div>
 					<div class="uk-width-medium-1-2">
-						<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
+						<div class="uk-panel uk-panel-box">
+
+							<h3 class="uk-panel-title"><?= __('Billing address') ?></h3>
+
+							<?= $view->render('bixie/cart/templates/address.php', [
+								'cart' => $cart, 'order' => $order, 'address' => $order->get('billing_address')
+							]) ?>
+
+						</div>
+
 					</div>
 				</div>
 
@@ -155,13 +199,13 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 								<div class="uk-width-medium-3-4">
 									<h3><a class="uk-icon-external-link uk-icon-hover uk-margin-small-right"
 										   href="<?= $cartItem->item_url ?>" target="_blank"></a>
-										<?= $cartItem->item_title ?></h3>
+										<?= $cartItem->title ?></h3>
 
 									<dl class="uk-description-list uk-description-list-horizontal">
 										<dt><?= __('Purchase key') ?></dt>
 										<dd><em><?= $cartItem->purchaseKey($order) ?></em></dd>
 									</dl>
-									<?= $cartItem->getTemplate('bixie.admin.order') ?>
+									<?= $cartItem->getTemplate('bixie.cart.admin.order') ?>
 								</div>
 								<div class="uk-width-medium-1-4">
 									<dl class="uk-description-list uk-description-list-horizontal">
@@ -180,6 +224,9 @@ $view->style('codemirror'); $view->script('admin-order', 'bixie/cart:app/bundle/
 				</ul>
 
 			</div>
+		</div>
+		<div v-for="section in sections">
+			<component :is="section.name" :order.sync="order" :config="config" :form="form"></component>
 		</div>
 	</div>
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bixie\Cart\Cart;
+namespace Bixie\Cart\Helper;
 
 use Bixie\Cart\CartModule;
 use Pagekit\Application as App;
@@ -89,37 +89,6 @@ class UserHelper {
 		} catch (AuthException $e) {
 			throw new Exception($e->getMessage(), $e->getCode(), $e);
 		}
-	}
-
-	public function getCheckoutDefaults () {
-		$names = $this->chopName();
-		$checkout = [
-			'billing_address' => [
-				'firstName' => $names['firstName'],
-				'lastName' => $names['lastName'],
-				'email' => $this->user->email,
-				'phone' => '',
-				'address1' => '',
-				'address2' => '',
-				'postcode' => '',
-				'city' => '',
-				'state' => '',
-				'country' => ''
-			],
-			'card' => [
-				'number' => '',
-				'expiryMonth' => '',
-				'expiryYear' => '',
-				'cvv' => ''
-			]
-		];
-
-		return $checkout;
-	}
-
-	public function chopName () {
-		$parts = explode(' ', $this->user->name);
-		return ['firstName' => array_shift($parts), 'lastName' => implode(' ', $parts)];
 	}
 
 }

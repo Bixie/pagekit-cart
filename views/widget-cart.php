@@ -1,22 +1,16 @@
 <?php
-$view->script('bixie-cart');
+$view->script('bixie-cart-widget', 'bixie/cart:app/bundle/bixie-cart-widget.js', 'bixie-cart');
 ?>
 <div id="cart-widget">
+	<ul class="uk-subnav">
+		<li class="">
+			<a onclick="$bixCart.openCart()"><span class="uk-text-primary"><?= $widget->title ?><i
+						class="uk-icon-shopping-cart uk-margin-small-left"></i></span>
+				<span class="uk-text-small">{{ $bixCart.nr_items_format }}</span>
+				<strong class="uk-text-small">{{ $bixCart.total_price | currency $bixCart.filter.currency }}</strong>
 
-	<cartlist></cartlist>
-
-	<div class="uk-form">
-		<select v-model="filters.currency">
-			<option value="EUR">{{ 'Euro' | trans }}</option>
-			<option value="USD">{{ 'US Dollar' | trans }}</option>
-		</select>
-	</div>
-
-	<div class="uk-margin">
-		<a v-attr="href: cart_loading ? 'javascript:void(0)' : checkout_url" class="uk-button uk-button-success">
-			<i v-show="!cart_loading" class="uk-icon-shopping-cart uk-margin-small-right"></i>
-			<i v-show="cart_loading" class="uk-icon-circle-o-notch uk-icon-spin uk-margin-small-right"></i>
-			{{ 'To checkout' | trans }}</a>
-	</div>
+			</a>
+		</li>
+	</ul>
 
 </div>

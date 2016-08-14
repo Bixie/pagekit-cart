@@ -1,4 +1,8 @@
-module.exports = Vue.extend({
+module.exports = {
+
+    name: 'settings',
+
+    el: '#cart-settings',
 
     data: function () {
         return window.$data;
@@ -9,10 +13,10 @@ module.exports = Vue.extend({
     methods: {
 
         save: function () {
-            this.$http.post('admin/system/settings/config', { name: 'bixie/cart', config: this.config }, function () {
+            this.$http.post('admin/system/settings/config', { name: 'bixie/cart', config: this.config }).then(function () {
                 this.$notify('Settings saved.');
-            }).error(function (data) {
-                this.$notify(data, 'danger');
+            }, function (res) {
+                this.$notify(res.data, 'danger');
             });
         }
     },
@@ -27,16 +31,6 @@ module.exports = Vue.extend({
         }
     }
 
-});
+};
 
-Vue.field.templates.formrow = require('../../templates/formrow.html');
-Vue.field.templates.raw = require('../../templates/raw.html');
-Vue.field.types.checkbox = '<p class="uk-form-controls-condensed"><label><input type="checkbox" v-attr="attrs" v-model="value"> {{ optionlabel | trans }}</label></p>';
-Vue.field.types.number = '<input type="number" v-attr="attrs" v-model="value" number>';
-Vue.field.types.title = '<h3 v-attr="attrs">{{ title | trans }}</h3>';
-
-$(function () {
-
-    (new module.exports()).$mount('#cart-settings');
-
-});
+Vue.ready(module.exports);

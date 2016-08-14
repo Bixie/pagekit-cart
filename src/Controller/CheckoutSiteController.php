@@ -2,8 +2,8 @@
 
 namespace Bixie\Cart\Controller;
 
-use Bixie\Cart\Cart\MailHelper;
-use Bixie\Cart\Cart\UserHelper;
+use Bixie\Cart\Helper\MailHelper;
+use Bixie\Cart\Helper\UserHelper;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
@@ -27,7 +27,7 @@ class CheckoutSiteController
 	/**
 	 * @Route("/")
 	 */
-	public function checkoutAction()
+	public function indexAction()
 	{
 		$checkoutData = App::bixiePayment()->activeCheckoutData();
 		if(empty($checkoutData['checkout'])) {
@@ -71,7 +71,8 @@ class CheckoutSiteController
 		if ($order->status != Order::STATUS_CONFIRMED && $payment_method = App::session()->get('_bixiePayment.redirected')) {
 			try {
 
-				$paymentResponse = App::bixiePayment()->getReturn($payment_method, $order);
+                /** @var \Omnipay\Common\Message\ResponseInterface $paymentResponse */
+                $paymentResponse = App::bixiePayment()->getReturn($payment_method, $order);
 
 				if ($paymentResponse->isSuccessful()) {
 
@@ -81,7 +82,7 @@ class CheckoutSiteController
 					App::bixieCart()->reset();
 
 					//send mail
-					(new MailHelper($order))->sendMail();
+//					(new MailHelper($order))->sendMail();
 
 					App::message()->success(__('Payment successful'));
 

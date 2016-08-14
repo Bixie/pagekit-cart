@@ -1,23 +1,30 @@
 module.exports = {
 
+    name: 'orders',
+
+    el: '#cart-orders',
+
     data: function () {
         return _.merge({
             user: {},
             orders: false,
+            config: {
+                filter: this.$session.get('bixie.site.cart.orders.filter', {
+                    user_id: window.$data.user.id,
+                    status: '',
+                    search: '',
+                    order: 'created desc',
+                    limit: 20
+                })
+            },
             pages: 0,
             count: ''
         }, window.$data);
     },
 
     created: function () {
-        this.resource = this.$resource('api/cart/order{/id}');
-        this.config.filter = _.extend({
-            user_id: this.user.id,
-            status: '',
-            search: '',
-            order: 'created desc',
-            limit: 20
-        }, this.config.filter);
+        this.Order = this.$resource('api/cart/order{/id}');
+        this.$watch('config.page', this.load, {immediate: true});
     },
 
     computed: {
@@ -36,24 +43,19 @@ module.exports = {
 
         cartItems: function (order) {
             var cartItems = order.cartItems.map(function (cartItem) {
-                return cartItem.item_title;
+                return cartItem.title;
             });
             return cartItems.join(', ');
         },
 
-        load: function (page) {
-
+        load: function () {
             if (!this.user.id) {
                 return;
             }
-
-            page = page !== undefined ? page : this.config.page;
-
-            return this.resource.query({ filter: this.config.filter, page: page }, function (data) {
-                this.$set('orders', data.orders);
-                this.$set('pages', data.pages);
-                this.$set('count', data.count);
-                this.$set('config.page', page);
+            return this.Order.query(this.config).then(function (res) {
+                this.$set('orders', res.data.orders);
+                this.$set('pages', res.data.pages);
+                this.$set('count', res.data.count);
             });
         },
 
@@ -64,10 +66,16 @@ module.exports = {
     },
 
     watch: {
-        'config.page': 'load',
-
         'config.filter': {
-            handler: function () { this.load(0); },
+            handler: function (filter) {
+                if (this.config.page) {
+                    this.config.page = 0;
+                } else {
+                    this.load();
+                }
+
+                this.$session.set('bixie.site.cart.orders.filter', filter);
+            },
             deep: true
         }
     },
@@ -78,15 +86,4 @@ module.exports = {
 };
 
 
-$(function () {
-
-    new Vue(module.exports).$mount('#bixie-orders');
-    Vue.asset({
-        css: [
-            'app/assets/uikit/css/components/form-select.css'
-        ]
-    }, function () {
-    });
-
-});
-
+Vue.ready(module.exports);

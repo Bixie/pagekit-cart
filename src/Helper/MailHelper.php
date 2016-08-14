@@ -1,6 +1,6 @@
 <?php
 
-namespace Bixie\Cart\Cart;
+namespace Bixie\Cart\Helper;
 
 use Bixie\Cart\CartModule;
 use Bixie\Cart\Payment\PaymentException;
