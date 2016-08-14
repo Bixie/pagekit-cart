@@ -131,6 +131,11 @@
             nr_items: function () {
                 return this.cart.items.length || 0;
             },
+            total_items: function () {
+                return _.reduce(this.cart.items, function (sum, item) {
+                    return sum + item.price;
+                }, 0);
+            },
             delivery_price: function () {
                 var delivery_option = _.find(this.cart.delivery_options, 'id', this.cart.delivery_option_id);
                 if (delivery_option) {
@@ -146,12 +151,34 @@
                 return 0;
             },
             total_price: function () {
-                var item_total = _.reduce(this.cart.items, function (sum, item) {
-                    return sum + item.price;
-                }, 0);
-
-                console.log('total_priceCalx', item_total);
-                return item_total + this.delivery_price + this.payment_price;
+                return this.total_items + this.delivery_price + this.payment_price;
+            },
+            vat_calc: function () {
+                var vat_calc = {none: 0, low: 0, high: 0};
+                _.forEach(this.cart.items, function (cartItem) {
+                    vat_calc[cartItem.vat] += cartItem.price * 100;
+                }, this);
+                if (this.delivery_price) {
+                    vat_calc['high'] += this.delivery_price * 100;
+                }
+                if (this.payment_price) {
+                    vat_calc['high'] += this.payment_price * 100;
+                }
+                return {
+                    total: Math.round(this.$cartCurrency.getVat({price:  vat_calc['high'], vat: 'high'})
+                         + this.$cartCurrency.getVat({price:  vat_calc['low'], vat: 'low'})) / 100,
+                    low:  {
+                        netto: vat_calc['low'] / 100,
+                        vat: Math.round(this.$cartCurrency.getVat({price:  vat_calc['low'], vat: 'low'})) / 100
+                    },
+                    high: {
+                        netto: vat_calc['high'] / 100,
+                        vat: Math.round(this.$cartCurrency.getVat({price:  vat_calc['high'], vat: 'high'})) / 100
+                    }
+                };
+            },
+            total_bruto: function () {
+                return this.total_price + this.vat_calc.total;
             },
             delivery_valid: function () {
                 return this.$refs.delivery && this.$refs.delivery.isValid;
@@ -262,6 +289,12 @@
             },
             checkoutModalDestroy: function () {
                 this.checkoutmodal = false;
+            },
+            vatLabel: function (vat_type) {
+                return this.$trans('%perc%\% of %amount%', {
+                    'perc': this.config.vatclasses[vat_type].rate,
+                    'amount': this.$cartCurrency.formatPrice(this.vat_calc[vat_type].netto)
+                });
             },
             resetErrors: function () {
                 this.checkouterror = '';

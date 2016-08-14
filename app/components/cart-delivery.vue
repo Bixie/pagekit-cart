@@ -8,8 +8,8 @@
                         <input type="radio" v-model="$bixCart.cart.delivery_option_id" :value="delivery_option.id"/>
                     </div>
                     <div class="uk-flex-item-1">
-                        <strong>{{ getDaysFormat(delivery_option.business_days) }}</strong> - {{ delivery_option.eta_date | date}}<br>
-                        {{ delivery_option.price | currency delivery_option.currency }}
+                        <strong>{{ getDaysFormat(delivery_option.business_days) }}</strong> - {{ delivery_option.eta_date | date}}
+                        <span v-if="delivery_option.price"><br>{{{ delivery_option.price | formatprice }}}</span>
                     </div>
                 </label>
             </li>

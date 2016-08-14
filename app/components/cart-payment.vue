@@ -12,7 +12,7 @@
                     </div>
                     <div class="uk-flex-item-1">
                         <strong>{{ payment_option.title || payment_option.name }}</strong>
-                        <span v-if="payment_option.price"><br>{{ payment_option.price | currency payment_option.currency }}</span>
+                        <span v-if="payment_option.price"><br>{{{ payment_option.price | formatprice }}}</span>
                     </div>
                 </label>
             </li>

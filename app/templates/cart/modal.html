@@ -57,6 +57,34 @@
                             </div>
                         </div>
 
+                        <dl class="uk-description-list-horizontal">
+                            <dt>{{ 'Ordered items' | trans }}</dt>
+                            <dd class="uk-text-right">{{{ total_items | formatprice }}}</dd>
+                            <template v-if="delivery_price">
+                                <dt>{{ 'Delivery costs' | trans }}</dt>
+                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ delivery_price | formatprice }}}</span></dd>
+                            </template>
+                            <template v-if="payment_price">
+                                <dt>{{ 'Payment costs' | trans }}</dt>
+                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ payment_price | formatprice }}}</span></dd>
+                            </template>
+                            <template v-if="delivery_price || payment_price">
+                                <dt>{{ 'Amount excl. VAT' | trans }}</dt>
+                                <dd class="uk-text-right">{{{ total_price | formatprice }}}</dd>
+                            </template>
+                            <dt>{{ 'VAT amount' | trans }}</dt>
+                            <dd v-if="vat_calc.low.vat" class="uk-text-right">
+                                <small class="uk-margin-small-right">{{{ vatLabel('low') }}}</small>
+                                <span class="uk-margin-large-right">{{{ vat_calc.low.vat | formatprice }}}</span>
+                            </dd>
+                            <dd v-if="vat_calc.high.vat" class="uk-text-right">
+                                <small class="uk-margin-small-right">{{{ vatLabel('high') }}}</small>
+                                <span class="uk-margin-large-right">{{{ vat_calc.high.vat | formatprice }}}</span>
+                            </dd>
+                            <dt>{{ 'Amount incl. VAT' | trans }}</dt>
+                            <dd class="uk-text-right uk-text-large">{{{ total_bruto | formatprice }}}</dd>
+                        </dl>
+
                         <cart-terms class="uk-margin" :confirmed.sync="cart.confirmed"></cart-terms>
 
                     </template>

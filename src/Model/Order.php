@@ -113,18 +113,20 @@ class Order implements \JsonSerializable {
 			$prices = $cartItem->calcPrices($this);
 
 			$this->total_netto += $prices['netto'];
-            $vat_calc[$cartItem->vat] += $prices['vat'];
+            $vat_calc[$cartItem->vat] += $prices['netto'] * 100;
 		}
 		if ($delivery_price = $this->get('delivery_option.price', 0)) {
             $this->total_netto += $delivery_price;
-            $vat_calc['high'] += App::cartCalcVat($delivery_price, 'high');
+            $vat_calc['high'] += $delivery_price * 100;
         }
 		if ($payment_price = $this->get('payment_option.price', 0)) {
             $this->total_netto += $payment_price;
-            $vat_calc['high'] += App::cartCalcVat($payment_price, 'high');
+            $vat_calc['high'] += $payment_price * 100;
         }
 
-        $this->total_bruto += round($vat_calc['high'] + $vat_calc['low'] + $this->total_netto, 2);
+        $this->total_bruto += (round(
+                                App::cartCalcVat($vat_calc['high'], 'high')
+                                + App::cartCalcVat($vat_calc['low'], 'low')) / 100) + $this->total_netto;
 		return $this;
 	}
 
