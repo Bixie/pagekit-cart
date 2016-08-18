@@ -7,7 +7,7 @@ use Pagekit\Database\ORM\ModelTrait;
 use Pagekit\System\Model\DataModelTrait;
 
 /**
- * @Entity(tableClass="@cart_product")
+ * @Entity(tableClass="@cart_product",eventPrefix="cart_product")
  */
 class Product implements \JsonSerializable
 {

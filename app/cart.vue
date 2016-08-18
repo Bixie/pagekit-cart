@@ -293,7 +293,7 @@
             vatLabel: function (vat_type) {
                 return this.$trans('%perc%\% of %amount%', {
                     'perc': this.config.vatclasses[vat_type].rate,
-                    'amount': this.$cartCurrency.formatPrice(this.vat_calc[vat_type].netto)
+                    'amount': this.$cartCurrency.formatNumber(this.vat_calc[vat_type].netto)
                 });
             },
             resetErrors: function () {

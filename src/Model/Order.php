@@ -10,7 +10,7 @@ use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
 
 /**
- * @Entity(tableClass="@cart_order")
+ * @Entity(tableClass="@cart_order",eventPrefix="cart_order")
  */
 class Order implements \JsonSerializable {
 	use DataModelTrait, OrderModelTrait;
@@ -68,21 +68,26 @@ class Order implements \JsonSerializable {
 	/** @var array */
 	protected static $properties = [
 		'valid' => 'isValid',
+		'url' => 'getUrl',
 		'cartItems' => 'getCartItems',
 		'user_username' => 'getUserUsername',
 		'user_name' => 'getUserName'
 	];
+
+    public function getUrl () {
+        return App::url('@cart/orders/detail', ['transaction_id' => $this->transaction_id]);
+    }
 
 	public function isValid () {
 		return $this->status == self::STATUS_CONFIRMED;
 	}
 
 	public function getUserName () {
-		return $this->user ? $this->user->name : null;
+		return $this->user ? $this->user->name : 'Guest';
 	}
 
 	public function getUserUsername () {
-		return $this->user ? $this->user->username : null;
+		return $this->user ? $this->user->username : 'Guest';
 	}
 
 	/**
@@ -94,7 +99,7 @@ class Order implements \JsonSerializable {
 			$cartItems = [];
             /** @var CartItemCollection $bixieCart */
 			$bixieCart = App::bixieCart();
-			foreach ($this->cartItemsData as $cartItemData) {
+			foreach ((array)$this->cartItemsData as $cartItemData) {
 				$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->loadItemFromData($cartItemData);
 			}
 		}

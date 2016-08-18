@@ -65,7 +65,7 @@ class PaymentHelper {
             $shortName = $gateway->getShortName();
 			if (!empty($this->config[$shortName]['active'])) {
 			    $config = array_merge(['title' => '', 'price' => 0, 'data' => []], $this->config[$shortName]);
-                $card = in_array($shortName, ['Stripe']) ? true : false;
+                $card = in_array($shortName, ['Stripe', 'PayPal_Pro']) ? true : false;
 				$gatewaysData[] = new PaymentOption([
 					'name' => $shortName,
 					'title' => $config['title'] ?: $gateway->getName(),

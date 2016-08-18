@@ -51,7 +51,25 @@ class CheckoutSiteController
 		];
 	}
 
-	/**
+    /**
+     * @Route("/terms", methods="GET")
+     */
+    public function termsAction () {
+
+        $title = $this->cart->config('terms.title');
+        $content = App::content()->applyPlugins($this->cart->config('terms.content'), ['markdown' => $this->cart->config('terms.markdown_enabled')]);;
+
+        return [
+            '$view' => [
+                'title' => $title,
+                'name' => 'bixie/cart/templates/terms.php'
+            ],
+            'title' => $title,
+            'content' => $content
+        ];
+    }
+
+    /**
 	 * @Route("/paymentreturn")
 	 * @Request({"transaction_id": "string"})
 	 */

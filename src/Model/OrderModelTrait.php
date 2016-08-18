@@ -14,12 +14,21 @@ trait OrderModelTrait
     }
 
     /**
+     * Proxy for emailsender to create empty orders
+     * @param array $data
+     * @return static
+     */
+    public static function create ($data = []) {
+        return static::modelCreate($data);
+    }
+
+    /**
      * Creates a new instance of this model.
      * @param  CartHandler $cartHandler
      * @param array        $data
      * @return static Order
      */
-    public static function create (CartHandler $cartHandler, $data = []) {
+    public static function createFromHandler (CartHandler $cartHandler, $data = []) {
         $user = App::auth()->getUser();//get from auth, fresh user
         $order_data = !empty($data['data']) ? array_merge($data['data'], $cartHandler->getOrderData()): $cartHandler->getOrderData();
         return static::modelCreate(array_merge($data, [

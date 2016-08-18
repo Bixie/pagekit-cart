@@ -74,11 +74,11 @@
                             </template>
                             <dt>{{ 'VAT amount' | trans }}</dt>
                             <dd v-if="vat_calc.low.vat" class="uk-text-right">
-                                <small class="uk-margin-small-right">{{{ vatLabel('low') }}}</small>
+                                <small class="uk-margin-small-right"><i>{{{ vatLabel('low') }}}</i></small>
                                 <span class="uk-margin-large-right">{{{ vat_calc.low.vat | formatprice }}}</span>
                             </dd>
                             <dd v-if="vat_calc.high.vat" class="uk-text-right">
-                                <small class="uk-margin-small-right">{{{ vatLabel('high') }}}</small>
+                                <small class="uk-margin-small-right"><i>{{{ vatLabel('high') }}}</i></small>
                                 <span class="uk-margin-large-right">{{{ vat_calc.high.vat | formatprice }}}</span>
                             </dd>
                             <dt>{{ 'Amount incl. VAT' | trans }}</dt>

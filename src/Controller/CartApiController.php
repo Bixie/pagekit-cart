@@ -119,7 +119,7 @@ class CartApiController {
                 $order->data = array_merge((array)$order->data, $order_data['data'], $handler->getOrderData());
                 $order->calculateOrder();
             } else {
-                $order = Order::create($handler, $order_data)->calculateOrder();
+                $order = Order::createFromHandler($handler, $order_data)->calculateOrder();
             }
 
             /** @var \Omnipay\Common\Message\ResponseInterface $paymentResponse */
@@ -154,7 +154,7 @@ class CartApiController {
         return [
             'cartItems' => array_values($cartItems),
             'checkout' => $checkout,
-            'order' => $order
+            'order' => $order ?: []
         ];
 
 

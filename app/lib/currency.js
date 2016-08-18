@@ -68,7 +68,7 @@ var Currency = function ($bixCart) {
         return formatprice(price);
     }
 
-    function formatPrice(price, currency) {
+    function formatPrice(price, currency, no_icon) {
         var icon = '<i class="' + icons[currency] + ' uk-margin-small-right"></i>',
             numberString;
         try {
@@ -76,7 +76,7 @@ var Currency = function ($bixCart) {
         } catch (ign) {
             numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
         }
-        return icon + numberString;
+        return no_icon ? numberString : icon + numberString;
     }
 
 
@@ -126,6 +126,13 @@ var Currency = function ($bixCart) {
          */
         getVat: function (options) {
             return getVat(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
+        },
+        /**
+         * Expose number_format
+         * @param number
+         */
+        formatNumber: function (number) {
+            return formatPrice(number, 'EUR', true);
         }
 
 
