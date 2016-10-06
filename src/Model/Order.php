@@ -94,15 +94,12 @@ class Order implements \JsonSerializable {
 	 * @return CartItem[]
 	 */
 	public function getCartItems () {
-		static $cartItems;
-		if (!$cartItems) {
-			$cartItems = [];
-            /** @var CartItemCollection $bixieCart */
-			$bixieCart = App::bixieCart();
-			foreach ((array)$this->cartItemsData as $cartItemData) {
-				$cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->loadItemFromData($cartItemData);
-			}
-		}
+        $cartItems = [];
+        /** @var CartItemCollection $bixieCart */
+        $bixieCart = App::bixieCart();
+        foreach ((array)$this->cartItemsData as $cartItemData) {
+            $cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->loadItemFromData($cartItemData);
+        }
 		return $cartItems;
 	}
 
