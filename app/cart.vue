@@ -109,6 +109,7 @@
                 //do not store cc info
                 localStorage.setItem('bixcart.cart', JSON.stringify(_.assign({}, cart, {card: defaultCart.card})));
             }, {deep: true});
+            this.$watch('total_price', this.saveCart);
         },
 
         events: {
@@ -116,7 +117,16 @@
         },
 
         watch: {
-            'total_price': 'saveCart'
+            'reference_show': function (value) {
+                if (value) {
+                    this.$els.reference.focus();
+                }
+            },
+            'comment_show': function (value) {
+                if (value) {
+                    this.$els.comment.focus();
+                }
+            }
         },
 
         computed: {
@@ -181,7 +191,7 @@
                 return this.total_price + this.vat_calc.total;
             },
             delivery_valid: function () {
-                return this.$refs.delivery && this.$refs.delivery.isValid;
+                return this.$refs.delivery_address && this.$refs.delivery_address.validate();
             },
             cart_valid: function () {
                 return !!(this.delivery_valid && this.cart.delivery_option_id && this.cart.payment_option_name && this.cart.confirmed)
@@ -244,7 +254,20 @@
                     this.setError(res.data.message || res.data);
                 });
             },
+            validate: function () {
+                var valid = true;
+                ['delivery', 'payment'].forEach(function (ref) {
+                    if (this.$refs[ref]) {
+                        var res = this.$refs[ref].validate();
+                        valid = valid ? res : false;
+                    }
+                }.bind(this));
+                return valid;
+            },
             doCheckout: function () {
+                if (!this.validate()) {
+                    return;
+                }
                 this.resetErrors();
                 this.checkingout = true;
                 console.log('checkout ' + this.cart.items.length);

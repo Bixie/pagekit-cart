@@ -41,6 +41,9 @@
                 return this.$transChoice('{0} %count% days|{1} %count% day|]1,Inf[ %count% days',
                         days, {count: days}
                 );
+            },
+            validate: function () {
+                return !!$bixCart.cart.delivery_option_id;
             }
         }
     };

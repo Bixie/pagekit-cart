@@ -19,8 +19,7 @@
             </div>
             <div class="uk-width-1-1" style="overflow-y: auto; height:calc(100vh - 185px);">
                 <div v-show="cart.items.length" class="uk-margin-small-right">
-
-                    <cart-address v-ref:delivery class="uk-margin"
+                    <cart-address v-ref:delivery_address class="uk-margin"
                                   :on-valid="saveCart"
                                   :title="$trans('Delivery address')"
                                   :address.sync="cart.delivery_address"
@@ -29,11 +28,11 @@
                     <template v-if="delivery_valid">
                         <h3>{{ 'Delivery options' | trans }}</h3>
 
-                        <cart-delivery class="uk-margin"></cart-delivery>
+                        <cart-delivery v-ref:delivery class="uk-margin"></cart-delivery>
 
                         <h3>{{ 'Payment options' | trans }}</h3>
 
-                        <cart-payment :card.sync="cart.card" class="uk-margin"></cart-payment>
+                        <cart-payment v-ref:payment :card.sync="cart.card" class="uk-margin"></cart-payment>
 
                         <div class="uk-margin">
                             <i class="uk-icon-tag uk-icon-hover uk-margin-small-right"></i>
@@ -42,7 +41,7 @@
                                @click="reference_show = true">{{ 'Add' | trans }}</a>
 
                             <div v-if="cart.order.reference || reference_show" class="uk-margin uk-form">
-                                <input type="text" v-model="cart.order.reference" class="uk-width-1-1"/>
+                                <input type="text" v-el:reference v-model="cart.order.reference" class="uk-width-1-1"/>
                             </div>
                         </div>
 
@@ -53,7 +52,7 @@
                                @click="comment_show = true">{{ 'Add' | trans }}</a>
 
                             <div v-if="cart.order.comment || comment_show" class="uk-margin uk-form">
-                                <textarea v-model="cart.order.comment" class="uk-width-1-1" cols="30" rows="3"></textarea>
+                                <textarea v-el:comment v-model="cart.order.comment" class="uk-width-1-1" cols="30" rows="3"></textarea>
                             </div>
                         </div>
 

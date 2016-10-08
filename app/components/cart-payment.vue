@@ -19,48 +19,55 @@
         </ul>
         <p v-else class="uk-text-center"><i class="uk-icon-spinner uk-icon-spin"></i></p>
 
-        <div v-if="show_card" class="uk-margin uk-form-horizontal">
-            <div class="uk-form-row">
-                <label class="uk-form-label">{{ 'Credit card number' | trans }}</label>
-                <div class="uk-form-controls">
-                    <div class="uk-form-icon uk-width-1-1">
-                        <i class="uk-icon-credit-card"></i>
-                        <input v-model="card.number" name="number" type="text"
-                               class="uk-width-1-1">
-                    </div>
-                    <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.number">
-                        {{ 'Please enter card number' | trans }}</p>
-                </div>
-            </div>
-            <div class="uk-form-row">
-                <div class="uk-form-controls uk-form-controls-text">
-                    <div class="uk-grid uk-grid-small">
-                        <div class="uk-width-1-3">
-                            <select v-model="card.expiryMonth" name="expiryMonth" class="uk-width-1-1">
-                                <option v-for="month in months" :value="month.value">{{ month.text }}</option>
-                            </select>
+        <div v-show="show_card" class="uk-margin uk-form-horizontal">
+            <form class="uk-form" name="cartCCardForm" v-validator="cartCCardForm">
 
-                            <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryMonth">
-                                {{ 'Please enter expiry month' | trans }}</p>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ 'Credit card number' | trans }}</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-form-icon uk-width-1-1">
+                            <i class="uk-icon-credit-card"></i>
+                            <input v-model="card.number" name="number" type="text" class="uk-width-1-1"
+                                   v-validate:required :class="{'uk-form-danger': fieldInvalid('number')}">
                         </div>
-                        <div class="uk-width-1-3">
-                            <select v-model="card.expiryYear" name="expiryYear" class="uk-width-1-1">
-                                <option v-for="year in years" :value="year.value">{{ year.text }}</option>
-                            </select>
-
-                            <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.expiryYear">
-                                {{ 'Please enter expiry year' | trans }}</p>
-                        </div>
-                        <div class="uk-width-1-3">
-                            <input v-model="card.cvv" name="vvc" type="text" class="uk-width-1-1"
-                                   :placeholder="$trans('CVV')" maxlength="3">
-
-                            <p class="uk-form-help-block uk-text-danger" v-show="invalid.card.cvv">
-                                {{ 'Please enter card number' | trans }}</p>
-                        </div>
+                        <p class="uk-form-help-block uk-text-danger" v-show="fieldInvalid('number')">
+                            {{ 'Please enter card number' | trans }}</p>
                     </div>
                 </div>
-            </div>
+                <div class="uk-form-row">
+                    <div class="uk-form-controls uk-form-controls-text">
+                        <div class="uk-grid uk-grid-small">
+                            <div class="uk-width-1-3">
+                                <select v-model="card.expiryMonth" name="expiryMonth" class="uk-width-1-1"
+                                        v-validate:required :class="{'uk-form-danger': fieldInvalid('expiryMonth')}">
+                                    <option v-for="month in months" :value="month.value">{{ month.text }}</option>
+                                </select>
+
+                            </div>
+                            <div class="uk-width-1-3">
+                                <select v-model="card.expiryYear" name="expiryYear" class="uk-width-1-1"
+                                        v-validate:required :class="{'uk-form-danger': fieldInvalid('expiryYear')}">
+                                    <option v-for="year in years" :value="year.value">{{ year.text }}</option>
+                                </select>
+
+                            </div>
+                            <div class="uk-width-1-3">
+                                <input type="text" v-model="card.cvv" name="cvv" class="uk-width-1-1"
+                                       v-validate:required :class="{'uk-form-danger': fieldInvalid('cvv')}"
+                                       :placeholder="$trans('CVV')" maxlength="3">
+
+                            </div>
+                        </div>
+                        <p class="uk-form-help-block uk-text-danger" v-show="fieldInvalid('expiryMonth')">
+                            {{ 'Please enter expiry month' | trans }}</p>
+                        <p class="uk-form-help-block uk-text-danger" v-show="fieldInvalid('expiryYear')">
+                            {{ 'Please enter expiry year' | trans }}</p>
+                        <p class="uk-form-help-block uk-text-danger" v-show="fieldInvalid('cvv')">
+                            {{ 'Please enter card cvv' | trans }}</p>
+                    </div>
+                </div>
+
+            </form>
         </div>
     </div>
 
@@ -72,6 +79,19 @@
     module.exports = {
 
         props: ['card'],
+
+        data: function () {
+            return {
+                cartCCardForm: false
+            };
+        },
+
+        created: function () {
+            this.$bixCart = window.$bixCart;
+            if ($bixCart.cart.payment_option_name === '' && $bixCart.cart.payment_options.length) {
+                $bixCart.cart.payment_option_name = _.first($bixCart.cart.payment_options).name
+            }
+        },
 
         computed: {
             show_card: function () {
@@ -95,10 +115,15 @@
             }
         },
 
-        created: function () {
-            this.$bixCart = window.$bixCart;
-            if ($bixCart.cart.payment_option_name === '' && $bixCart.cart.payment_options.length) {
-                $bixCart.cart.payment_option_name = _.first($bixCart.cart.payment_options).name
+        methods: {
+            fieldInvalid: function (field_name) {
+                if (this.cartCCardForm && this.cartCCardForm[field_name]) {
+                    return this.cartCCardForm[field_name].invalid;
+                }
+                return false;
+            },
+            validate: function () {
+                return $bixCart.cart.payment_option_name && (!this.show_card || this.cartCCardForm.validate());
             }
         }
     };
