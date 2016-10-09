@@ -3,7 +3,7 @@
 
         <div class="uk-flex uk-flex-middle uk-margin">
             <h3 class="uk-margin-remove">{{ title }}</h3>
-            <a v-show="edit" @click="save" class="uk-margin-small-left">{{ 'Save' | trans }}</a>
+            <a v-show="edit" @click="saveValid" class="uk-margin-small-left">{{ 'Save' | trans }}</a>
             <a v-else @click="edit = true" class="uk-margin-small-left">{{ 'Edit' | trans }}</a>
         </div>
 
@@ -199,12 +199,19 @@
         },
 
         created: function () {
-            if (!this.validate()) {
-                this.edit = false;
-            }
+            this.$nextTick(function () {
+                if (this.validate()) {
+                    this.edit = false;
+                }
+            });
         },
 
         methods: {
+            saveValid: function () {
+                if (this.cartAddressForm && this.cartAddressForm.validate()) {
+                    this.save();
+                }
+            },
             save: function () {
                 this.$dispatch('address.saved');
                 this.edit = false;
