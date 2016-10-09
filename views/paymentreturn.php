@@ -26,6 +26,11 @@ $payment_price = $order->get('payment_option.price', 0);
 			<dd><?= $order->transaction_id ?></dd>
 			<dt><?= __('Order date') ?></dt>
 			<dd><?= $cart->formatDate($order->created, 'medium', $order->get('user_tz')) ?></dd>
+			<?php if ($delivery_option = $order->getDeliverOption()) : ?>
+				<dt><?= __('Estimated delivery date') ?></dt>
+				<dd><?= $cart->formatDate($delivery_option->eta_date, 'mediumDate', $order->get('user_tz')); ?></dd>
+			<?php endif; ?>
+
 			<?php if ($order->reference) : ?>
 				<dt><?= __('Order reference') ?></dt>
 				<dd><?= $order->reference ?></dd>
@@ -56,9 +61,9 @@ $payment_price = $order->get('payment_option.price', 0);
 					<dt><?= __('Amount incl. VAT') ?></dt>
 					<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
 				</dl>
-                <dl class="uk-description-list uk-description-list-horizontal">
+				<dl class="uk-description-list uk-description-list-horizontal">
                     <dt><?= __('Order comment') ?></dt>
-                    <dd><?= nl2br($order->get('comment', '-')) ?></dd>
+					<dd><?= $order->get('comment') ? nl2br($order->get('comment')) : '-' ?></dd>
                 </dl>
 
 			</div>

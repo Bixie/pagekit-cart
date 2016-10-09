@@ -5,6 +5,7 @@ namespace Bixie\Cart\Model;
 use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\CartItem;
 use Bixie\Cart\Cart\CartItemCollection;
+use Bixie\Cart\Cart\DeliveryOption;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
@@ -144,7 +145,18 @@ class Order implements \JsonSerializable {
 		return isset($statuses[$this->status]) ? $statuses[$this->status] : __('Unknown');
 	}
 
-	/**
+    /**
+     * @return DeliveryOption|bool
+     */
+    public function getDeliverOption() {
+        $data = $this->get('delivery_option');
+        if ($data['id']) {
+            return new DeliveryOption($data);
+        }
+        return false;
+    }
+
+    /**
 	 * {@inheritdoc}
 	 */
 	public function jsonSerialize () {

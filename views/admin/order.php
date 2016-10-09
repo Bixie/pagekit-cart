@@ -99,8 +99,21 @@ $payment_price = $order->get('payment_option.price', 0);
 									<dt><?= __('Order reference') ?></dt>
 									<dd><?= $order->reference ?></dd>
 								<?php endif; ?>
-								delivery
 							</dl>
+
+							<?php if ($delivery_option = $order->getDeliverOption()) : ?>
+							<dl class="uk-description-list uk-description-list-horizontal">
+								<dt><?= __('Delivery option') ?></dt>
+								<dd><?= $delivery_option->id ?></dd>
+								<dt><?= __('Business days') ?></dt>
+								<dd><?=  $delivery_option->business_days ?> days</dd>
+								<dt><?= __('Price') ?></dt>
+								<dd><?= $cart->formatMoney($delivery_option->price,  $delivery_option->currency) ?></dd>
+								<dt><?= __('ETA date') ?></dt>
+								<dd><?= $cart->formatDate($delivery_option->eta_date, 'mediumDate', $order->get('user_tz')); ?></dd>
+							</dl>
+							<?php endif; ?>
+
 							<dl class="uk-description-list uk-description-list-horizontal">
 								<?php if ($delivery_price || $payment_price) : ?>
 									<dt><?= __('Ordered items') ?></dt>

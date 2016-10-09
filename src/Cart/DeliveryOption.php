@@ -62,16 +62,33 @@ class DeliveryOption implements \JsonSerializable
      * @param \DateTime $eta_date
      * @param string    $tz
      * @return $this
+     * @throws CartException
      */
     public function setEtaDate ($eta_date, $tz = 'UTC') {
         if (is_string($eta_date)) {
             try {
-                $eta_date = new \DateTime($eta_date, new \DateTimeZone($tz));
+                $etaDate = new \DateTime($eta_date, new \DateTimeZone($tz));
+                if ($eta_date == '' && $this->business_days) {
+                    //todo add non-bus days in range
+                    $etaDate->add(new \DateInterval('P' . $this->business_days . 'D'));
+                }
+
             } catch (\InvalidArgumentException $e) {
                 throw new CartException(sprintf('Invalid ETA date', $eta_date));
             }
+        } elseif (is_array($eta_date)) {
+            try {
+                $etaDate = new \DateTime($eta_date['date'], new \DateTimeZone($eta_date['timezone']));
+
+            } catch (\InvalidArgumentException $e) {
+                throw new CartException(sprintf('Invalid ETA date', $eta_date));
+            }
+        } elseif ($eta_date instanceof \DateTime) {
+            $etaDate = $eta_date;
+        } else {
+            throw new CartException(sprintf('Invalid ETA date', $eta_date));
         }
-        $this->eta_date = $eta_date;
+        $this->eta_date = $etaDate;
         return $this;
     }
 

@@ -277,7 +277,7 @@
                     if (this.checkout.redirect_url) {
                         setTimeout(function () {
                             window.location.href = this.checkout.redirect_url;
-                        }.bind(this));
+                        }.bind(this), 300);
                     }
                     if (this.order.status === 1) {
                         this.emptyCart();

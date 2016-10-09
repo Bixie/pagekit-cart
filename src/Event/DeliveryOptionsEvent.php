@@ -19,7 +19,6 @@ class DeliveryOptionsEvent extends Event{
 
     /**
      * DeliveryOptionsEvent constructor.
-     * @param string      $name
      * @param CartHandler $cartHandler
      * @param array       $parameters
      */
