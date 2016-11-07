@@ -62,7 +62,7 @@
 							</div>
 						</div>
 
-						<fields :config="$options.fields.cart" :model.sync="config" template="formrow"></fields>
+						<bixie-fields :config="$options.fields.cart" :values.sync="config"></bixie-fields>
 
 					</div>
 
@@ -190,7 +190,7 @@
 
 					<div class="uk-form-horizontal">
 
-						<fields :config="$options.fields.general" :model.sync="config" template="formrow"></fields>
+						<bixie-fields :config="$options.fields.general" :values.sync="config"></bixie-fields>
 
 					</div>
 				</li>
