@@ -7,7 +7,8 @@
                 <label for="form-title" class="uk-form-label">{{ 'Title' | trans }}</label>
                 <div class="uk-form-controls">
                     <input id="form-title" class="uk-form-width-large" type="text" name="title" v-model="widget.title" v-validate:required>
-                    <p class="uk-form-help-block uk-text-danger" v-show="form.title.invalid">{{ 'Title cannot be blank.' | trans }}</p>
+                    <p class="uk-form-help-block uk-text-danger"
+                       v-show="form.title.invalid">{{ 'Title cannot be blank.' | trans }}</p>
                 </div>
             </div>
 
@@ -15,8 +16,8 @@
                 <span class="uk-form-label">{{ 'Currency' | trans }}</span>
 
                 <div class="uk-form-controls uk-form-controls-text">
-                    <label><input type="checkbox" value="hide-title" v-model="widget.data.show_currency"> {{ 'Show currency selector' |
-                        trans }}</label>
+                    <label><input type="checkbox" value="hide-title"
+                                  v-model="widget.data.show_currency"> {{ 'Show currency selector' | trans }}</label>
                 </div>
             </div>
 

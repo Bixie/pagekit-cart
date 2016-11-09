@@ -101,9 +101,9 @@
 										<span class="uk-form-label">{{ 'Active' | trans }}</span>
 
 										<div class="uk-form-controls uk-form-controls-text">
-											<label><input type="checkbox" value="active"
-														  v-model="config.gateways['<?= $shortName ?>'].active"> {{ 'Payment method active' |
-												trans }}</label>
+											<label><input type="checkbox"
+														  v-model="config.gateways['<?= $shortName ?>'].active"
+														  value="active"> {{ 'Payment method active' | trans }}</label>
 										</div>
 									</div>
 
