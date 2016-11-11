@@ -175,7 +175,7 @@ return [
 		'view.scripts' => function ($event, $scripts) use ($app) {
 			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');
 			$scripts->register('bixie-cart', 'bixie/cart:app/bundle/bixie-cart.js',
-                ['bixie-framework', 'uikit-form-select', 'uikit-tooltip', 'uikit-notify', 'uikit-form-password', 'jstz']
+                ['bixie-pkframework', 'uikit-form-select', 'uikit-tooltip', 'uikit-notify', 'uikit-form-password', 'jstz']
             );
         },
 

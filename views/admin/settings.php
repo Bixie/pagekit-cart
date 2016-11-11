@@ -1,4 +1,4 @@
-<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['bixie-framework', 'editor', 'uikit-accordion']) ?>
+<?php $view->style('codemirror'); $view->script('bixie/cart-settings', 'bixie/cart:app/bundle/cart-settings.js', ['bixie-pkframework', 'editor', 'uikit-accordion']) ?>
 
 <div id="cart-settings" class="uk-form">
 

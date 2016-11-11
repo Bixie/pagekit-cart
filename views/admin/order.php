@@ -5,7 +5,7 @@
 * @var Bixie\Cart\CartModule $cart
 * @var Bixie\Cart\Cart\CartItem $cartItem
 */
-$view->style('codemirror'); $view->script('cart-order-edit', 'bixie/cart:app/bundle/admin-order.js', ['bixie-framework', 'editor', 'uikit-lightbox']);
+$view->style('codemirror'); $view->script('cart-order-edit', 'bixie/cart:app/bundle/admin-order.js', ['bixie-pkframework', 'editor', 'uikit-lightbox']);
 $delivery_price = $order->get('delivery_option.price', 0);
 $payment_price = $order->get('payment_option.price', 0);
 
