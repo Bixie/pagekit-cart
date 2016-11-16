@@ -85,5 +85,5 @@ module.exports = {
 
 };
 
-
-Vue.ready(module.exports);
+window.$bixCartComponents = window.$bixCartComponents || [];
+window.$bixCartComponents.push(module.exports);

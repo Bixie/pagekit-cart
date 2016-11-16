@@ -3,14 +3,16 @@
  * @var $view
  * @var string $title
  * @var string $content
+ * @var Bixie\Invoicemaker\Model\Invoice[] $invoices
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
 $delivery_price = $order->get('delivery_option.price', 0);
 $payment_price = $order->get('payment_option.price', 0);
+$view->script('bixie-paymentreturn', 'bixie/cart:app/bundle/paymentreturn.js', ['vue']);
 ?>
 
-<div id="bixie-paymentreturn">
+<div id="cart-paymentreturn">
 
 	<h1><?= __($title) ?></h1>
 
@@ -26,7 +28,7 @@ $payment_price = $order->get('payment_option.price', 0);
 			<dd><?= $order->transaction_id ?></dd>
 			<dt><?= __('Order date') ?></dt>
 			<dd><?= $cart->formatDate($order->created, 'medium', $order->get('user_tz')) ?></dd>
-			<?php if ($delivery_option = $order->getDeliverOption()) : ?>
+			<?php if ($delivery_option = $order->getDeliveryOption()) : ?>
 				<dt><?= __('Estimated delivery date') ?></dt>
 				<dd><?= $cart->formatDate($delivery_option->eta_date, 'mediumDate', $order->get('user_tz')); ?></dd>
 			<?php endif; ?>
@@ -65,6 +67,19 @@ $payment_price = $order->get('payment_option.price', 0);
                     <dt><?= __('Order comment') ?></dt>
 					<dd><?= $order->get('comment') ? nl2br($order->get('comment')) : '-' ?></dd>
                 </dl>
+				<?php if (count($invoices)) : ?>
+				<dl class="uk-description-list uk-description-list-horizontal">
+					<dt><?= __('Invoice') ?></dt>
+					<?php foreach ($invoices as $invoice) : ?>
+						<dd>
+							<a href="<?= $invoice->getPdfUrl() ?>" download>
+								<i class="uk-icon-download uk-margin-small-right"></i>
+								<?= $invoice->invoice_number ?>
+							</a>
+						</dd>
+					<?php endforeach; ?>
+				</dl>
+				<?php endif; ?>
 
 			</div>
 		    <div class="uk-width-medium-1-3">
@@ -74,7 +89,7 @@ $payment_price = $order->get('payment_option.price', 0);
 	</div>
 
 	<div class="uk-margin">
-		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order')) ?>
+		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'cartItems')) ?>
 	</div>
 
 	<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">

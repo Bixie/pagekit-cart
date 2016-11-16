@@ -66,14 +66,16 @@
 
         name: 'bix-cart',
 
-        data: function () {
+        data() {
             return _.merge({
                 modal_template: 'default-cart-modal',
+                checkout_template: 'default-cart-checkout',
                 error: '',
                 checkouterror: '',
-                filter: {
-                    currency: 'EUR'
-                },
+                filter: this.$session.get('bixie.cart.filter', {
+                    currency:  '',
+                    vat_view: '',
+                }),
                 reference_show: false,
                 comment_show: false,
                 checkoutmodal: false,
@@ -94,7 +96,8 @@
             }, window.$bix_cart);
         },
 
-        created: function () {
+        created() {
+            this.$cartCurrency.setCartObject(this);
             var storedCart = localStorage.getItem('bixcart.cart');
             this.Cart = this.$resource('api/cart/cart', {}, {
                 terms: {method: 'GET', url: 'api/cart/cart/terms'},
@@ -102,12 +105,15 @@
             });
             //localstorage sync
             this.cart = storedCart ? JSON.parse(storedCart) : _.assign({}, defaultCart);
-            this.$watch('cart', function (cart) {
+            this.$watch('cart', cart => {
                 //fill order info
                 this.order.reference = cart.order.reference;
                 this.order.data.comment = cart.order.comment;
                 //do not store cc info
                 localStorage.setItem('bixcart.cart', JSON.stringify(_.assign({}, cart, {card: defaultCart.card})));
+            }, {deep: true});
+            this.$watch('filter', filter => {
+                this.$session.set('bixie.cart.filter', filter);
             }, {deep: true});
             this.$watch('total_price', this.saveCart);
         },
@@ -130,44 +136,44 @@
         },
 
         computed: {
-            currency: function () {
+            currency() {
                 return this.filter.currency;
             },
-            nr_items_format: function () {
+            nr_items_format() {
                 return this.$transChoice('{0} %count% items|{1} %count% item|]1,Inf[ %count% items',
                         this.nr_items, {count: this.nr_items}
                 );
             },
-            nr_items: function () {
+            nr_items() {
                 return this.cart.items.length || 0;
             },
-            total_items: function () {
-                return _.reduce(this.cart.items, function (sum, item) {
+            total_items() {
+                return _.reduce(this.cart.items, (sum, item) => {
                     return sum + item.price;
                 }, 0);
             },
-            delivery_price: function () {
+            delivery_price() {
                 var delivery_option = _.find(this.cart.delivery_options, 'id', this.cart.delivery_option_id);
-                if (delivery_option) {
+                if (delivery_option && this.total_items) {
                     return delivery_option.price;
                 }
                 return 0;
             },
-            payment_price: function () {
+            payment_price() {
                 var payment_option = _.find(this.cart.payment_options, 'name', this.cart.payment_option_name);
-                if (payment_option) {
+                if (payment_option && this.total_items) {
                     return payment_option.price;
                 }
                 return 0;
             },
-            total_price: function () {
+            total_price() {
                 return this.total_items + this.delivery_price + this.payment_price;
             },
-            vat_calc: function () {
+            vat_calc() {
                 var vat_calc = {none: 0, low: 0, high: 0};
-                _.forEach(this.cart.items, function (cartItem) {
+                _.forEach(this.cart.items, cartItem => {
                     vat_calc[cartItem.vat] += cartItem.price * 100;
-                }, this);
+                });
                 if (this.delivery_price) {
                     vat_calc['high'] += this.delivery_price * 100;
                 }
@@ -187,33 +193,43 @@
                     }
                 };
             },
-            total_bruto: function () {
+            total_bruto() {
                 return this.total_price + this.vat_calc.total;
             },
-            delivery_valid: function () {
+            total_formatted() {
+                if ((this.filter.vat_view || this.config.vat_view) === 'incl') {
+                    return this.$cartCurrency.formatPrice(this.total_bruto);
+                }
+                return this.$cartCurrency.formatPrice(this.total_price);
+            },
+            delivery_valid() {
                 return this.$refs.delivery_address && this.$refs.delivery_address.validate();
             },
-            cart_valid: function () {
+            cart_valid() {
                 return !!(this.delivery_valid && this.cart.delivery_option_id && this.cart.payment_option_name && this.cart.confirmed)
             }
         },
 
         methods: {
-            openCart: function () {
-                this.$refs.modal.open();
+            openCart() {
+                if (this.config.checkout_type == 'modal') {
+                    this.$refs.modal.open();
+                } else {
+                    window.location.href = this.checkout_url;
+                }
             },
-            closeCart: function () {
+            closeCart() {
                 this.$refs.modal.close();
             },
-            addItem: function (item) {
-                var existing = _.find(this.cart.items, 'sku', item.sku);
+            addItem(item) {
+                var existing = false;//_.find(this.cart.items, 'sku', item.sku); //todo match specs/props
                 if (existing) {
                     this.addQuantity(existing, item.quantity);
                 } else {
-                    this.cart.items.push(_.merge({}, defaultItem, item, {id: md5(item.sku  + item.title)}));
+                    this.cart.items.push(_.merge({}, defaultItem, item, {id: md5(item.sku  + item.title + JSON.stringify(item.data))}));
                 }
             },
-            addQuantity: function (item, quantity) {
+            addQuantity(item, quantity) {
                 var des_option = _.find(item.quantity_options, 'quantity', (item.quantity + quantity));
                 if (des_option) {
                     item.quantity = des_option.quantity;
@@ -229,68 +245,70 @@
                     }
                 }
             },
-            removeItem: function (item) {
+            removeItem(item) {
                 this.cart.items.$remove(item);
             },
-            emptyCart: function () {
-                this.cart =  _.assign({}, defaultCart)
+            emptyCart() {
+                this.cart =  _.assign({}, defaultCart, {delivery_address: this.cart.delivery_address})
             },
-            saveCart: function () {
+            saveCart() {
                 this.resetErrors();
                 console.log('save ' + this.cart.items.length);
-                this.Cart.save({}, {cart: this.cart}).then(function (res) {
+                this.Cart.save({}, {cart: this.cart}).then(res => {
                     console.log('saved ' + res.data.items.length);
                     if (res.data.items) { //valid result?
                         this.cart.items = res.data.items;
                         this.cart.delivery_options = res.data.delivery_options;
                         this.cart.payment_options = res.data.payment_options;
                     }
-                }, function (res) {
+                }, res => {
                     this.setError(res.data.message || res.data);
                 });
             },
-            getTerms: function () {
-                return this.Cart.terms().then(_.noop(), function (res) {
+            getTerms() {
+                return this.Cart.terms().then(_.noop(), res => {
                     this.setError(res.data.message || res.data);
                 });
             },
-            validate: function () {
+            validate() {
                 var valid = true;
-                ['delivery', 'payment'].forEach(function (ref) {
+                ['delivery', 'payment'].forEach(ref => {
                     if (this.$refs[ref]) {
                         var res = this.$refs[ref].validate();
                         valid = valid ? res : false;
                     }
-                }.bind(this));
+                });
                 return valid;
             },
-            doCheckout: function () {
+            doCheckout() {
                 if (!this.validate()) {
                     return;
                 }
                 this.resetErrors();
                 this.checkingout = true;
                 console.log('checkout ' + this.cart.items.length);
-                this.Cart.checkout({}, {cart: this.cart, order_data: this.order, user_data: {}}).then(function (res) {
+                this.Cart.checkout({}, {cart: this.cart, order_data: this.order, user_data: {}}).then(res => {
                     this.checkout = res.data.checkout;
                     this.order = res.data.order;
-                    if (this.checkout.redirect_url) {
-                        setTimeout(function () {
-                            window.location.href = this.checkout.redirect_url;
-                        }.bind(this), 300);
-                    }
                     if (this.order.status === 1) {
                         this.emptyCart();
                     }
-                    this.checkingout = false;
-                    this.checkoutModalOpen();
-                }, function (res) {
+                    this.$nextTick(() => {
+                        if (this.checkout.redirect_url) {
+                            setTimeout(() => {
+                                window.location.href = this.checkout.redirect_url;
+                            }, 300);
+                        }
+                        this.checkingout = false;
+                        this.checkoutModalOpen();
+                    });
+                }, res => {
                     this.checkingout = false;
                     this.setError(res.data.message || res.data);
                 });
 
             },
-            checkoutModal: function () {
+            checkoutModal() {
                 if (this.checkoutmodal) {
                     return this.checkoutmodal;
                 }
@@ -299,31 +317,30 @@
                     center: true,
                     modal: false
                 });
-                this.checkoutmodal.on('hide.uk.modal', function (e) {
-                    e.stopPropagation(); //prevent closing main modal
-                });
+                this.checkoutmodal.on('show.uk.modal', () => UIkit.$(this.$els.checkoutmodal).appendTo(UIkit.$body));
+                this.checkoutmodal.on('hide.uk.modal', e => e.stopPropagation()); //prevent closing main modal
                 return this.checkoutmodal;
             },
-            checkoutModalOpen: function () {
+            checkoutModalOpen() {
                 this.checkoutModal().show();
             },
-            checkoutModalClose: function () {
+            checkoutModalClose() {
                 this.checkoutModal().hide();
             },
-            checkoutModalDestroy: function () {
+            checkoutModalDestroy() {
                 this.checkoutmodal = false;
             },
-            vatLabel: function (vat_type) {
+            vatLabel(vat_type) {
                 return this.$trans('%perc%\% of %amount%', {
                     'perc': this.config.vatclasses[vat_type].rate,
                     'amount': this.$cartCurrency.formatNumber(this.vat_calc[vat_type].netto)
                 });
             },
-            resetErrors: function () {
+            resetErrors() {
                 this.checkouterror = '';
                 this.error = '';
             },
-            setError: function (error) {
+            setError(error) {
                 this.error = error;
                 if (UIkit.notify) UIkit.notify(error, 'danger');
             }
@@ -332,6 +349,7 @@
         partials: {
             'default-product': require('./templates/product/default-product.html'),
             'default-cart-modal': require('./templates/cart/modal.html'),
+            'default-cart-checkout': require('./templates/cart/checkout.html')
         },
 
         components: {

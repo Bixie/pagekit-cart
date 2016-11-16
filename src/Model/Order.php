@@ -6,6 +6,7 @@ use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\CartItem;
 use Bixie\Cart\Cart\CartItemCollection;
 use Bixie\Cart\Cart\DeliveryOption;
+use Bixie\Cart\Cart\PaymentOption;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
@@ -148,10 +149,20 @@ class Order implements \JsonSerializable {
     /**
      * @return DeliveryOption|bool
      */
-    public function getDeliverOption() {
+    public function getDeliveryOption() {
         $data = $this->get('delivery_option');
         if ($data['id']) {
             return new DeliveryOption($data);
+        }
+        return false;
+    }
+
+    /**
+     * @return PaymentOption|bool
+     */
+    public function getPaymentOption() {
+        if ($data = $this->get('payment_option')) {
+            return new PaymentOption($data);
         }
         return false;
     }

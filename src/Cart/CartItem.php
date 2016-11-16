@@ -42,6 +42,10 @@ class CartItem implements \JsonSerializable
 	 * @var float
 	 */
 	public $price;
+    /**
+     * @var integer
+     */
+    public $quantity;
 	/**
 	 * @var string
 	 */

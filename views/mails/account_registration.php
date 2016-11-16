@@ -15,7 +15,7 @@
 
 	<p><?= __('Your account has been prepared! Now it only needs to be confirmed.') ?></p>
 
-	<a href="<?= $view->url('@user/registration/activate', ['user' => $user->username, 'key' => $user->activation], true) ?>">
+	<a href="<?= $view->url('@user/registration/activate', ['user' => $user->username, 'key' => $user->activation], \Pagekit\Routing\Generator\UrlGenerator::ABSOLUTE_URL) ?>">
 		<?= __('Click this link to confirm your account') ?>
 	</a>
 

@@ -2,6 +2,7 @@
 /**
 * @var \Pagekit\View\View $view
 * @var Bixie\Cart\Model\Order $order
+* @var Bixie\Invoicemaker\Model\Invoice[] $invoices
 * @var Bixie\Cart\CartModule $cart
 * @var Bixie\Cart\Cart\CartItem $cartItem
 */
@@ -61,6 +62,20 @@ $payment_price = $order->get('payment_option.price', 0);
 								</select>
 							</div>
 						</div>
+						<?php if (count($invoices)) : ?>
+							<dl class="uk-description-list uk-description-list-horizontal">
+								<dt><?= __('Invoice') ?></dt>
+								<?php foreach ($invoices as $invoice) : ?>
+									<dd>
+										<a href="<?= $invoice->getPdfUrl() ?>" download>
+											<i class="uk-icon-download uk-margin-small-right"></i>
+											<?= $invoice->invoice_number ?>
+										</a>
+									</dd>
+								<?php endforeach; ?>
+							</dl>
+						<?php endif; ?>
+
 					</div>
 					<div class="uk-width-medium-1-2">
 						<div class="uk-form-row">
@@ -71,6 +86,7 @@ $payment_price = $order->get('payment_option.price', 0);
 								  v-model="order.data.comment" placeholder="{{ 'Add a comment (visible for user)' | trans }}"></textarea>
 							</div>
 						</div>
+
 					</div>
 				</div>
 
@@ -101,7 +117,7 @@ $payment_price = $order->get('payment_option.price', 0);
 								<?php endif; ?>
 							</dl>
 
-							<?php if ($delivery_option = $order->getDeliverOption()) : ?>
+							<?php if ($delivery_option = $order->getDeliveryOption()) : ?>
 							<dl class="uk-description-list uk-description-list-horizontal">
 								<dt><?= __('Delivery option') ?></dt>
 								<dd><?= $delivery_option->id ?></dd>
@@ -166,7 +182,7 @@ $payment_price = $order->get('payment_option.price', 0);
 
 
 				<div class="uk-margin">
-					<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order')) ?>
+					<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'cartItems')) ?>
 				</div>
 
 				<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">
@@ -202,7 +218,7 @@ $payment_price = $order->get('payment_option.price', 0);
 		<div>
 			<div class="uk-margin">
 				<ul class="uk-list uk-list-line">
-					<?php foreach ($order->cartItems as $cartItem) :
+					<?php foreach ($cartItems as $cartItem) :
 						$prices = $cartItem->calcPrices($order);
 
 						?>

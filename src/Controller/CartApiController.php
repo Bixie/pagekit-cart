@@ -138,9 +138,9 @@ class CartApiController {
                 //reset cart
                 App::bixieCart()->reset();
                 $cartItems = [];
+                App::trigger('bixie.cart.payment.confirmed', [$order]);
 
-                //send mail
-//                (new MailHelper($order))->sendMail();
+
             }
 
             $order->payment = $paymentResponse->getData();

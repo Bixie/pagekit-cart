@@ -17,7 +17,7 @@
 
         created: function () {
             this.$options.partials = this.$root.$options.partials;
-            this.$bixCart = window.$bixCart;
+            this.$bixCart = this.$root;
         },
         watch: {
             'item.quantity': function (qty) {

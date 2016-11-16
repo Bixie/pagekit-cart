@@ -32,6 +32,7 @@ class MailHelper {
 	/**
 	 * @return string
 	 * @throws PaymentException
+     * @deprecated
 	 */
 	public function sendMail () {
 

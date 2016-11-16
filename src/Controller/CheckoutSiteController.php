@@ -29,18 +29,12 @@ class CheckoutSiteController
 	 */
 	public function indexAction()
 	{
-		$checkoutData = App::bixiePayment()->activeCheckoutData();
-		if(empty($checkoutData['checkout'])) {
-			$checkoutData['checkout'] = (new UserHelper(App::user()))->getCheckoutDefaults();
-		}
-		unset($checkoutData['checkout']['agreed']);
 
 		return [
 			'$view' => [
 				'title' => __('Checkout'),
 				'name' => 'bixie/cart/checkout.php'
 			],
-			'$checkout' => $checkoutData,
 			'$cart' => [
 				'countries' => App::module('system/intl')->getCountries(),
 				'gateways' => App::bixiePayment()->activeGatewaysData(),
@@ -101,6 +95,7 @@ class CheckoutSiteController
 
 					//send mail
 //					(new MailHelper($order))->sendMail();
+                    App::trigger('bixie.cart.payment.confirmed', [$order]);
 
 					App::message()->success(__('Payment successful'));
 
@@ -138,19 +133,31 @@ class CheckoutSiteController
 			$content = (new MailHelper($order))->replaceString($content);
 		}
 
-		foreach ($order->getCartItems() as $cartItem) {
+        $cartItems = $order->getCartItems();
+        foreach ($cartItems as $cartItem) {
 			$event = new Event('bixie.cart.orderitem');
 			App::trigger($event, [$order, $cartItem]);
 			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}
 
-		return [
+        /** @var \Bixie\Invoicemaker\InvoicemakerModule $invoicemaker */
+        $invoices = [];
+        if ($invoicemaker = App::module('bixie/invoicemaker')) {
+            $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
+        }
+
+        return [
 			'$view' => [
 				'title' => $this->cart->config('thankyou.title'),
 				'name' => 'bixie/cart/paymentreturn.php'
 			],
+            '$data' => [
+                'order' => $order
+            ],
 			'title' => $this->cart->config('thankyou.title'),
 			'content' => $content,
+            'cartItems' => $cartItems,
+            'invoices' => $invoices,
 			'order' => $order,
 			'cart' => $this->cart,
 			'node' => App::node()

@@ -1,6 +1,8 @@
 <?php
 /**
  * @var $view
+ * @var Bixie\Invoicemaker\Model\Invoice[] $invoices
+ * @var Bixie\Cart\Cart\CartItem[] $cartItems
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
@@ -23,7 +25,7 @@ $payment_price = $order->get('payment_option.price', 0);
 			<dd><?= $order->transaction_id ?></dd>
 			<dt><?= __('Order date') ?></dt>
 			<dd><?= $cart->formatDate($order->created, 'medium', $order->get('user_tz')) ?></dd>
-			<?php if ($delivery_option = $order->getDeliverOption()) : ?>
+			<?php if ($delivery_option = $order->getDeliveryOption()) : ?>
 				<dt><?= __('Estimated delivery date') ?></dt>
 				<dd><?= $cart->formatDate($delivery_option->eta_date, 'mediumDate', $order->get('user_tz')); ?></dd>
 			<?php endif; ?>
@@ -63,6 +65,19 @@ $payment_price = $order->get('payment_option.price', 0);
 					<dd><?= $order->get('comment') ? nl2br($order->get('comment')) : '-' ?></dd>
 				</dl>
 
+				<?php if (count($invoices)) : ?>
+					<dl class="uk-description-list uk-description-list-horizontal">
+						<dt><?= __('Invoice') ?></dt>
+						<?php foreach ($invoices as $invoice) : ?>
+							<dd>
+								<a href="<?= $invoice->getPdfUrl() ?>" download>
+									<i class="uk-icon-download uk-margin-small-right"></i>
+									<?= $invoice->invoice_number ?>
+								</a>
+							</dd>
+						<?php endforeach; ?>
+					</dl>
+				<?php endif; ?>
 			</div>
 			<div class="uk-width-medium-1-3">
 				<?= $view->render('bixie/cart/templates/payment_details.php', compact('cart', 'order')) ?>
@@ -71,7 +86,7 @@ $payment_price = $order->get('payment_option.price', 0);
 	</div>
 
 	<div class="uk-margin">
-		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order')) ?>
+		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'cartItems')) ?>
 	</div>
 
 	<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">

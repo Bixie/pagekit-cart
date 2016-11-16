@@ -120,6 +120,7 @@ return [
 		'currency' => 'EUR',
 		'vat' => 'high',
 		'vat_view' => 'incl',
+		'checkout_type' => 'page',
 		'addtocart' => [
 			'show_vat' => true
 		],

@@ -3,7 +3,7 @@
  * @var $view
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
- * @var Bixie\Cart\Cart\CartItem $cartItem
+ * @var Bixie\Cart\Cart\CartItem[] $cartItems
  */
 
 ?>
@@ -12,7 +12,7 @@
 	<h3 class="uk-panel-title"><?= __('Purchased items') ?></h3>
 
 	<ul class="uk-list uk-list-line">
-		<?php foreach ($order->cartItems as $cartItem) :
+		<?php foreach ($cartItems as $cartItem) :
 			$prices = $cartItem->calcPrices($order);
 			?>
 			<li>

@@ -74,7 +74,8 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 				<div class="uk-form-row">
 					<div class="uk-form-controls">
 						<div class="uk-form-password">
-							<input id="form-password" class="uk-form-large uk-form-width-large" type="password" placeholder="{{ 'Password' | trans}}"
+							<input id="form-password" class="uk-form-large uk-form-width-large"
+								   type="password" placeholder="{{ 'Password' | trans}}"
 								   name="password" v-model="password" v-validate:required>
 							<a href="" class="uk-form-password-toggle" tabindex="-1"
 							   data-uk-form-password="{ lblShow: '<?= __('Show') ?>', lblHide: '<?= __('Hide') ?>' }"><?= __('Show') ?></a>
@@ -110,7 +111,6 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 					</div>
 				</div>
 
-
 			</div>
 
 			<div v-if="alert" class="uk-alert uk-alert-danger">{{ alert | trans }}</div>
@@ -119,5 +119,5 @@ $view->script('bixie-findorder', 'bixie/cart:app/bundle/findorder.js', ['vue', '
 
 
 	</div>
-<pre>{{$data|json}}</pre>
+
 </section>

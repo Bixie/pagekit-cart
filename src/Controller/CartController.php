@@ -63,7 +63,8 @@ class CartController
 
 		}
 
-		foreach ($order->getCartItems() as $cartItem) {
+        $cartItems = $order->getCartItems();
+		foreach ($cartItems as $cartItem) {
 			$event = new Event('bixie.cart.admin.orderitem');
 			App::trigger($event, [$order, $cartItem]);
 			$cartItem->setTemplate('bixie.cart.admin.order', $event['bixie.cart.admin.order'] ? : '');
@@ -74,7 +75,13 @@ class CartController
 			->execute('id, username')
 			->fetchAll();
 
-		return [
+        /** @var \Bixie\Invoicemaker\InvoicemakerModule $invoicemaker */
+        $invoices = [];
+        if ($invoicemaker = App::module('bixie/invoicemaker')) {
+            $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
+        }
+
+        return [
 			'$view' => [
 				'title' => __('Edit order'),
 				'name'  => 'bixie/cart/admin/order.php'
@@ -85,7 +92,9 @@ class CartController
 				'config' => $this->cart->config(),
 				'order'  => $order
 			],
-			'cart' => $this->cart,
+            'cartItems' => $cartItems,
+            'invoices' => $invoices,
+            'cart' => $this->cart,
 			'order' => $order
 		];
 

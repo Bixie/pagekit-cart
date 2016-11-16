@@ -10,6 +10,7 @@ module.exports = [
             /*views*/
             "orders": "./app/views/front/orders.js",
             "findorder": "./app/views/front/findorder.js",
+            "paymentreturn": "./app/views/front/paymentreturn.js",
             "cart-settings": "./app/views/admin/settings.js",
             "admin-order": "./app/views/admin/order.js",
             "admin-orders": "./app/views/admin/orders.js"
@@ -31,7 +32,8 @@ module.exports = [
         module: {
             loaders: [
                 {test: /\.vue$/, loader: "vue"},
-                {test: /\.html/, loader: "vue-html"}
+                {test: /\.html/, loader: "vue-html"},
+                {test: /\.js/, loader: 'babel', query: {presets: ['es2015']}}
             ]
         }
     }

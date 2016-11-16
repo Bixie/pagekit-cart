@@ -7,16 +7,10 @@ $view->script('bixie-cart');
 
 ?>
 
-<section id="bixie-checkout">
+<section id="bix-cart-checkout">
 
 	<h1><?= __('Checkout') ?></h1>
 
-	<div class="uk-margin">
-		<cartlist is-checkout="1"></cartlist>
-	</div>
-	<form name="form" @submit.prevent="checkoutSubmit">
+	<partial :name="checkout_template"></partial>
 
-		<checkout v-ref="checkout"></checkout>
-
-	</form>
 </section>

@@ -77,17 +77,26 @@ class OrderSiteController
 			App::abort(403, __('No access to this order.'));
 		}
 
-		foreach ($order->getCartItems() as $cartItem) {
+		$cartItems = $order->getCartItems();
+		foreach ($cartItems as $cartItem) {
 			$event = new Event('bixie.cart.admin.orderitem');
 			App::trigger($event, [$order, $cartItem]);
 			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
 		}
+
+        /** @var \Bixie\Invoicemaker\InvoicemakerModule $invoicemaker */
+        $invoices = [];
+        if ($invoicemaker = App::module('bixie/invoicemaker')) {
+            $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
+        }
 
 		return [
 			'$view' => [
 				'title' => __('Details of order %transaction_id%', ['%transaction_id%' => $order->transaction_id]),
 				'name' => 'bixie/cart/order.php'
 			],
+			'cartItems' => $cartItems,
+			'invoices' => $invoices,
 			'order' => $order,
 			'cart' => $this->cart,
 			'node' => App::node()

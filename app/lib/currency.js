@@ -1,14 +1,25 @@
 var icons = {
     'EUR': 'uk-icon-euro',
     'USD': 'uk-icon-dollar'
-}, number_format = require('./number_format');
+};
+var symbols = {
+    'EUR': '€ ',
+    'USD': '$'
+};
+var number_format = require('./number_format');
 
-var Currency = function ($bixCart) {
+var $bixCart;
+
+var Currency = function () {
 
     "use strict";
 
     function currentCurrency() {
         return $bixCart.filter.currency || $bixCart.config.currency || 'EUR';
+    }
+
+    function currentVatView() {
+        return $bixCart.filter.vat_view || $bixCart.config.vat_view || 'incl';
     }
 
     function convertPrice(price, options) {
@@ -42,22 +53,25 @@ var Currency = function ($bixCart) {
         return vat.vat;
     }
 
-    function formatprice(price, currency) {
-        var icon = '<i class="' + icons[currency || currentCurrency()] + ' uk-margin-small-right"></i>',
+    function formatPrice(price, currency, symbol_type) {
+        symbol_type = symbol_type || 'icon';
+        var icon = symbol_type === 'none' ?
+            '<i class="' + icons[currency || currentCurrency()] + ' uk-margin-small-right"></i>' :
+                symbols[currency || currentCurrency()],
             numberString;
         try {
             numberString = price.toLocaleString(window.$trans.locale, {minimumFractionDigits: 2});
         } catch (ign) {
             numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
         }
-        return icon + numberString;
+        return symbol_type === 'none' ? numberString : icon + numberString;
     }
 
 
     function productPrice(options) {
         var price = Number(options.price);
 
-        if ($bixCart.config.vat_view === 'incl') {
+        if (currentVatView() === 'incl') {
             price = inclVat(options);
         }
 
@@ -65,18 +79,7 @@ var Currency = function ($bixCart) {
             price = convertPrice(price, options);
         }
 
-        return formatprice(price);
-    }
-
-    function formatPrice(price, currency, no_icon) {
-        var icon = '<i class="' + icons[currency] + ' uk-margin-small-right"></i>',
-            numberString;
-        try {
-            numberString = price.toLocaleString(window.$trans.locale, {minimumFractionDigits: 2});
-        } catch (ign) {
-            numberString = number_format(price, 2, window.$locale.NUMBER_FORMATS.DECIMAL_SEP, window.$locale.NUMBER_FORMATS.GROUP_SEP);
-        }
-        return no_icon ? numberString : icon + numberString;
+        return formatPrice(price, currentCurrency(), options.symbol_type);
     }
 
 
@@ -89,10 +92,11 @@ var Currency = function ($bixCart) {
          * @api public
          * @param price
          * @param currency
+         * @param symbol_type
          */
-        formatPrice: function (price, currency) {
+        formatPrice(price, currency, symbol_type) {
             currency = currency || currentCurrency();
-            return formatPrice(Number(price), currency);
+            return formatPrice(Number(price), currency, symbol_type);
         },
 
         /**
@@ -102,7 +106,7 @@ var Currency = function ($bixCart) {
          * @api public
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
-        productPrice: function (options) {
+        productPrice(options) {
             return productPrice(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
 
@@ -113,7 +117,7 @@ var Currency = function ($bixCart) {
          * @api public
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
-        inclVat: function (options) {
+        inclVat(options) {
             return inclVat(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
 
@@ -124,24 +128,31 @@ var Currency = function ($bixCart) {
          * @api public
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
-        getVat: function (options) {
+        getVat(options) {
             return getVat(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
         /**
          * Expose number_format
          * @param number
          */
-        formatNumber: function (number) {
-            return formatPrice(number, 'EUR', true);
+        formatNumber(number) {
+            return formatPrice(number, 'EUR', 'none');
+        },
+        /**
+         * Set the current window.$bixCart
+         * @param $bixCartObject
+         */
+        setCartObject($bixCartObject) {
+            $bixCart = $bixCartObject;
         }
 
 
     };
 };
 
-module.exports = function (Vue, $bixCart) {
+module.exports = function (Vue) {
 
-    Vue.prototype.$cartCurrency = new Currency($bixCart);
+    Vue.prototype.$cartCurrency = new Currency();
 
     Vue.filter('formatprice', function (price, currency) {
         return this.$cartCurrency.formatPrice(price, currency);

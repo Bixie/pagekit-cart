@@ -1,0 +1,131 @@
+<ul class="uk-list uk-list-line">
+    <li v-for="item in cart.items">
+        <cart-item :item.sync="item"></cart-item>
+    </li>
+</ul>
+<div class="uk-grid uk-grid-width-medium-1-2" data-uk-grid-margin>
+    <div>
+        <div class="uk-panel uk-panel-box">
+
+            <cart-address v-ref:delivery_address class="uk-margin"
+                          :on-valid="saveCart"
+                          :title="$trans('Delivery address')"
+                          :address.sync="cart.delivery_address"
+                          :countries="countries"></cart-address>
+
+        </div>
+    </div>
+    <div>
+        <div class="uk-panel uk-panel-box">
+            <div>
+                <div v-show="cart.items.length" class="uk-flex uk-flex-middle uk-flex-space-around">
+                    <strong>{{ nr_items_format }}</strong>
+                    <h4 class="uk-margin-remove">{{{ total_formatted }}}</h4>
+                </div>
+            </div>
+            <div class="uk-margin">
+                <div v-show="cart.items.length">
+                    <template v-if="delivery_valid">
+                        <h3>{{ 'Delivery options' | trans }}</h3>
+
+                        <cart-delivery v-ref:delivery class="uk-margin"></cart-delivery>
+
+                        <h3>{{ 'Payment options' | trans }}</h3>
+
+                        <cart-payment v-ref:payment :card.sync="cart.card" class="uk-margin"></cart-payment>
+
+                        <div class="uk-margin">
+                            <i class="uk-icon-tag uk-icon-hover uk-margin-small-right"></i>
+                            <strong>{{ 'Order reference' | trans }}</strong>
+                            <a v-if="!cart.order.reference" class="uk-margin-small-left"
+                               @click="reference_show = true">{{ 'Add' | trans }}</a>
+
+                            <div v-if="cart.order.reference || reference_show" class="uk-margin uk-form">
+                                <input type="text" v-el:reference v-model="cart.order.reference" class="uk-width-1-1"/>
+                            </div>
+                        </div>
+
+                        <div class="uk-margin">
+                            <i class="uk-icon-comment-o uk-icon-hover uk-margin-small-right"></i>
+                            <strong>{{ 'Order comment' | trans }}</strong>
+                            <a v-if="!cart.order.comment" class="uk-margin-small-left"
+                               @click="comment_show = true">{{ 'Add' | trans }}</a>
+
+                            <div v-if="cart.order.comment || comment_show" class="uk-margin uk-form">
+                                <textarea v-el:comment v-model="cart.order.comment" class="uk-width-1-1" cols="30" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <dl class="uk-description-list-horizontal">
+                            <dt>{{ 'Ordered items' | trans }}</dt>
+                            <dd class="uk-text-right">{{{ total_items | formatprice }}}</dd>
+                            <template v-if="delivery_price">
+                                <dt>{{ 'Delivery costs' | trans }}</dt>
+                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ delivery_price | formatprice }}}</span></dd>
+                            </template>
+                            <template v-if="payment_price">
+                                <dt>{{ 'Payment costs' | trans }}</dt>
+                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ payment_price | formatprice }}}</span></dd>
+                            </template>
+                            <template v-if="delivery_price || payment_price">
+                                <dt>{{ 'Amount excl. VAT' | trans }}</dt>
+                                <dd class="uk-text-right">{{{ total_price | formatprice }}}</dd>
+                            </template>
+                            <dt>{{ 'VAT amount' | trans }}</dt>
+                            <dd v-if="vat_calc.low.vat" class="uk-text-right">
+                                <small class="uk-margin-small-right"><i>{{{ vatLabel('low') }}}</i></small>
+                                <span class="uk-margin-large-right">{{{ vat_calc.low.vat | formatprice }}}</span>
+                            </dd>
+                            <dd v-if="vat_calc.high.vat" class="uk-text-right">
+                                <small class="uk-margin-small-right"><i>{{{ vatLabel('high') }}}</i></small>
+                                <span class="uk-margin-large-right">{{{ vat_calc.high.vat | formatprice }}}</span>
+                            </dd>
+                            <dt>{{ 'Amount incl. VAT' | trans }}</dt>
+                            <dd class="uk-text-right uk-text-large">{{{ total_bruto | formatprice }}}</dd>
+                        </dl>
+
+                        <cart-terms class="uk-margin" :confirmed.sync="cart.confirmed"></cart-terms>
+
+                    </template>
+
+                </div>
+                <div v-else class="uk-width-1-1 uk-alert uk-text-center">
+                    {{ 'No items in your cart yet!' | trans }}
+                </div>
+
+            </div>
+            <div class="uk-flex uk-flex-middle uk-flex-space-between uk-flex-wrap" data-uk-margin>
+                <div>
+                    <button type="button" class="uk-button" :disabled="!cart.items.length"
+                            @click="emptyCart">{{ 'Empty cart' | trans }}</button>
+                </div>
+                <button type="button" class="uk-button uk-button-large uk-button-primary" :disabled="!cart_valid"
+                        @click="doCheckout"><i v-spinner="checkingout" icon="check"></i>{{ 'Order now' | trans }}</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div v-el:checkoutmodal class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-close" @click="checkoutModalClose"></a>
+
+        <div v-if="checkout.error" class="uk-margin-large-top">
+            <div class="uk-alert uk-alert-warning">{{ checkout.errormessage }}</div>
+            <div class="uk-modal-footer uk-text-right">
+                <button type="button" class="uk-button" @click="checkoutModalClose">{{ 'Close' | trans }}</button>
+            </div>
+        </div>
+
+        <div v-if="checkout.redirect_url" class="uk-margin-large-top uk-text-center">
+            <h1 v-if="order.status == 1" class="uk-heading-large"><i class="uk-icon-check uk-text-success uk-margin-small-right"></i>
+                {{ 'Payment successful' | trans }}</h1>
+
+            <p>{{ 'You are redirected...' | trans }}</p>
+
+            <p><i class="uk-icon-refresh uk-icon-spin"></i></p>
+
+        </div>
+
+    </div>
+</div>

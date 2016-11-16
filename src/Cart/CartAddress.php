@@ -1,7 +1,7 @@
 <?php
 
 namespace Bixie\Cart\Cart;
-use Bixie\Framework\Traits\JsonSerializableTrait;
+use Bixie\PkFramework\Traits\JsonSerializableTrait;
 
 
 /**
@@ -67,5 +67,9 @@ class CartAddress implements \JsonSerializable
 	 * @var string
 	 */
 	public $mobile;
+
+    public function fullName () {
+        return ($this->first_name ? $this->first_name . ' ' : '') . ($this->middle_name ? $this->middle_name . ' ' : '') . $this->last_name;
+    }
 
 }
