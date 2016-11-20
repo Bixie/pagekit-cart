@@ -17,20 +17,14 @@
     </div>
     <div>
         <div class="uk-panel uk-panel-box">
-            <div>
-                <div v-show="cart.items.length" class="uk-flex uk-flex-middle uk-flex-space-around">
-                    <strong>{{ nr_items_format }}</strong>
-                    <h4 class="uk-margin-remove">{{{ total_formatted }}}</h4>
-                </div>
-            </div>
             <div class="uk-margin">
                 <div v-show="cart.items.length">
                     <template v-if="delivery_valid">
-                        <h3>{{ 'Delivery options' | trans }}</h3>
+                        <h5>{{ 'Delivery option' | trans }}</h5>
 
                         <cart-delivery v-ref:delivery class="uk-margin"></cart-delivery>
 
-                        <h3>{{ 'Payment options' | trans }}</h3>
+                        <h5>{{ 'Payment option' | trans }}</h5>
 
                         <cart-payment v-ref:payment :card.sync="cart.card" class="uk-margin"></cart-payment>
 
@@ -56,20 +50,24 @@
                             </div>
                         </div>
 
+                        <h5>{{ 'Confirmation' | trans }}</h5>
+
                         <dl class="uk-description-list-horizontal">
-                            <dt>{{ 'Ordered items' | trans }}</dt>
-                            <dd class="uk-text-right">{{{ total_items | formatprice }}}</dd>
-                            <template v-if="delivery_price">
-                                <dt>{{ 'Delivery costs' | trans }}</dt>
-                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ delivery_price | formatprice }}}</span></dd>
-                            </template>
-                            <template v-if="payment_price">
-                                <dt>{{ 'Payment costs' | trans }}</dt>
-                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ payment_price | formatprice }}}</span></dd>
-                            </template>
-                            <template v-if="delivery_price || payment_price">
-                                <dt>{{ 'Amount excl. VAT' | trans }}</dt>
-                                <dd class="uk-text-right">{{{ total_price | formatprice }}}</dd>
+                            <template v-show="filter.show_specs">
+                                <dt>{{ 'Ordered items' | trans }}</dt>
+                                <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ total_items | formatprice }}}</span></dd>
+                                <template v-if="delivery_price">
+                                    <dt>{{ 'Delivery costs' | trans }}</dt>
+                                    <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ delivery_price | formatprice }}}</span></dd>
+                                </template>
+                                <template v-if="payment_price">
+                                    <dt>{{ 'Payment costs' | trans }}</dt>
+                                    <dd class="uk-text-right"><span class="uk-margin-large-right">{{{ payment_price | formatprice }}}</span></dd>
+                                </template>
+                                <template v-if="delivery_price || payment_price">
+                                    <dt>{{ 'Amount excl. VAT' | trans }}</dt>
+                                    <dd class="uk-text-right">{{{ total_price | formatprice }}}</dd>
+                                </template>
                             </template>
                             <dt>{{ 'VAT amount' | trans }}</dt>
                             <dd v-if="vat_calc.low.vat" class="uk-text-right">
@@ -80,7 +78,7 @@
                                 <small class="uk-margin-small-right"><i>{{{ vatLabel('high') }}}</i></small>
                                 <span class="uk-margin-large-right">{{{ vat_calc.high.vat | formatprice }}}</span>
                             </dd>
-                            <dt>{{ 'Amount incl. VAT' | trans }}</dt>
+                            <dt>{{ 'Total amount incl. VAT' | trans }}</dt>
                             <dd class="uk-text-right uk-text-large">{{{ total_bruto | formatprice }}}</dd>
                         </dl>
 

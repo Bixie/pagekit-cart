@@ -2,7 +2,7 @@
     <div class="uk-form uk-form-horizontal">
 
         <div class="uk-flex uk-flex-middle uk-margin">
-            <h3 class="uk-margin-remove">{{ title }}</h3>
+            <h5 class="uk-margin-remove">{{ title }}</h5>
             <a v-show="edit" @click="saveValid" class="uk-margin-small-left">{{ 'Save' | trans }}</a>
             <a v-else @click="edit = true" class="uk-margin-small-left">{{ 'Edit' | trans }}</a>
         </div>

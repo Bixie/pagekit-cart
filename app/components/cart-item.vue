@@ -21,13 +21,13 @@
         },
         watch: {
             'item.quantity': function (qty) {
-                var price = _.find(this.item.quantity_options, 'quantity', qty);
-                console.log('quaCh', price.price);
-                this.item.price = price.price * qty;
-                this.item.currency = price.currency;
+                var quantity = _.find(this.item.quantity_data.quantities, qanty => (qanty.min_quantity <= qty && qanty.max_quantity >= qty));
+                this.item.price = quantity.price * (this.item.quantity_data.type === 'piece' ? qty : 1);
+                this.item.currency = quantity.currency;
             }
         },
-        events: {
+        components: {
+            'cart-item-quantity': require('./cart-item-quantity.vue')
         }
 
     };

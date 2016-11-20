@@ -66,6 +66,10 @@ class CartAddress implements \JsonSerializable
 	/**
 	 * @var string
 	 */
+	public $phone_ext;
+	/**
+	 * @var string
+	 */
 	public $mobile;
 
     public function fullName () {

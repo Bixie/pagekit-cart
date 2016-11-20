@@ -107,7 +107,7 @@ var Currency = function () {
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
         productPrice(options) {
-            return productPrice(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
+            return productPrice(_.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
 
         /**
@@ -118,7 +118,7 @@ var Currency = function () {
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
         inclVat(options) {
-            return inclVat(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
+            return inclVat(_.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
 
         /**
@@ -129,7 +129,7 @@ var Currency = function () {
          * @param {Object} options        {price: Number, currency: 'EUR|USD', vat: 'high|low|none'}
          */
         getVat(options) {
-            return getVat(Object.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
+            return getVat(_.assign({price: 0, currency: 'EUR', vat: 'high'}, options));
         },
         /**
          * Expose number_format

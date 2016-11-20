@@ -34,7 +34,7 @@
         price: 0,
         currency: 'EUR',
         vat: 'high',
-        quantity_options: [],
+        quantity_data: {},
         data: {},
         template: 'default-product'
     };
@@ -75,6 +75,7 @@
                 filter: this.$session.get('bixie.cart.filter', {
                     currency:  '',
                     vat_view: '',
+                    show_specs: false
                 }),
                 reference_show: false,
                 comment_show: false,
@@ -229,19 +230,20 @@
                     this.cart.items.push(_.merge({}, defaultItem, item, {id: md5(item.sku  + item.title + JSON.stringify(item.data))}));
                 }
             },
-            addQuantity(item, quantity) {
-                var des_option = _.find(item.quantity_options, 'quantity', (item.quantity + quantity));
+            addQuantity(item, qty) {
+                var quantities = item.quantity_data.quantities
+                var des_option = _.find(quantities, qanty => (qanty.min_quantity <= qty && qanty.max_quantity >= qty));
                 if (des_option) {
                     item.quantity = des_option.quantity;
                     item.price = des_option.price * item.quantity;
                     item.currency = des_option.currency;
                 } else {
                     //todo refine this. now goto next option
-                    var idx = _.findIndex(item.quantity_options, 'quantity', quantity);
-                    if (idx < item.quantity_options.length) {
-                        item.quantity = item.quantity_options[(idx + 1)].quantity;
-                        item.price = item.quantity_options[(idx + 1)].price * item.quantity;
-                        item.currency = item.quantity_options[(idx + 1)].currency;
+                    var idx = _.findIndex(quantities, 'quantity', qty);
+                    if (idx < item.quantity_data.length) {
+                        item.quantity = quantities[(idx + 1)].quantity;
+                        item.price = quantities[(idx + 1)].price * item.quantity;
+                        item.currency = quantities[(idx + 1)].currency;
                     }
                 }
             },
