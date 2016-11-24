@@ -12,7 +12,7 @@
                     </div>
                     <div class="uk-flex-item-1">
                         <strong>{{ payment_option.title || payment_option.name }}</strong>
-                        <span v-if="payment_option.price"><br>{{{ payment_option.price | formatprice }}}</span>
+                        <span v-if="payment_option.price"><br>{{{ {price: payment_option.price} | productprice }}}</span>
                     </div>
                 </label>
             </li>
@@ -69,6 +69,11 @@
 
             </form>
         </div>
+
+        <div v-if="$bixCart.validating && !valid" class="uk-alert uk-alert-danger">
+            {{ 'Please select a valid payment option' | trans }}
+        </div>
+
     </div>
 
 </template>
@@ -94,6 +99,9 @@
         },
 
         computed: {
+            valid() {
+                return $bixCart.cart.payment_option_name && (!this.show_card || this.cartCCardForm.validate());
+            },
             show_card: function () {
                 var method = _.find($bixCart.cart.payment_options, 'name', $bixCart.cart.payment_option_name);
                 return method && method.settings.card;
@@ -121,9 +129,6 @@
                     return this.cartCCardForm[field_name].invalid;
                 }
                 return false;
-            },
-            validate: function () {
-                return $bixCart.cart.payment_option_name && (!this.show_card || this.cartCCardForm.validate());
             }
         }
     };

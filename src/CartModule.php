@@ -2,13 +2,12 @@
 
 namespace Bixie\Cart;
 
+use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
 use Bixie\Cart\Payment\PaymentHelper;
-use Pagekit\Application as App;
-use Pagekit\Event\Event;
+use Bixie\Cart\Calculation\OrderCalculator;
 use Pagekit\Module\Module;
 use Bixie\Cart\Cart\CartItemCollection;
-use Pagekit\Application\Exception;
 
 class CartModule extends Module {
 
@@ -52,7 +51,26 @@ class CartModule extends Module {
             };
 		};
 
-	}
+        $app->factory('cartCalculator', function ($app) {
+            return function (Order $order) {
+                return (new OrderCalculator($order, $this->config))->calculate();
+            };
+        });
+
+        $app->on('boot', function () use ($app) {
+            //add mailtypes
+            if (isset($app['emailtypes'])) {
+                $app['emailtypes']->register([
+                    'bixie.cart.admin.order.status' => [
+                        'label' => 'Cart: Change orderstatus',
+                        'classes' => [
+                            'order' => 'Bixie\Cart\Model\Order'
+                        ]
+                    ],
+                ]);
+            }
+        });
+   }
 
     /**
      * @param string $transaction_id
@@ -120,13 +138,20 @@ class CartModule extends Module {
 		}
 	}
 
-	public function formatMoney ($amount, $currency = 'EUR') {
+    /**
+     * @param        $amount
+     * @param string $currency
+     * @param bool   $raw
+     * @return string
+     */
+	public function formatMoney ($amount, $currency = 'EUR', $raw = false) {
+        $symbols = ['EUR' => '€ ','USD' => '$'];
 		$icon = '<i class="' . $this->currency_icons[$currency] . ' uk-margin-small-right"></i>';
 
 		$formats = App::module('system/intl')->getFormats();
 		$numberString = number_format($amount, 2, $formats['NUMBER_FORMATS']['DECIMAL_SEP'], $formats['NUMBER_FORMATS']['GROUP_SEP']);
 
-		return $icon . $numberString;
+		return ($raw ? $symbols[$currency] : $icon) . $numberString;
 	}
 
 	public function getTimeZomes () {

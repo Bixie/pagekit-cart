@@ -2,19 +2,18 @@
 
 namespace Bixie\Cart\Model;
 
-use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\CartItem;
 use Bixie\Cart\Cart\CartItemCollection;
 use Bixie\Cart\Cart\DeliveryOption;
 use Bixie\Cart\Cart\PaymentOption;
 use Pagekit\Application as App;
-use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
 
 /**
  * @Entity(tableClass="@cart_order",eventPrefix="cart_order")
  */
 class Order implements \JsonSerializable {
+
 	use DataModelTrait, OrderModelTrait;
 
 	/* Order not yet payed. */
@@ -69,11 +68,13 @@ class Order implements \JsonSerializable {
 
 	/** @var array */
 	protected static $properties = [
+		'attachments' => 'getAttachments',
 		'valid' => 'isValid',
 		'url' => 'getUrl',
 		'cartItems' => 'getCartItems',
 		'user_username' => 'getUserUsername',
-		'user_name' => 'getUserName'
+		'user_name' => 'getUserName',
+		'status_text' => 'getStatusText',
 	];
 
     public function getUrl () {
@@ -92,6 +93,10 @@ class Order implements \JsonSerializable {
 		return $this->user ? $this->user->username : 'Guest';
 	}
 
+	public function getAttachments () {
+		return []; //todo get invoices
+	}
+
 	/**
 	 * @return CartItem[]
 	 */
@@ -103,35 +108,6 @@ class Order implements \JsonSerializable {
             $cartItems[] = $cartItemData instanceof CartItem ? $cartItemData : $bixieCart->loadItemFromData($cartItemData);
         }
 		return $cartItems;
-	}
-
-	public function calculateOrder () {
-		$this->total_netto = 0;
-		$this->total_bruto = 0;
-        $vat_calc = ['none' => 0, 'low' => 0, 'high' => 0];
-		foreach ($this->getCartItems() as $cartItem) {
-
-			$event = new Event('bixie.calculate.order');
-			App::trigger($event, [$this, $cartItem]);
-
-			$prices = $cartItem->calcPrices($this);
-
-			$this->total_netto += $prices['netto'];
-            $vat_calc[$cartItem->vat] += $prices['netto'] * 100;
-		}
-		if ($delivery_price = $this->get('delivery_option.price', 0)) {
-            $this->total_netto += $delivery_price;
-            $vat_calc['high'] += $delivery_price * 100;
-        }
-		if ($payment_price = $this->get('payment_option.price', 0)) {
-            $this->total_netto += $payment_price;
-            $vat_calc['high'] += $payment_price * 100;
-        }
-
-        $this->total_bruto += (round(
-                                App::cartCalcVat($vat_calc['high'], 'high')
-                                + App::cartCalcVat($vat_calc['low'], 'low')) / 100) + $this->total_netto;
-		return $this;
 	}
 
 	public static function getStatuses () {

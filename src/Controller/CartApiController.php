@@ -2,6 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Calculation\OrderCalculator;
 use Pagekit\Application as App;
 use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\DeliveryHelper;
@@ -12,6 +13,7 @@ use Bixie\Cart\Helper\MailHelper;
 use Bixie\Cart\Model\Order;
 use Bixie\Cart\Payment\PaymentException;
 use Bixie\Cart\Cart\CartItem;
+use Pagekit\Event\Event;
 use Pagekit\User\Model\User;
 use Pagekit\Application\Exception;
 use Pagekit\Util\Arr;
@@ -117,10 +119,19 @@ class CartApiController {
                 $order->reference = $order_data['reference'];
                 $order->cartItemsData = $cartItems;
                 $order->data = array_merge((array)$order->data, $order_data['data'], $handler->getOrderData());
-                $order->calculateOrder();
             } else {
-                $order = Order::createFromHandler($handler, $order_data)->calculateOrder();
+                $order = Order::createFromHandler($handler, $order_data);
             }
+
+            foreach ($order->getCartItems() as $cartItem) {
+                $event = new Event('bixie.cartitem.ordered');
+                App::trigger($event, [$this, $cartItem]);
+            }
+
+            /** @var OrderCalculator $calculator */
+            $calculator = App::cartCalculator($order);
+            $order->total_netto = $calculator->total_netto;
+            $order->total_bruto = $calculator->total_bruto;
 
             /** @var \Omnipay\Common\Message\ResponseInterface $paymentResponse */
             $paymentResponse = App::bixiePayment()->getPayment($handler, $order, $cart['card']);
@@ -138,7 +149,7 @@ class CartApiController {
                 //reset cart
                 App::bixieCart()->reset();
                 $cartItems = [];
-                App::trigger('bixie.cart.payment.confirmed', [$order]);
+                App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
 
 
             }

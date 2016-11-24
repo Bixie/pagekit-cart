@@ -2,6 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Calculation\OrderCalculator;
 use Bixie\Cart\Model\Order;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
@@ -63,13 +64,7 @@ class CartController
 
 		}
 
-        $cartItems = $order->getCartItems();
-		foreach ($cartItems as $cartItem) {
-			$event = new Event('bixie.cart.admin.orderitem');
-			App::trigger($event, [$order, $cartItem]);
-			$cartItem->setTemplate('bixie.cart.admin.order', $event['bixie.cart.admin.order'] ? : '');
-			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
-		}
+		//todo replace by related-item picker
 		$users = App::db()->createQueryBuilder()
 			->from('@system_user')
 			->execute('id, username')
@@ -81,6 +76,23 @@ class CartController
             $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
         }
 
+        $templates = [];
+        /** @var \Bixie\Emailsender\EmailsenderModule $emailsender */
+        if ($emailsender = App::module('bixie/emailsender')) {
+            $templates = array_values($emailsender->loadTexts('bixie.cart.admin.order.'));
+        }
+
+        /** @var OrderCalculator $calculator */
+        $calculator = App::cartCalculator($order);
+
+        $orderItems = $calculator->getItems();
+        foreach ($orderItems as $orderItem) {
+            $event = new Event('bixie.cart.admin.orderitem');
+            App::trigger($event, [$order, $orderItem->getItem()]);
+            $orderItem->getItem()->setTemplate('bixie.cart.admin.order', $event['bixie.cart.admin.order'] ? : '');
+            $orderItem->getItem()->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
+        }
+
         return [
 			'$view' => [
 				'title' => __('Edit order'),
@@ -89,13 +101,15 @@ class CartController
 			'$data' => [
 				'statuses' => Order::getStatuses(),
 				'users' => $users,
+				'templates' => $templates,
 				'config' => $this->cart->config(),
 				'order'  => $order
 			],
-            'cartItems' => $cartItems,
             'invoices' => $invoices,
             'cart' => $this->cart,
-			'order' => $order
+            'calculator' => $calculator,
+            'orderItems' => $orderItems,
+			'order' => $order,
 		];
 
     }

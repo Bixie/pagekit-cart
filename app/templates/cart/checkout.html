@@ -3,6 +3,11 @@
         <cart-item :item.sync="item"></cart-item>
     </li>
 </ul>
+
+<p v-if="cart.items.length" class="uk-text-right">
+    <button type="button" class="uk-button" v-confirm="$trans('Clear all items from the cart?')" @click="emptyCart">{{ 'Empty cart' | trans }}</button>
+</p>
+
 <div class="uk-grid uk-grid-width-medium-1-2" data-uk-grid-margin>
     <div>
         <div class="uk-panel uk-panel-box">
@@ -66,7 +71,9 @@
                                 </template>
                                 <template v-if="delivery_price || payment_price">
                                     <dt>{{ 'Amount excl. VAT' | trans }}</dt>
-                                    <dd class="uk-text-right">{{{ total_price | formatprice }}}</dd>
+                                    <dd class="uk-text-right">
+                                        <span style="border-top: 1px solid #ccc;">{{{ total_price | formatprice }}}</span>
+                                    </dd>
                                 </template>
                             </template>
                             <dt>{{ 'VAT amount' | trans }}</dt>
@@ -79,12 +86,17 @@
                                 <span class="uk-margin-large-right">{{{ vat_calc.high.vat | formatprice }}}</span>
                             </dd>
                             <dt>{{ 'Total amount incl. VAT' | trans }}</dt>
-                            <dd class="uk-text-right uk-text-large">{{{ total_bruto | formatprice }}}</dd>
+                            <dd class="uk-text-right uk-text-large">
+                                <span style="border-top: 1px solid #ccc;">{{{ total_bruto | formatprice }}}</span>
+                            </dd>
                         </dl>
 
-                        <cart-terms class="uk-margin" :confirmed.sync="cart.confirmed"></cart-terms>
+                        <cart-terms v-ref:terms class="uk-margin" :confirmed.sync="cart.confirmed"></cart-terms>
 
                     </template>
+                    <div v-else class="uk-width-1-1 uk-alert uk-text-center">
+                        {{ 'Please provide your shipping address first.' | trans }}
+                    </div>
 
                 </div>
                 <div v-else class="uk-width-1-1 uk-alert uk-text-center">
@@ -92,12 +104,8 @@
                 </div>
 
             </div>
-            <div class="uk-flex uk-flex-middle uk-flex-space-between uk-flex-wrap" data-uk-margin>
-                <div>
-                    <button type="button" class="uk-button" :disabled="!cart.items.length"
-                            @click="emptyCart">{{ 'Empty cart' | trans }}</button>
-                </div>
-                <button type="button" class="uk-button uk-button-large uk-button-primary" :disabled="!cart_valid"
+            <div class="uk-text-right">
+                <button type="button" class="uk-button uk-button-large uk-button-primary" :disabled="!cart.items.length"
                         @click="doCheckout"><i v-spinner="checkingout" icon="check"></i>{{ 'Order now' | trans }}</button>
             </div>
         </div>

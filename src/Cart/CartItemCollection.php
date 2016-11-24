@@ -161,14 +161,14 @@ class CartItemCollection implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * Gets a cartItem by id.
-     * @param  string $id
+     * @param  string $name
      * @return bool
      */
-    public function offsetGet ($id) {
-        if (property_exists($this, $id)) {
-            return $this->$id;
+    public function offsetGet ($name) {
+        if (property_exists($this, $name)) {
+            return $this->$name;
         }
-        return $this->getItem($id);
+        return $this->getItem($name);
     }
 
     /**

@@ -19,6 +19,10 @@ trait OrderModelTrait
      * @return static
      */
     public static function create ($data = []) {
+        //make sure created is a date
+        if (!empty($data['created']) and is_string($data['created'])) {
+            $data['created'] = new \DateTime($data['created']);
+        }
         return static::modelCreate($data);
     }
 

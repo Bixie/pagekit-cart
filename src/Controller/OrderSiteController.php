@@ -2,9 +2,9 @@
 
 namespace Bixie\Cart\Controller;
 
-use Bixie\Cart\Cart\MailHelper;
-use Bixie\Cart\Model\Order;
+use Bixie\Cart\Calculation\OrderCalculator;
 use Pagekit\Application as App;
+use Bixie\Cart\Model\Order;
 use Pagekit\Event\Event;
 
 class OrderSiteController
@@ -77,17 +77,20 @@ class OrderSiteController
 			App::abort(403, __('No access to this order.'));
 		}
 
-		$cartItems = $order->getCartItems();
-		foreach ($cartItems as $cartItem) {
-			$event = new Event('bixie.cart.admin.orderitem');
-			App::trigger($event, [$order, $cartItem]);
-			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
-		}
-
         /** @var \Bixie\Invoicemaker\InvoicemakerModule $invoicemaker */
         $invoices = [];
         if ($invoicemaker = App::module('bixie/invoicemaker')) {
             $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
+        }
+
+        /** @var OrderCalculator $calculator */
+        $calculator = App::cartCalculator($order);
+
+        $orderItems = $calculator->getItems();
+        foreach ($orderItems as $orderItem) {
+            $event = new Event('bixie.cart.admin.orderitem');
+            App::trigger($event, [$order, $orderItem->getItem()]);
+            $orderItem->getItem()->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
         }
 
 		return [
@@ -95,7 +98,8 @@ class OrderSiteController
 				'title' => __('Details of order %transaction_id%', ['%transaction_id%' => $order->transaction_id]),
 				'name' => 'bixie/cart/order.php'
 			],
-			'cartItems' => $cartItems,
+			'calculator' => $calculator,
+			'orderItems' => $orderItems,
 			'invoices' => $invoices,
 			'order' => $order,
 			'cart' => $this->cart,

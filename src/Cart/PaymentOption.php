@@ -49,22 +49,6 @@ class PaymentOption implements \JsonSerializable
         }
 	}
 
-    /**
-     * @param \DateTime $eta_date
-     * @param string    $tz
-     * @return $this
-     */
-    public function setEtaDate ($eta_date, $tz = 'UTC') {
-        if (is_string($eta_date)) {
-            try {
-                $eta_date = new \DateTime($eta_date, new \DateTimeZone($tz));
-            } catch (\InvalidArgumentException $e) {
-                throw new CartException(sprintf('Invalid ETA date', $eta_date));
-            }
-        }
-        $this->eta_date = $eta_date;
-        return $this;
-    }
 
 	/**
 	 * {@inheritdoc}

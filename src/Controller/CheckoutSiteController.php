@@ -2,6 +2,7 @@
 
 namespace Bixie\Cart\Controller;
 
+use Bixie\Cart\Calculation\OrderCalculator;
 use Bixie\Cart\Helper\MailHelper;
 use Bixie\Cart\Helper\UserHelper;
 use Bixie\Cart\Model\Order;
@@ -79,7 +80,10 @@ class CheckoutSiteController
 			App::abort(404, __('Order not found.'));
 		}
 
-		//check payment
+        /** @var OrderCalculator $calculator */
+        $calculator = App::cartCalculator($order);
+
+        //check payment
 		if ($order->status != Order::STATUS_CONFIRMED && $payment_method = App::session()->get('_bixiePayment.redirected')) {
 			try {
 
@@ -95,7 +99,7 @@ class CheckoutSiteController
 
 					//send mail
 //					(new MailHelper($order))->sendMail();
-                    App::trigger('bixie.cart.payment.confirmed', [$order]);
+                    App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
 
 					App::message()->success(__('Payment successful'));
 
@@ -133,17 +137,17 @@ class CheckoutSiteController
 			$content = (new MailHelper($order))->replaceString($content);
 		}
 
-        $cartItems = $order->getCartItems();
-        foreach ($cartItems as $cartItem) {
-			$event = new Event('bixie.cart.orderitem');
-			App::trigger($event, [$order, $cartItem]);
-			$cartItem->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
-		}
-
         /** @var \Bixie\Invoicemaker\InvoicemakerModule $invoicemaker */
         $invoices = [];
         if ($invoicemaker = App::module('bixie/invoicemaker')) {
             $invoices = $invoicemaker->getByExternKey('game2art.order.' . $order->id);
+        }
+
+        $orderItems = $calculator->getItems();
+        foreach ($orderItems as $orderItem) {
+            $event = new Event('bixie.cart.admin.orderitem');
+            App::trigger($event, [$order, $orderItem->getItem()]);
+            $orderItem->getItem()->setTemplate('bixie.cart.order_item', $event['bixie.cart.order_item'] ? : '');
         }
 
         return [
@@ -156,9 +160,10 @@ class CheckoutSiteController
             ],
 			'title' => $this->cart->config('thankyou.title'),
 			'content' => $content,
-            'cartItems' => $cartItems,
             'invoices' => $invoices,
 			'order' => $order,
+            'calculator' => $calculator,
+            'orderItems' => $orderItems,
 			'cart' => $this->cart,
 			'node' => App::node()
 		];

@@ -2,9 +2,9 @@
 
     <div :id="id" class="uk-flex">
         <div class="uk-flex-item-1">
-            <template v-if="item.quantity_data.quantities.length > 1">
+            <template v-if="quantity_data.quantities.length > 1">
 
-                <template v-if="item.quantity_data.type === 'piece'">
+                <template v-if="quantity_data.type === 'piece'">
                     <template v-if="showOptions">
                         <div class="uk-grid uk-grid-small uk-grid-divider uk-margin-small-bottom" :class="'uk-grid-width-1-' + rows">
                             <div v-for="qty in quantity_rows">
@@ -20,7 +20,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="item.quantity_data.quantities.length > rows" class="uk-margin-small-bottom">
+                        <div v-if="quantity_data.quantities.length > rows" class="uk-margin-small-bottom">
                             <div class="uk-button-dropdown" :data-uk-dropdown="`{justify:'#${id}'}`">
 
                                 <!-- This is the element toggling the dropdown -->
@@ -47,12 +47,12 @@
                         </div>
                     </div>
                 </template>
-                <template v-if="item.quantity_data.type === 'total'">
+                <template v-if="quantity_data.type === 'total'">
                     <div class="uk-flex uk-flex-middle uk-form">
                         <label class="uk-form-label">{{ 'Quantity' | trans }}</label>
                         <select class="uk-flex-item-1 uk-margin-small-left"
                                 v-model="item.quantity" number>
-                            <option v-for="qty in item.quantity_data.quantities" :value="qty.min_quantity">
+                            <option v-for="qty in quantity_data.quantities" :value="qty.min_quantity">
                                 {{ $trans('Qty. %min_quantity% : ', {
                                 'min_quantity': qty.min_quantity
                                 }) }}{{ qty | productprice }}
@@ -66,7 +66,7 @@
 
                 <div class="uk-grid uk-grid-small">
                     <div class="uk-width-2-3 uk-text-right">
-                        {{ $trans('Qty. %quantity%', {'quantity': quantity}) }}
+                        {{ $trans('Qty. %quantity%', {'quantity': item.quantity}) }}
                     </div>
                     <div class="uk-width-1-3 uk-flex uk-flex-middle uk-flex-right">
                         <strong class="uk-margin-right uk-text-nowrap">{{{ formatted_price }}}</strong>
@@ -87,6 +87,7 @@
 
         props: {
             item: Object,
+            hash: String,
             rows: {type: Number,  default: 5},
             showOptions: {type: Boolean,  default: false}
         },
@@ -101,16 +102,19 @@
         },
 
         watch: {
-            quantity(qty) {
-                var quantity = _.find(this.item.quantity_data.quantities, qanty => (qanty.min_quantity <= qty && qanty.max_quantity >= qty));
-                this.item.price = quantity.price * (this.item.quantity_data.type === 'piece' ? qty : 1);
+            'item.quantity + hash': function () {
+                var quantity = _.find(this.quantity_data.quantities, qanty => (qanty.min_quantity <= this.item.quantity && qanty.max_quantity >= this.item.quantity));
+                this.item.price = quantity.price * (this.quantity_data.type === 'piece' ? this.item.quantity : 1);
                 this.item.currency = quantity.currency;
             }
         },
 
         computed: {
+            quantity_data() {
+                return this.item.quantity_data[this.hash] || {quantities: [], type: ''};
+            },
             quantity_rows() {
-                return this.item.quantity_data.quantities.slice(0, this.rows);
+                return this.quantity_data.quantities.slice(0, this.rows);
             },
             formatted_price() {
                 return this.$cartCurrency.productPrice({
@@ -122,7 +126,7 @@
         },
         methods: {
             quantityHeader(qty, idx) {
-                return (idx === (this.item.quantity_data.quantities.length - 1) && (qty.max_quantity === 0 ||  qty.max_quantity > 100000))
+                return (idx === (this.quantity_data.quantities.length - 1) && (qty.max_quantity === 0 ||  qty.max_quantity > 100000))
                         ? this.$trans('Qty. %min_quantity% and up', {
                     'min_quantity': qty.min_quantity,
                     'max_quantity': qty.max_quantity

@@ -26,6 +26,11 @@ use Pagekit\Application as App;
 	<?php endif; ?>
 	<dt><?= __('Payment method') ?></dt>
 	<dd><?= $order->get('payment.method_name') ?></dd>
+	<?php if ($order->issetPayment('status')) : ?>
+	<dt><?= __('Payment provider status') ?></dt>
+	<dd><?= $order->getPayment('status') ?></dd>
+	<?php endif; ?>
+
 	<?php if ($order->get('payment.message')) : ?>
 	<dt><?= __('Payment message') ?></dt>
 	<dd><?= $order->get('payment.message') ?></dd>

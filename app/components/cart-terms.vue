@@ -1,7 +1,7 @@
 <template>
     <div class="uk-form">
 
-        <div class="uk-flex">
+        <div v-el:ui class="uk-flex">
             <div><input id="cart_terms_condicitons" type="checkbox" v-model="confirmed"/></div>
             <div class="uk-margin-left">
                 <label for="cart_terms_condicitons"><strong>{{ 'I agree with the terms and conditions' | trans }}</strong></label><br/>
@@ -57,6 +57,12 @@
         },
 
         methods: {
+            reset: function () {
+                UIkit.$(this.$els.ui).removeClass('uk-animation-shake uk-form-danger');
+            },
+            invalid: function () {
+                this.$nextTick(() => UIkit.$(this.$els.ui).addClass('uk-animation-shake uk-form-danger'));
+            },
             showTerms() {
                 this.show = true;
                 if (!this.content) {

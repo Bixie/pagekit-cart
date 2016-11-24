@@ -193,6 +193,53 @@ class PaymentHelper {
 	 * @return ResponseInterface
 	 * @throws PaymentException
 	 */
+	public function fetchTransaction ($type, Order &$order) {
+		// Setup payment gateway
+		if (!isset($this->config[$type])) {
+			throw new PaymentException("Payment method $type not found in configuration");
+		}
+
+        try {
+
+            $gateway = Omnipay::create($type);
+
+            if (!method_exists($gateway, 'fetchTransaction')) {
+                throw new PaymentException("Payment method $type does not support fetchTransaction");
+            }
+
+            $gateway->initialize($this->config[$type]);
+
+            $response = $gateway->fetchTransaction([
+                'transactionReference' => $order->getPayment('id')
+            ])->send();
+
+            // Process response
+            if ($response->isSuccessful()) {
+
+                // Payment was successful
+                $order->set('payment.success', true);
+
+            } else {
+
+                // Payment failed
+                $order->set('payment.success', false);
+                $order->set('payment.message', $response->getMessage());
+            }
+
+            return $response;
+
+        } catch (\Exception $e) {
+            throw new PaymentException($e->getMessage(), $e->getCode(), $e);
+        }
+
+    }
+
+	/**
+	 * @param string $type
+	 * @param Order  $order
+	 * @return ResponseInterface
+	 * @throws PaymentException
+	 */
 	public function getReturn ($type, Order &$order) {
 		// Setup payment gateway
 		if (!isset($this->config[$type])) {

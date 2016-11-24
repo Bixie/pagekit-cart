@@ -4,6 +4,7 @@
  * @var $view
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
+ * @var Bixie\Cart\Calculation\ItemCalculator[] $orderItems
  */
 
 ?>
@@ -30,7 +31,7 @@
 </div>
 
 <div style="margin: 20px 0">
-	<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order')) ?>
+	<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'orderItems')) ?>
 </div>
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%">

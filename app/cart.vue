@@ -72,6 +72,7 @@
                 checkout_template: 'default-cart-checkout',
                 error: '',
                 checkouterror: '',
+                validating: false,
                 filter: this.$session.get('bixie.cart.filter', {
                     currency:  '',
                     vat_view: '',
@@ -205,9 +206,6 @@
             },
             delivery_valid() {
                 return this.$refs.delivery_address && this.$refs.delivery_address.validate();
-            },
-            cart_valid() {
-                return !!(this.delivery_valid && this.cart.delivery_option_id && this.cart.payment_option_name && this.cart.confirmed)
             }
         },
 
@@ -276,17 +274,23 @@
                 var valid = true;
                 ['delivery', 'payment'].forEach(ref => {
                     if (this.$refs[ref]) {
-                        var res = this.$refs[ref].validate();
+                        var res = this.$refs[ref].valid;
                         valid = valid ? res : false;
                     }
                 });
+                if (this.$refs.terms && !this.$refs.terms.confirmed) {
+                    setTimeout(() => this.$refs.terms.invalid(), 50);
+                    return false;
+                }
                 return valid;
             },
             doCheckout() {
+                this.validating  = true;
+                this.resetErrors();
                 if (!this.validate()) {
                     return;
                 }
-                this.resetErrors();
+                this.validating  = false;
                 this.checkingout = true;
                 console.log('checkout ' + this.cart.items.length);
                 this.Cart.checkout({}, {cart: this.cart, order_data: this.order, user_data: {}}).then(res => {
@@ -339,6 +343,9 @@
                 });
             },
             resetErrors() {
+                if (this.$refs.terms) {
+                    this.$refs.terms.reset();
+                }
                 this.checkouterror = '';
                 this.error = '';
             },

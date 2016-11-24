@@ -160,6 +160,45 @@ class OrderApiController {
 	}
 
 	/**
+	 * @Route("/fetchtransaction/{id}", methods="POST", requirements={"id"="\d+"})
+	 * @Request({"id": "int"}, csrf=true)
+	 * @Access("cart: manage orders")
+	 */
+	public function fetchtransactionAction($id = 0) {
+
+        if (!$id || !$order = Order::find($id)) {
+
+            if ($id) {
+                App::abort(404, __('Order not found.'));
+            }
+
+            App::abort(401, __('Orders cannot be created.'));
+        }
+
+        try {
+
+            /** @var \Omnipay\Common\Message\ResponseInterface $paymentResponse */
+            $paymentResponse = App::bixiePayment()->fetchTransaction($order->get('payment.method_name'), $order);
+
+            if ($paymentResponse->isSuccessful()) {
+                $order->status = max(Order::STATUS_CONFIRMED, $order->status);
+            }
+
+            $order->payment = $paymentResponse->getData();
+            $order->save();
+
+            return compact('order');
+
+        } catch (Exception $e) {
+
+            App::abort(400, $e->getMessage());
+
+        }
+
+
+    }
+
+	/**
 	 * @Route("/", methods="POST")
 	 * @Route("/{id}", methods="POST", requirements={"id"="\d+"})
 	 * @Request({"order": "array", "id": "int"}, csrf=true)

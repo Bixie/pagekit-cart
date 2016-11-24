@@ -2,7 +2,7 @@
 /**
  * @var $view
  * @var Bixie\Invoicemaker\Model\Invoice[] $invoices
- * @var Bixie\Cart\Cart\CartItem[] $cartItems
+ * @var Bixie\Cart\Calculation\ItemCalculator[] $orderItems
  * @var Bixie\Cart\Model\Order $order
  * @var Bixie\Cart\CartModule $cart
  */
@@ -40,26 +40,8 @@ $payment_price = $order->get('payment_option.price', 0);
 
 		<div class="uk-grid" data-uk-grid-margin>
 			<div class="uk-width-medium-2-3">
-				<dl class="uk-description-list uk-description-list-horizontal">
-					<?php if ($delivery_price || $payment_price) : ?>
-						<dt><?= __('Ordered items') ?></dt>
-						<dd class="uk-text-right"><?= $cart->formatMoney(($order->total_netto - $delivery_price - $payment_price), $order->currency) ?></dd>
-						<?php if ($delivery_price) : ?>
-							<dt><?= __('Delivery costs') ?></dt>
-							<dd class="uk-text-right"><?= $cart->formatMoney($delivery_price, $order->currency) ?></dd>
-						<?php endif; ?>
-						<?php if ($payment_price) : ?>
-							<dt><?= __('Payment costs') ?></dt>
-							<dd class="uk-text-right"><?= $cart->formatMoney($payment_price, $order->currency) ?></dd>
-						<?php endif; ?>
-					<?php endif; ?>
-					<dt><?= __('Amount excl. VAT') ?></dt>
-					<dd class="uk-text-right"><?= $cart->formatMoney($order->total_netto, $order->currency) ?></dd>
-					<dt><?= __('VAT amount') ?></dt>
-					<dd class="uk-text-right"><?= $cart->formatMoney($order->total_bruto - $order->total_netto, $order->currency) ?></dd>
-					<dt><?= __('Amount incl. VAT') ?></dt>
-					<dd class="uk-text-large uk-text-right"><?= $cart->formatMoney($order->total_bruto, $order->currency) ?></dd>
-				</dl>
+				<?= $view->render('bixie/cart/templates/order_totals.php', compact('cart', 'calculator')) ?>
+
 				<dl class="uk-description-list uk-description-list-horizontal">
 					<dt><?= __('Order comment') ?></dt>
 					<dd><?= $order->get('comment') ? nl2br($order->get('comment')) : '-' ?></dd>
@@ -86,7 +68,7 @@ $payment_price = $order->get('payment_option.price', 0);
 	</div>
 
 	<div class="uk-margin">
-		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'cartItems')) ?>
+		<?= $view->render('bixie/cart/templates/order_items.php', compact('cart', 'order', 'orderItems')) ?>
 	</div>
 
 	<div class="uk-grid uk-grid-medium" data-uk-grid-match="{target: '.uk-panel'}" data-uk-grid-margin="">

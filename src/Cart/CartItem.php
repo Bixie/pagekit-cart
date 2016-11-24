@@ -3,6 +3,9 @@
 namespace Bixie\Cart\Cart;
 
 use Bixie\Cart\Model\Order;
+use Bixie\Cart\Calculation\Price\Quantity;
+use Bixie\Cart\Calculation\Price\QuantityCollection;
+use Bixie\Cart\Calculation\Prop\PropModelTrait;
 use Pagekit\Application as App;
 use Pagekit\Event\Event;
 use Pagekit\System\Model\DataModelTrait;
@@ -12,7 +15,7 @@ use Pagekit\System\Model\DataModelTrait;
  */
 class CartItem implements \JsonSerializable
 {
-	use DataModelTrait;
+	use DataModelTrait, PropModelTrait;
 
 	/**
 	 * @var string
@@ -57,6 +60,10 @@ class CartItem implements \JsonSerializable
 	/**
 	 * @var array
 	 */
+	public $quantity_data;
+	/**
+	 * @var array
+	 */
 	protected $templates = [];
 
 	/**
@@ -82,6 +89,17 @@ class CartItem implements \JsonSerializable
 		return $this->id;
 	}
 
+    /**
+     * @return QuantityCollection
+     */
+    public function getQuantityPrices () {
+        $quantities = new QuantityCollection();
+        foreach ($this->quantity_data as $hash => $quantity_data) {
+            $quantities[$hash] = new Quantity($quantity_data);
+        }
+        return $quantities;
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -93,24 +111,6 @@ class CartItem implements \JsonSerializable
 		return null;
 	}
 
-
-	/**
-	 * @param Order $order
-	 * @return array
-	 */
-	public function calcPrices (Order $order) {
-
-		$netto = $this->convertPrice($this->price, $order);
-		$vatclass = App::module('bixie/cart')->config('vatclasses.' . $this->vat);
-		$vat = App::cartCalcVat($netto, $this->vat);
-
-		return [
-			'netto' => $netto,
-			'bruto' => $netto + $vat,
-			'vat' => $vat,
-			'vatclass' => $vatclass
-		];
-	}
 
 	/**
 	 * @param Order $order
@@ -140,20 +140,6 @@ class CartItem implements \JsonSerializable
 	 */
 	public function getTemplate ($name) {
 		return isset($this->templates[$name]) ? $this->templates[$name] : '';
-	}
-
-	/**
-	 * @param float $price
-	 * @param Order $order
-	 * @return float
-	 */
-	protected function convertPrice ($price, Order $order) {
-
-		if ($this->currency !== $order->currency) {
-			$factor = App::module('bixie/cart')->config($this->currency . 'to' . $order->currency);
-			$price = (round(($price * 100) * ($factor ? : 1))) / 100;
-		}
-		return $price;
 	}
 
 	/**
