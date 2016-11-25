@@ -199,6 +199,7 @@
         },
 
         created: function () {
+            this.$bixCart = this.$root;
             this.$nextTick(function () {
                 if (this.validate()) {
                     this.edit = false;
@@ -213,8 +214,7 @@
                 }
             },
             save: function () {
-                this.$dispatch('address.saved');
-                this.edit = false;
+                this.$bixCart.saveCart().then(() => this.edit = false);
             },
             fieldInvalid: function (field_name) {
                 if (this.cartAddressForm && this.cartAddressForm[field_name]) {

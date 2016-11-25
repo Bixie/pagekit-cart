@@ -92,7 +92,7 @@
         },
 
         created: function () {
-            this.$bixCart = window.$bixCart;
+            this.$bixCart = this.$root;
             if ($bixCart.cart.payment_option_name === '' && $bixCart.cart.payment_options.length) {
                 $bixCart.cart.payment_option_name = _.first($bixCart.cart.payment_options).name
             }

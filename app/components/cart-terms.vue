@@ -53,7 +53,7 @@
         },
 
         created() {
-            this.$bixCart = window.$bixCart;
+            this.$bixCart = this.$root;
         },
 
         methods: {

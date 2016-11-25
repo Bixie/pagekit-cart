@@ -71,7 +71,9 @@
                 modal_template: 'default-cart-modal',
                 checkout_template: 'default-cart-checkout',
                 error: '',
+                delivery_errors: [],
                 checkouterror: '',
+                saving: false,
                 validating: false,
                 filter: this.$session.get('bixie.cart.filter', {
                     currency:  '',
@@ -100,12 +102,12 @@
 
         created() {
             this.$cartCurrency.setCartObject(this);
-            var storedCart = localStorage.getItem('bixcart.cart');
             this.Cart = this.$resource('api/cart/cart', {}, {
                 terms: {method: 'GET', url: 'api/cart/cart/terms'},
                 checkout: {method: 'POST', url: 'api/cart/cart/checkout'}
             });
             //localstorage sync
+            var storedCart = localStorage.getItem('bixcart.cart');
             this.cart = storedCart ? JSON.parse(storedCart) : _.assign({}, defaultCart);
             this.$watch('cart', cart => {
                 //fill order info
@@ -117,11 +119,11 @@
             this.$watch('filter', filter => {
                 this.$session.set('bixie.cart.filter', filter);
             }, {deep: true});
-            this.$watch('total_price', this.saveCart);
+//            this.$watch('total_price', this.saveCart);
         },
 
         events: {
-            'address.saved': 'saveCart'
+//            'address.saved': 'saveCart'
         },
 
         watch: {
@@ -227,9 +229,10 @@
                 } else {
                     this.cart.items.push(_.merge({}, defaultItem, item, {id: md5(item.sku  + item.title + JSON.stringify(item.data))}));
                 }
+                return this.saveCart();
             },
             addQuantity(item, qty) {
-                var quantities = item.quantity_data.quantities
+                var quantities = item.quantity_data.quantities;
                 var des_option = _.find(quantities, qanty => (qanty.min_quantity <= qty && qanty.max_quantity >= qty));
                 if (des_option) {
                     item.quantity = des_option.quantity;
@@ -247,22 +250,27 @@
             },
             removeItem(item) {
                 this.cart.items.$remove(item);
+                return this.saveCart();
             },
             emptyCart() {
-                this.cart =  _.assign({}, defaultCart, {delivery_address: this.cart.delivery_address})
+                this.cart =  _.assign({}, defaultCart, {delivery_address: this.cart.delivery_address});
+                return this.saveCart();
             },
             saveCart() {
+                this.saving = true;
                 this.resetErrors();
                 console.log('save ' + this.cart.items.length);
-                this.Cart.save({}, {cart: this.cart}).then(res => {
+                return this.Cart.save({}, {cart: this.cart}).then(res => {
                     console.log('saved ' + res.data.items.length);
                     if (res.data.items) { //valid result?
                         this.cart.items = res.data.items;
                         this.cart.delivery_options = res.data.delivery_options;
                         this.cart.payment_options = res.data.payment_options;
                     }
+                    this.saving = false;
                 }, res => {
                     this.setError(res.data.message || res.data);
+                    this.saving = false;
                 });
             },
             getTerms() {

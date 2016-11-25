@@ -1,7 +1,7 @@
 <template>
     <div class="uk-form">
 
-        <ul v-if="$bixCart.cart.delivery_options.length" class="uk-list uk-list-line">
+        <ul v-if="$bixCart.cart.delivery_options.length && !$bixCart.saving" class="uk-list uk-list-line">
             <li v-for="delivery_option in $bixCart.cart.delivery_options">
                 <label class="uk-flex uk-flex-middle uk-flex-space-between">
                     <div class="uk-margin-right">
@@ -20,6 +20,10 @@
             {{ 'Please select a delivery option' | trans }}
         </div>
 
+        <div v-if="$bixCart.deliveryerror" class="uk-alert uk-alert-danger">
+            {{ deliveryerror }}
+        </div>
+
     </div>
 
 </template>
@@ -33,7 +37,7 @@
         },
 
         created: function () {
-            this.$bixCart = window.$bixCart;
+            this.$bixCart = this.$root;
             this.checkValue();
             this.$watch('$bixCart.cart.delivery_options', this.checkValue);
         },
@@ -46,7 +50,7 @@
 
         methods: {
             checkValue() {
-                if ($bixCart.cart.delivery_options.length) {
+                if (this.$bixCart.cart.delivery_options.length) {
                     var current = _.find(this.$bixCart.cart.delivery_options, {id: this.$bixCart.cart.delivery_option_id});
                     if (!current) {
                         if (!this.$bixCart.cart.delivery_options.length) {

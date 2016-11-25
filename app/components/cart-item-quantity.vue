@@ -38,7 +38,7 @@
                         <div class="uk-width-2-3 uk-flex uk-flex-middle">
                             <label class="uk-form-label">{{ 'Quantity' | trans }}</label>
                             <input type="number" class="uk-flex-item-1 uk-width-1-1 uk-form-large uk-margin-small-left uk-text-center"
-                                   v-model="item.quantity" min="0" number/>
+                                   v-model="item.quantity" min="1" number/>
                         </div>
                         <div class="uk-width-1-3 uk-flex uk-flex-middle uk-flex-right">
                             <strong class="uk-margin-right uk-text-nowrap">
