@@ -64,6 +64,27 @@
 
 						<bixie-fields :config="$options.fields.cart" :values.sync="config"></bixie-fields>
 
+                        <template v-if="invoicemaker_groups.length">
+
+                            <div class="uk-form-row">
+                                <label class="uk-form-label" >{{ 'Invoicemaker group' | trans }}</label>
+                                <div class="uk-form-controls">
+                                    <select v-model="config.invoicemaker_group" class="uk-form-width-medium">
+                                        <option v-for="group in invoicemaker_groups" :value="group.name">{{ group.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="uk-form-row">
+                                <label class="uk-form-label" >{{ 'Invoicemaker template' | trans }}</label>
+                                <div class="uk-form-controls">
+                                    <select v-model="config.invoicemaker_template" class="uk-form-width-medium">
+                                        <option v-for="template in invoicemaker_templates" :value="template.name">{{ template.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </template>
 					</div>
 
 

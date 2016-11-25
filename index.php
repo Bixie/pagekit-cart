@@ -121,6 +121,8 @@ return [
 		'vat' => 'high',
 		'vat_view' => 'incl',
 		'checkout_type' => 'page',
+        'invoicemaker_group' => '',
+        'invoicemaker_template' => 'default',
 		'addtocart' => [
 			'show_vat' => true
 		],
@@ -166,12 +168,6 @@ return [
 	],
 
 	'events' => [
-
-		'boot' => function ($event, $app) {
-			$app->subscribe(
-				new Bixie\Cart\Event\UserListener()
-			);
-		},
 
 		'view.scripts' => function ($event, $scripts) use ($app) {
 			$scripts->register('jstz', 'bixie/cart:assets/jstz-1.0.5.min.js');

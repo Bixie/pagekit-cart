@@ -6,6 +6,8 @@ use Pagekit\Application as App;
 use Bixie\Cart\Model\Order;
 use Bixie\Cart\Payment\PaymentHelper;
 use Bixie\Cart\Calculation\OrderCalculator;
+use Bixie\Cart\Event\CartListener;
+use Bixie\Cart\Event\UserListener;
 use Pagekit\Module\Module;
 use Bixie\Cart\Cart\CartItemCollection;
 
@@ -58,6 +60,10 @@ class CartModule extends Module {
         });
 
         $app->on('boot', function () use ($app) {
+            $app->subscribe(
+                new UserListener(),
+                new CartListener()
+            );
             //add mailtypes
             if (isset($app['emailtypes'])) {
                 $app['emailtypes']->register([

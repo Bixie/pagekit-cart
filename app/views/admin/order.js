@@ -95,7 +95,7 @@ window.CartOrder = {
 
             section: {
                 label: 'Communication',
-                priority: 90
+                priority: 5
             },
 
             props: ['order', 'config', 'form'],
