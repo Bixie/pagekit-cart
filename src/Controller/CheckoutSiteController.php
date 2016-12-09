@@ -3,6 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Calculation\OrderCalculator;
+use Bixie\Cart\CartException;
 use Bixie\Cart\Helper\MailHelper;
 use Bixie\Cart\Helper\UserHelper;
 use Bixie\Cart\Model\Order;
@@ -99,7 +100,14 @@ class CheckoutSiteController
 
 					//send mail
 //					(new MailHelper($order))->sendMail();
-                    App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
+                    try {
+
+                        App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
+
+                    } catch (CartException $e) {
+                        //todo create events on order
+                        $order->set('error', $e->getMessage());
+                    }
 
 					App::message()->success(__('Payment successful'));
 

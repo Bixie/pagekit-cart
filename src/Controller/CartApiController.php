@@ -3,6 +3,7 @@
 namespace Bixie\Cart\Controller;
 
 use Bixie\Cart\Calculation\OrderCalculator;
+use Bixie\Cart\CartDeliveryException;
 use Pagekit\Application as App;
 use Bixie\Cart\Cart\CartHandler;
 use Bixie\Cart\Cart\DeliveryHelper;
@@ -43,25 +44,25 @@ class CartApiController {
         /** @var CartItemCollection $bixieCart */
         /** @var CartItem $cartItem */
         $bixieCart = App::bixieCart();
-        $cartItems = $this->saveCartItems($cart['items']);
+        $this->saveCartItems($cart['items']);
 
         try {
             $handler = new CartHandler($bixieCart);
             $deliveryHelper = new DeliveryHelper($handler);
 
             $handler->setDeliveryAddress($cart['delivery_address']);
-            $delivery_options = $deliveryHelper->getDeliveryOptions();
+            $deliveryOptions = $deliveryHelper->getProviderDeliveryOptions();
 
             $payment_options = App::bixiePayment()->activeGatewaysData();
 
             return array_merge($cart, [
                 'delivery_address' => $handler->getDeliveryAddress(),
-                'delivery_options' => $delivery_options,
+                'deliveryOptions' => $deliveryOptions,
                 'payment_options' => $payment_options,
-                'items' => array_values($cartItems),
+                'items' => array_values($bixieCart->all()),
             ]);
         } catch (CartException $e) {
-            App::abort(400, $e->getMessage());
+            return App::abort(400, $e->getMessage());
         }
     }
 
@@ -149,8 +150,16 @@ class CartApiController {
                 //reset cart
                 App::bixieCart()->reset();
                 $cartItems = [];
-                App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
 
+
+                try {
+
+                    App::trigger('bixie.cart.payment.confirmed', [$order, $calculator]);
+
+                } catch (CartException $e) {
+                    //todo create events on order
+                    $order->set('error', $e->getMessage());
+                }
 
             }
 
@@ -182,7 +191,7 @@ class CartApiController {
 
     /**
      * @param $cartItems
-     * @return array
+     * @return CartItem[]
      */
     protected function saveCartItems ($cartItems) {
         /** @var CartItemCollection $bixieCart */
